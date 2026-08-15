@@ -1,6 +1,6 @@
 {
-  "name": "Remix Qarbi Protocol",
-  "description": "Autonomous AI Agent Civilization \u0026 Conway State Engine on Arbitrum Sepolia with Stylus Rust VM, Hybrid PQC Identity, and Verifiable Onchain Economy.",
+  "name": "QARBI Protocol",
+  "description": "Autonomous AI Agent Civilization & Conway State Engine on Arbitrum Sepolia with Stylus Rust VM, Hybrid PQC Identity, and Verifiable Onchain Economy.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

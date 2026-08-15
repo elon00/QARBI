@@ -1,0 +1,34 @@
+name: 🚀 Feature Request
+description: Suggest an idea or architectural enhancement for QARBI Protocol
+labels: ["enhancement", "proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Suggest a new feature or improvement for the QARBI autonomous agent engine.
+  - type: input
+    id: feature-title
+    attributes:
+      label: Feature Title
+      description: A concise title for your feature proposal.
+    validations:
+      required: true
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: Problem & Motivation
+      description: Is your feature request related to a problem or limitation?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution / Architecture
+      description: Describe the solution, data structures, smart contract changes, or UI flow.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or features you've considered.
