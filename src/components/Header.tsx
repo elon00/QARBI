@@ -41,14 +41,14 @@ export const Header: React.FC<HeaderProps> = ({
             <div>
               <div className="flex items-center space-x-2">
                 <span className="text-2xl font-extrabold tracking-wider bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
-                  {t.appName}
+                  {t?.appName || "Qarbi Protocol"}
                 </span>
                 <span className="px-2 py-0.5 text-[11px] font-semibold tracking-wide uppercase rounded-full bg-cyan-950/80 text-cyan-300 border border-cyan-700/50">
                   Stylus Rust VM
                 </span>
               </div>
               <p className="text-xs text-slate-400 hidden sm:block">
-                {t.tagline}
+                {t?.tagline || "Autonomous Agent Civilization & Conway State Engine on Arbitrum Sepolia"}
               </p>
             </div>
           </div>
@@ -57,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="hidden lg:flex items-center space-x-3 text-xs">
             <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span className="font-mono font-medium text-emerald-400">{t.networkBadge}</span>
+              <span className="font-mono font-medium text-emerald-400">{t?.networkBadge || "Arbitrum Sepolia"}</span>
               <span className="text-slate-600">|</span>
               <span className="text-slate-400 font-mono">Chain 421614</span>
             </div>
@@ -139,7 +139,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="flex items-center space-x-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-md shadow-cyan-900/30 transition active:scale-95 cursor-pointer"
             >
               <Droplets className="w-3.5 h-3.5 text-cyan-200" />
-              <span className="hidden sm:inline">{t.claimFaucet}</span>
+              <span className="hidden sm:inline">{t?.claimFaucet || "Claim Testnet Faucet"}</span>
               <span className="sm:hidden">Faucet</span>
             </button>
 

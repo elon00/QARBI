@@ -174,11 +174,11 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
               <ShieldCheck className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-bold text-white tracking-wide">
-              {t.security.title}
+              {t?.security?.title || "Policy Engine & Security Enclave"}
             </h2>
           </div>
           <p className="mt-1 text-sm text-slate-300">
-            {t.security.subtitle}
+            {t?.security?.subtitle || "4-layer deterministic defense protecting against prompt injections and fund drains."}
           </p>
         </div>
 
@@ -200,7 +200,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
           ) : (
             <>
               <Lock className="w-4 h-4" />
-              <span>{t.security.toggleKillSwitch}</span>
+              <span>{t?.security?.toggleKillSwitch || "Emergency Kill Switch"}</span>
             </>
           )}
         </button>
@@ -212,7 +212,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
           <div className="border-b border-slate-800 pb-3">
             <h3 className="text-sm font-bold text-white flex items-center space-x-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>{t.security.layersTitle}</span>
+              <span>{t?.security?.layersTitle || "4-Layer Defense Architecture"}</span>
             </h3>
           </div>
 
@@ -265,7 +265,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
             <div className="border-b border-slate-800 pb-3 flex items-center justify-between">
               <h3 className="text-sm font-bold text-white flex items-center space-x-2">
                 <ShieldAlert className="w-4 h-4 text-rose-400" />
-                <span>{t.security.attackSimulatorTitle}</span>
+                <span>{t?.security?.attackSimulatorTitle || "Interactive Attack & Vulnerability Simulator"}</span>
               </h3>
               <span className="text-[10px] font-mono text-rose-400 bg-rose-950 px-2 py-0.5 rounded-full border border-rose-800">
                 Stress Testing
@@ -361,7 +361,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
           {/* Audit Stream Table */}
           <div className="space-y-2">
             <h4 className="text-xs font-bold text-slate-300">
-              {t.security.auditLogTitle}
+              {t?.security?.auditLogTitle || "Enclave Security Audit Stream"}
             </h4>
             <div className="max-h-40 overflow-y-auto rounded-xl bg-slate-950 border border-slate-800 text-[11px] divide-y divide-slate-800">
               {securityLogs.slice(0, 8).map((log) => (

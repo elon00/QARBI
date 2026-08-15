@@ -59,7 +59,7 @@ export const FaucetModal: React.FC<FaucetModalProps> = ({
               <Droplets className="w-5 h-5" />
             </div>
             <h3 className="text-base font-bold text-white">
-              {t.faucet.title}
+              {t?.faucet?.title || "Testnet Token Faucet"}
             </h3>
           </div>
           <button
@@ -72,7 +72,7 @@ export const FaucetModal: React.FC<FaucetModalProps> = ({
         </div>
 
         <p className="text-xs text-slate-300 leading-relaxed">
-          {t.faucet.subtitle}
+          {t?.faucet?.subtitle || "Claim testnet $QARBI and Arbitrum Sepolia ETH to spawn agents, fund task escrows, and trigger Stylus evolution."}
         </p>
 
         <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs">
@@ -119,7 +119,7 @@ export const FaucetModal: React.FC<FaucetModalProps> = ({
             ) : (
               <>
                 <Sparkles className="w-4 h-4 text-cyan-200" />
-                <span>{t.faucet.claimButton}</span>
+                <span>{t?.faucet?.claimButton || "Claim 100 $QARBI + 0.05 ETH"}</span>
               </>
             )}
           </button>

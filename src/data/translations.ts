@@ -117,6 +117,11 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationStrings> = {
       downloadPdf: "Export Whitepaper (Markdown)",
       tableOfContents: "Architecture Specifications",
     },
+    faucet: {
+      title: "Testnet Token Faucet",
+      subtitle: "Claim testnet $QARBI and Arbitrum Sepolia ETH to spawn agents, fund task escrows, and trigger Stylus evolution.",
+      claimButton: "Claim 100 $QARBI + 0.05 ETH",
+    },
   },
   es: {
     appName: "Protocolo Qarbi",
@@ -219,6 +224,11 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationStrings> = {
       subtitle: "Fundamentos matemáticos de Autómatas Conway e Identidades PQC.",
       downloadPdf: "Exportar Whitepaper",
       tableOfContents: "Especificaciones de Arquitectura",
+    },
+    faucet: {
+      title: "Faucet de Tokens Testnet",
+      subtitle: "Reclame tokens $QARBI de prueba y ETH de Arbitrum Sepolia para desplegar agentes y crear tareas.",
+      claimButton: "Reclamar 100 $QARBI + 0.05 ETH",
     },
   },
   ja: {
@@ -323,6 +333,11 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationStrings> = {
       downloadPdf: "ホワイトペーパー出力",
       tableOfContents: "アーキテクチャ仕様",
     },
+    faucet: {
+      title: "テストネットトークンフォーセット",
+      subtitle: "テストネットの $QARBI および Arbitrum Sepolia ETH を取得して、エージェントの作成とタスクの実行を行います。",
+      claimButton: "100 $QARBI + 0.05 ETH を請求",
+    },
   },
   zh: {
     appName: "Qarbi 协议",
@@ -425,6 +440,11 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationStrings> = {
       subtitle: "康威元胞自动机数学模型与后量子身份架构。",
       downloadPdf: "导出白皮书",
       tableOfContents: "系统架构技术规范",
+    },
+    faucet: {
+      title: "测试网代币水龙头",
+      subtitle: "领取测试网 $QARBI 和 Arbitrum Sepolia ETH 以生成智能体和执行链上任务。",
+      claimButton: "领取 100 $QARBI + 0.05 ETH",
     },
   },
   ko: {
@@ -529,6 +549,11 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationStrings> = {
       downloadPdf: "백서 내보내기",
       tableOfContents: "아키텍처 명세",
     },
+    faucet: {
+      title: "테스트넷 토큰 수도꼭지",
+      subtitle: "테스트넷 $QARBI 및 Arbitrum Sepolia ETH를 수령하여 에이전트를 생성하고 작업을 실행하세요.",
+      claimButton: "100 $QARBI + 0.05 ETH 받기",
+    },
   },
   fr: {
     appName: "Protocole Qarbi",
@@ -631,6 +656,11 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationStrings> = {
       subtitle: "Fondements mathématiques des automates de Conway et identités PQC.",
       downloadPdf: "Exporter Livre Blanc",
       tableOfContents: "Spécifications de l'Architecture",
+    },
+    faucet: {
+      title: "Robinet de Jetons Testnet",
+      subtitle: "Réclamez des jetons testnet $QARBI et Arbitrum Sepolia ETH pour déployer des agents et créer des tâches.",
+      claimButton: "Réclamer 100 $QARBI + 0.05 ETH",
     },
   },
   de: {
@@ -735,6 +765,11 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationStrings> = {
       downloadPdf: "Whitepaper Exportieren",
       tableOfContents: "Architektur-Spezifikation",
     },
+    faucet: {
+      title: "Testnet Token Faucet",
+      subtitle: "Fordern Sie Testnet-$QARBI und Arbitrum Sepolia ETH an, um Agenten zu erstellen und Aufgaben zu finanzieren.",
+      claimButton: "100 $QARBI + 0.05 ETH Anfordern",
+    },
   },
   pt: {
     appName: "Protocolo Qarbi",
@@ -837,6 +872,11 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationStrings> = {
       subtitle: "Fundamentos matemáticos de Autômatos Conway e Identidades PQC.",
       downloadPdf: "Exportar Whitepaper",
       tableOfContents: "Especificações de Arquitetura",
+    },
+    faucet: {
+      title: "Torneira de Tokens Testnet",
+      subtitle: "Reivindique tokens $QARBI de teste e ETH da Arbitrum Sepolia para criar agentes e tarefas.",
+      claimButton: "Reivindicar 100 $QARBI + 0.05 ETH",
     },
   },
   ru: {
@@ -941,6 +981,11 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationStrings> = {
       downloadPdf: "Экспорт Whitepaper",
       tableOfContents: "Технические спецификации",
     },
+    faucet: {
+      title: "Тестовый кран токенов",
+      subtitle: "Получите тестовые $QARBI и Arbitrum Sepolia ETH для развертывания агентов и выполнения задач.",
+      claimButton: "Получить 100 $QARBI + 0.05 ETH",
+    },
   },
   ar: {
     appName: "بروتوكول قاربي (Qarbi)",
@@ -1044,6 +1089,11 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationStrings> = {
       downloadPdf: "تصدير الورقة البيضاء",
       tableOfContents: "مواصفات الهيكل التقني",
     },
+    faucet: {
+      title: "صنبور عملات شبكة الاختبار",
+      subtitle: "احصل على عملات $QARBI الاختبارية و ETH على Arbitrum Sepolia لإنشاء الوكلاء والمهام.",
+      claimButton: "المطالبة بـ 100 $QARBI + 0.05 ETH",
+    },
   },
   hi: {
     appName: "Qarbi प्रोटोकॉल",
@@ -1146,6 +1196,11 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationStrings> = {
       subtitle: "Conway ऑटोमेटा व हाइब्रिड PQC आइडेंटिटी का गणितीय विवरण।",
       downloadPdf: "व्हाइटपेपर डाउनलोड करें",
       tableOfContents: "आर्किटेक्चर विवरण",
+    },
+    faucet: {
+      title: "टेस्टनेट टोकन नल (Faucet)",
+      subtitle: "एजेंट बनाने और टास्क एस्क्रो फंड करने के लिए टेस्टनेट $QARBI और Arbitrum Sepolia ETH क्लेम करें।",
+      claimButton: "100 $QARBI + 0.05 ETH क्लेम करें",
     },
   },
 };

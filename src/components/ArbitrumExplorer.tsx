@@ -39,11 +39,11 @@ export const ArbitrumExplorer: React.FC<ArbitrumExplorerProps> = ({
               <Activity className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-bold text-white tracking-wide">
-              {t.explorer.title}
+              {t?.explorer?.title || "Arbitrum Sepolia Explorer & Contracts"}
             </h2>
           </div>
           <p className="mt-1 text-sm text-slate-300">
-            {t.explorer.subtitle}
+            {t?.explorer?.subtitle || "Inspect real-time verifiable transactions, contract bytecodes, and Stylus gas efficiency benchmarks."}
           </p>
         </div>
 
@@ -53,7 +53,7 @@ export const ArbitrumExplorer: React.FC<ArbitrumExplorerProps> = ({
           rel="noreferrer"
           className="flex items-center space-x-1.5 px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition"
         >
-          <span>{t.explorer.viewOnArbiscan}</span>
+          <span>{t?.explorer?.viewOnArbiscan || "View on Sepolia Arbiscan"}</span>
           <ExternalLink className="w-3.5 h-3.5" />
         </a>
       </div>
@@ -63,7 +63,7 @@ export const ArbitrumExplorer: React.FC<ArbitrumExplorerProps> = ({
         <div className="flex items-center space-x-2">
           <Sparkles className="w-4 h-4 text-indigo-400" />
           <h3 className="text-sm font-bold text-white">
-            {t.explorer.gasSavingsTitle}
+            {t?.explorer?.gasSavingsTitle || "Arbitrum Stylus Wasm vs Standard EVM Benchmarks"}
           </h3>
         </div>
 
@@ -110,7 +110,7 @@ export const ArbitrumExplorer: React.FC<ArbitrumExplorerProps> = ({
       <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
         <h3 className="text-sm font-bold text-white flex items-center space-x-2">
           <CheckCircle className="w-4 h-4 text-emerald-400" />
-          <span>{t.explorer.verifiedContracts}</span>
+          <span>{t?.explorer?.verifiedContracts || "Verified Protocol Contracts"}</span>
         </h3>
 
         <div className="overflow-x-auto">
@@ -168,7 +168,7 @@ export const ArbitrumExplorer: React.FC<ArbitrumExplorerProps> = ({
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-white flex items-center space-x-2">
             <Activity className="w-4 h-4 text-cyan-400" />
-            <span>{t.explorer.recentTxs}</span>
+            <span>{t?.explorer?.recentTxs || "Live On-Chain Transaction Stream"}</span>
           </h3>
           <span className="text-xs text-emerald-400 font-mono flex items-center space-x-1">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />

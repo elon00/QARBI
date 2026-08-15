@@ -190,18 +190,18 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
                 <Sparkles className="w-5 h-5" />
               </div>
               <h2 className="text-xl font-bold text-white tracking-wide">
-                {t.spawner.title}
+                {t?.spawner?.title || "Autonomous Agent Citadel"}
               </h2>
             </div>
             <p className="mt-1.5 text-sm text-slate-300 max-w-3xl">
-              {t.spawner.subtitle}
+              {t?.spawner?.subtitle || "Provision on-chain AI agents with Hybrid PQC (Dilithium3) commitments, dedicated smart wallets, and Conway state bindings."}
             </p>
           </div>
 
           <div className="flex items-center space-x-3 text-xs bg-slate-950/60 px-4 py-2.5 rounded-xl border border-slate-800">
             <div>
               <span className="text-slate-400 block">Total Active Citizens</span>
-              <span className="font-mono text-lg font-bold text-cyan-300">{agents.length} Agents</span>
+              <span className="font-mono text-lg font-bold text-cyan-300">{agents?.length || 0} Agents</span>
             </div>
             <div className="h-8 w-px bg-slate-800" />
             <div>
@@ -218,7 +218,7 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
             <h3 className="text-base font-bold text-white flex items-center space-x-2">
               <PlusCircle className="w-4 h-4 text-cyan-400" />
-              <span>{t.spawner.createAgentBtn}</span>
+              <span>{t?.spawner?.createAgentBtn || "Spawn New Agent"}</span>
             </h3>
             <span className="text-[11px] font-mono text-cyan-400 bg-cyan-950/80 px-2.5 py-0.5 rounded-full border border-cyan-800/40">
               AgentRegistry.sol
@@ -229,7 +229,7 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
             {/* Agent Designation */}
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">
-                {t.spawner.agentNameLabel} *
+                {t?.spawner?.agentNameLabel || "Agent Designation"} *
               </label>
               <input
                 type="text"
@@ -244,7 +244,7 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
             {/* Functional Archetype */}
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">
-                {t.spawner.archetypeLabel}
+                {t?.spawner?.archetypeLabel || "Functional Archetype"}
               </label>
               <select
                 value={archetype}
@@ -262,7 +262,7 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
             {/* Mission / Description */}
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">
-                {t.spawner.descriptionLabel}
+                {t?.spawner?.descriptionLabel || "Mission & Directives"}
               </label>
               <textarea
                 rows={2}
@@ -282,7 +282,7 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
 
               <div>
                 <div className="flex justify-between text-xs text-slate-400 mb-1">
-                  <span>{t.spawner.singleLimitLabel}</span>
+                  <span>{t?.spawner?.singleLimitLabel || "Single Tx Limit ($QARBI)"}</span>
                   <span className="font-mono text-cyan-300 font-semibold">{singleTxLimit} QARBI</span>
                 </div>
                 <input
@@ -298,7 +298,7 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
 
               <div>
                 <div className="flex justify-between text-xs text-slate-400 mb-1">
-                  <span>{t.spawner.dailyBudgetLabel}</span>
+                  <span>{t?.spawner?.dailyBudgetLabel || "24h Velocity Budget ($QARBI)"}</span>
                   <span className="font-mono text-cyan-300 font-semibold">{dailyBudget} QARBI</span>
                 </div>
                 <input
@@ -325,7 +325,7 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
                   onClick={handleGeneratePQC}
                   className="text-[11px] font-semibold text-indigo-300 hover:text-indigo-200 underline cursor-pointer"
                 >
-                  {pqcIdentity ? "Regenerate Keys" : t.spawner.generatePqcBtn}
+                  {pqcIdentity ? "Regenerate Keys" : (t?.spawner?.generatePqcBtn || "Generate ML-DSA PQC Keypair")}
                 </button>
               </div>
 
@@ -378,7 +378,7 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 text-cyan-200" />
-                  <span>{t.spawner.deployOnchainBtn}</span>
+                  <span>{t?.spawner?.deployOnchainBtn || "Register on AgentRegistry.sol"}</span>
                 </>
               )}
             </button>
@@ -402,8 +402,8 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
           <div className="flex items-center justify-between">
             <h3 className="text-base font-bold text-white flex items-center space-x-2">
               <Layers className="w-4 h-4 text-indigo-400" />
-              <span>{t.spawner.citizenAgentsTitle}</span>
-              <span className="text-xs font-mono font-normal text-slate-400">({agents.length})</span>
+              <span>{t?.spawner?.citizenAgentsTitle || "Registered On-Chain Agents"}</span>
+              <span className="text-xs font-mono font-normal text-slate-400">({agents?.length || 0})</span>
             </h3>
             <span className="text-xs text-slate-400">
               Stylus Engine: <strong className="text-cyan-400">Wasm Evolving</strong>
@@ -411,13 +411,13 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {agents.map((agent) => {
-              const isGraduated = agent.status === "GRADUATED";
-              const isDormant = agent.status === "DORMANT";
+            {agents?.filter(Boolean)?.map((agent) => {
+              const isGraduated = agent?.status === "GRADUATED";
+              const isDormant = agent?.status === "DORMANT";
 
               return (
                 <div
-                  key={agent.id}
+                  key={agent?.id || Math.random()}
                   className={`p-5 rounded-2xl border transition shadow-lg flex flex-col justify-between ${
                     isGraduated
                       ? "bg-gradient-to-b from-amber-950/30 to-slate-900 border-amber-500/50 shadow-amber-950/20"
@@ -431,11 +431,11 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center space-x-2">
-                          <h4 className="font-bold text-white text-base">{agent.name}</h4>
-                          <span className="text-[10px] font-mono text-slate-500">#{agent.id}</span>
+                          <h4 className="font-bold text-white text-base">{agent?.name || "Agent"}</h4>
+                          <span className="text-[10px] font-mono text-slate-500">#{agent?.id}</span>
                         </div>
                         <span className="text-[11px] font-semibold text-cyan-400">
-                          {agent.archetype}
+                          {agent?.archetype}
                         </span>
                       </div>
 
@@ -449,12 +449,12 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
                             : "bg-emerald-950 text-emerald-300 border-emerald-700"
                         }`}
                       >
-                        {isGraduated ? "🎓 Graduated" : agent.status}
+                        {isGraduated ? "🎓 Graduated" : (agent?.status || "ACTIVE")}
                       </span>
                     </div>
 
                     <p className="mt-2.5 text-xs text-slate-300 line-clamp-2">
-                      {agent.description}
+                      {agent?.description || ""}
                     </p>
 
                     {/* Progress Bars: Reputation & Energy */}
@@ -463,16 +463,16 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
                         <div className="flex justify-between text-[11px] mb-1">
                           <span className="text-slate-400 flex items-center space-x-1">
                             <Award className="w-3 h-3 text-amber-400" />
-                            <span>{t.spawner.reputationLabel}</span>
+                            <span>{t?.spawner?.reputationLabel || "Reputation"}</span>
                           </span>
                           <span className="font-mono font-bold text-amber-300">
-                            {agent.reputation}/1000
+                            {agent?.reputation || 0}/1000
                           </span>
                         </div>
                         <div className="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
                           <div
                             className="bg-gradient-to-r from-amber-500 to-yellow-400 h-1.5 rounded-full transition-all duration-500"
-                            style={{ width: `${(agent.reputation / 1000) * 100}%` }}
+                            style={{ width: `${((agent?.reputation || 0) / 1000) * 100}%` }}
                           />
                         </div>
                       </div>
@@ -481,16 +481,16 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
                         <div className="flex justify-between text-[11px] mb-1">
                           <span className="text-slate-400 flex items-center space-x-1">
                             <Zap className="w-3 h-3 text-cyan-400" />
-                            <span>{t.spawner.energyLabel}</span>
+                            <span>{t?.spawner?.energyLabel || "Energy"}</span>
                           </span>
                           <span className="font-mono font-bold text-cyan-300">
-                            {agent.energy}/100
+                            {agent?.energy || 0}/100
                           </span>
                         </div>
                         <div className="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
                           <div
                             className="bg-gradient-to-r from-cyan-500 to-blue-500 h-1.5 rounded-full transition-all duration-500"
-                            style={{ width: `${agent.energy}%` }}
+                            style={{ width: `${agent?.energy || 0}%` }}
                           />
                         </div>
                       </div>
@@ -500,11 +500,11 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
                     <div className="mt-3.5 p-2 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono flex items-center justify-between text-slate-400">
                       <span className="text-slate-500 text-[10px]">PQC:</span>
                       <span className="truncate max-w-[140px] text-indigo-300">
-                        {agent.pqcCommitmentHash}
+                        {agent?.pqcCommitmentHash}
                       </span>
                       <button
                         type="button"
-                        onClick={() => copyToClipboard(agent.pqcCommitmentHash, `agent-${agent.id}`)}
+                        onClick={() => copyToClipboard(agent?.pqcCommitmentHash || "", `agent-${agent?.id}`)}
                         className="text-slate-500 hover:text-white transition"
                         title="Copy PQC Hash"
                       >
@@ -516,13 +516,13 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
                   {/* Footer Actions */}
                   <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
                     <div className="text-[11px] text-slate-400">
-                      <span>Tasks: <strong>{agent.completedTasks}</strong></span>
+                      <span>Tasks: <strong>{agent?.completedTasks || 0}</strong></span>
                     </div>
 
                     <div className="flex items-center space-x-2">
                       <button
                         type="button"
-                        onClick={() => onEvolveAgent(agent.id)}
+                        onClick={() => onEvolveAgent(agent?.id || 1)}
                         className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-800 transition cursor-pointer flex items-center space-x-1"
                         title="Call Stylus ConwayEngine.rs evolveState()"
                       >
@@ -532,7 +532,7 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
 
                       <button
                         type="button"
-                        onClick={() => onNavigateToTerminal(agent.name)}
+                        onClick={() => onNavigateToTerminal(agent?.name || "Agent")}
                         className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-800 transition cursor-pointer flex items-center space-x-1"
                       >
                         <span>Command</span>

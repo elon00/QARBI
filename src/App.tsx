@@ -32,7 +32,20 @@ export function App() {
   const [isFaucetOpen, setIsFaucetOpen] = useState<boolean>(false);
   const [terminalActiveAgent, setTerminalActiveAgent] = useState<string | undefined>(undefined);
 
-  const t = TRANSLATIONS[currentLanguage] || TRANSLATIONS.en;
+  const rawT = TRANSLATIONS[currentLanguage] || TRANSLATIONS.en;
+  const t = {
+    ...TRANSLATIONS.en,
+    ...rawT,
+    tabs: { ...TRANSLATIONS.en.tabs, ...(rawT?.tabs || {}) },
+    spawner: { ...TRANSLATIONS.en.spawner, ...(rawT?.spawner || {}) },
+    conway: { ...TRANSLATIONS.en.conway, ...(rawT?.conway || {}) },
+    terminal: { ...TRANSLATIONS.en.terminal, ...(rawT?.terminal || {}) },
+    tasks: { ...TRANSLATIONS.en.tasks, ...(rawT?.tasks || {}) },
+    security: { ...TRANSLATIONS.en.security, ...(rawT?.security || {}) },
+    explorer: { ...TRANSLATIONS.en.explorer, ...(rawT?.explorer || {}) },
+    whitepaper: { ...TRANSLATIONS.en.whitepaper, ...(rawT?.whitepaper || {}) },
+    faucet: { ...TRANSLATIONS.en.faucet, ...(rawT?.faucet || {}) },
+  };
 
   const handleAddAgent = (newAgent: Agent, tx: TransactionRecord) => {
     setAgents((prev) => [newAgent, ...prev]);

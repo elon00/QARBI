@@ -27,11 +27,11 @@ export const WhitepaperViewer: React.FC<WhitepaperViewerProps> = ({ t }) => {
               <FileText className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-bold text-white tracking-wide">
-              {t.whitepaper.title}
+              {t?.whitepaper?.title || "Qarbi Protocol Technical Whitepaper"}
             </h2>
           </div>
           <p className="mt-1 text-sm text-slate-300">
-            {t.whitepaper.subtitle}
+            {t?.whitepaper?.subtitle || "Mathematical foundations of Conway Cellular Automata and Post-Quantum Cryptography on Arbitrum."}
           </p>
         </div>
 

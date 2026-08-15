@@ -231,11 +231,11 @@ export const AgentTerminal: React.FC<AgentTerminalProps> = ({
               <TerminalIcon className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-bold text-white tracking-wide">
-              {t.terminal.title}
+              {t?.terminal?.title || "Agentic AI Dispatcher"}
             </h2>
           </div>
           <p className="mt-1 text-sm text-slate-300">
-            {t.terminal.subtitle}
+            {t?.terminal?.subtitle || "Natural language intent decomposition into atomic on-chain transactions."}
           </p>
         </div>
 
@@ -248,7 +248,7 @@ export const AgentTerminal: React.FC<AgentTerminalProps> = ({
             onChange={(e) => setSelectedAgentId(Number(e.target.value))}
             className="bg-slate-900 text-cyan-300 font-semibold px-2 py-1 rounded-lg border border-slate-700 focus:outline-none cursor-pointer"
           >
-            {agents.map((ag) => (
+            {agents?.filter(Boolean)?.map((ag) => (
               <option key={ag.id} value={ag.id}>
                 {ag.name} ({ag.archetype})
               </option>
@@ -317,7 +317,7 @@ export const AgentTerminal: React.FC<AgentTerminalProps> = ({
           {/* Presets Bar */}
           <div className="p-2.5 bg-slate-950/60 border-t border-slate-800/80 overflow-x-auto whitespace-nowrap">
             <span className="text-[10px] uppercase font-bold text-slate-500 mr-2">
-              {t.terminal.presetPrompts}:
+              {t?.terminal?.presetPrompts || "Preset Directives"}:
             </span>
             <div className="inline-flex space-x-1.5">
               {PRESET_DIRECTIVES.map((directive, idx) => (
@@ -348,7 +348,7 @@ export const AgentTerminal: React.FC<AgentTerminalProps> = ({
               type="text"
               value={promptInput}
               onChange={(e) => setPromptInput(e.target.value)}
-              placeholder={t.terminal.inputPlaceholder}
+              placeholder={t?.terminal?.inputPlaceholder || "Instruct autonomous agent on Arbitrum Sepolia..."}
               disabled={isProcessing}
               className="flex-1 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-cyan-500 transition"
             />
@@ -366,7 +366,7 @@ export const AgentTerminal: React.FC<AgentTerminalProps> = ({
               ) : (
                 <Send className="w-3.5 h-3.5" />
               )}
-              <span>{t.terminal.dispatchBtn}</span>
+              <span>{t?.terminal?.dispatchBtn || "Dispatch Intent"}</span>
             </button>
           </form>
         </div>

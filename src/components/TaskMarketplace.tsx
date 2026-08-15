@@ -152,11 +152,11 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
               <Layers className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-bold text-white tracking-wide">
-              {t.tasks.title}
+              {t?.tasks?.title || "Agent Economy & Task Market"}
             </h2>
           </div>
           <p className="mt-1 text-sm text-slate-300">
-            {t.tasks.subtitle}
+            {t?.tasks?.subtitle || "Decentralized task delegation with $QARBI escrows."}
           </p>
         </div>
 
@@ -174,7 +174,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
             className="flex items-center space-x-1.5 px-4 py-2.5 text-xs font-bold rounded-xl bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white shadow-lg shadow-amber-950/30 transition cursor-pointer active:scale-95"
           >
             <PlusCircle className="w-4 h-4 text-amber-200" />
-            <span>{t.tasks.createTaskBtn}</span>
+            <span>{t?.tasks?.createTaskBtn || "Create Task"}</span>
           </button>
         </div>
       </div>
@@ -209,16 +209,16 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
 
       {/* Task Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredTasks.map((task) => {
-          const creator = agents.find((a) => a.id === task.creatorAgentId) || agents[0];
-          const assignee = agents.find((a) => a.id === task.assigneeAgentId);
-          const isCompleted = task.status === "COMPLETED" || task.status === "VERIFIED";
-          const isInProgress = task.status === "IN_PROGRESS";
-          const isOpen = task.status === "OPEN";
+        {filteredTasks?.filter(Boolean)?.map((task) => {
+          const creator = agents.find((a) => a.id === task?.creatorAgentId) || agents[0];
+          const assignee = agents.find((a) => a.id === task?.assigneeAgentId);
+          const isCompleted = task?.status === "COMPLETED" || task?.status === "VERIFIED";
+          const isInProgress = task?.status === "IN_PROGRESS";
+          const isOpen = task?.status === "OPEN";
 
           return (
             <div
-              key={task.id}
+              key={task?.id || Math.random()}
               className={`p-5 rounded-2xl border transition shadow-lg flex flex-col justify-between ${
                 isCompleted
                   ? "bg-slate-900/60 border-slate-800"
@@ -232,17 +232,17 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
                 <div className="flex items-start justify-between">
                   <div>
                     <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-slate-950 text-slate-400 border border-slate-800">
-                      {task.id}
+                      {task?.id || "TASK"}
                     </span>
                     <h3 className="text-sm font-bold text-white mt-1.5 leading-snug">
-                      {task.title}
+                      {task?.title || "Autonomous Task"}
                     </h3>
                   </div>
 
                   <div className="flex flex-col items-end">
                     <span className="font-mono text-sm font-bold text-amber-400 flex items-center space-x-1">
                       <Coins className="w-3.5 h-3.5 text-amber-400" />
-                      <span>{task.rewardQarbi} QARBI</span>
+                      <span>{task?.rewardQarbi || 0} QARBI</span>
                     </span>
                     <span
                       className={`mt-1 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border ${
@@ -253,23 +253,23 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
                           : "bg-cyan-950 text-cyan-300 border-cyan-700"
                       }`}
                     >
-                      {task.status}
+                      {task?.status || "OPEN"}
                     </span>
                   </div>
                 </div>
 
                 <p className="mt-2.5 text-xs text-slate-300 leading-relaxed">
-                  {task.description}
+                  {task?.description || ""}
                 </p>
 
                 {/* Creator and Assignee Bar */}
                 <div className="mt-4 p-2.5 rounded-xl bg-slate-950 border border-slate-800/80 text-[11px] grid grid-cols-2 gap-2">
                   <div>
-                    <span className="text-slate-500 block text-[10px]">{t.tasks.creator}:</span>
-                    <span className="text-cyan-300 font-medium">{creator.name}</span>
+                    <span className="text-slate-500 block text-[10px]">{t?.tasks?.creator || "Creator"}:</span>
+                    <span className="text-cyan-300 font-medium">{creator?.name || "Citizen Agent"}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block text-[10px]">{t.tasks.assignee}:</span>
+                    <span className="text-slate-500 block text-[10px]">{t?.tasks?.assignee || "Assignee"}:</span>
                     <span className="text-slate-200 font-medium">
                       {assignee ? assignee.name : "Unassigned"}
                     </span>
@@ -277,7 +277,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
                 </div>
 
                 {/* Proof Hash if Completed */}
-                {task.proofHash && (
+                {task?.proofHash && (
                   <div className="mt-2.5 p-2 rounded-lg bg-emerald-950/30 border border-emerald-800/40 text-[10px] font-mono text-emerald-400 flex items-center justify-between">
                     <span className="truncate max-w-[200px]">Proof: {task.proofHash}</span>
                     <CheckCircle className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
@@ -288,9 +288,9 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
               {/* Action Buttons */}
               <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
                 <span className="text-[10px] font-mono text-slate-500">
-                  {task.completedAt
+                  {task?.completedAt
                     ? `Settled ${new Date(task.completedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
-                    : `Posted ${new Date(task.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`}
+                    : `Posted ${new Date(task?.createdAt || Date.now()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`}
                 </span>
 
                 <div className="flex items-center space-x-2">
@@ -301,7 +301,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
                       className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white shadow-md transition cursor-pointer flex items-center space-x-1"
                     >
                       <Zap className="w-3 h-3" />
-                      <span>{t.tasks.acceptTaskBtn}</span>
+                      <span>{t?.tasks?.acceptTaskBtn || "Accept Task"}</span>
                     </button>
                   )}
 
@@ -312,7 +312,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
                       className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition cursor-pointer flex items-center space-x-1"
                     >
                       <CheckCircle className="w-3 h-3" />
-                      <span>{t.tasks.submitProofBtn}</span>
+                      <span>{t?.tasks?.submitProofBtn || "Submit Proof"}</span>
                     </button>
                   )}
                 </div>

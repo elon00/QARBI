@@ -160,11 +160,11 @@ export const ConwayVisualizer: React.FC<ConwayVisualizerProps> = ({
               <Cpu className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-bold text-white tracking-wide">
-              {t.conway.title}
+              {t?.conway?.title || "Arbitrum Stylus Cellular Automaton"}
             </h2>
           </div>
           <p className="mt-1 text-sm text-slate-300">
-            {t.conway.subtitle}
+            {t?.conway?.subtitle || "High-throughput cellular state engine compiled to WebAssembly via Arbitrum Stylus."}
           </p>
         </div>
 
@@ -195,12 +195,12 @@ export const ConwayVisualizer: React.FC<ConwayVisualizerProps> = ({
               {isRunning ? (
                 <>
                   <Pause className="w-3.5 h-3.5" />
-                  <span>{t.conway.pause}</span>
+                  <span>{t?.conway?.pause || "Pause"}</span>
                 </>
               ) : (
                 <>
                   <Play className="w-3.5 h-3.5" />
-                  <span>{t.conway.play}</span>
+                  <span>{t?.conway?.play || "Run Simulation"}</span>
                 </>
               )}
             </button>
@@ -212,7 +212,7 @@ export const ConwayVisualizer: React.FC<ConwayVisualizerProps> = ({
               title="Execute single generation step"
             >
               <SkipForward className="w-3.5 h-3.5" />
-              <span>{t.conway.stepTick}</span>
+              <span>{t?.conway?.stepTick || "Step"}</span>
             </button>
 
             <button
@@ -221,7 +221,7 @@ export const ConwayVisualizer: React.FC<ConwayVisualizerProps> = ({
               className="flex items-center space-x-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer"
             >
               <Shuffle className="w-3.5 h-3.5" />
-              <span>{t.conway.randomize}</span>
+              <span>{t?.conway?.randomize || "Randomize"}</span>
             </button>
 
             <button
@@ -230,13 +230,13 @@ export const ConwayVisualizer: React.FC<ConwayVisualizerProps> = ({
               className="flex items-center space-x-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border border-slate-700 transition cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>{t.conway.clear}</span>
+              <span>{t?.conway?.clear || "Clear"}</span>
             </button>
           </div>
 
           {/* Pattern Presets */}
           <div className="flex items-center space-x-2">
-            <span className="text-xs text-slate-400 font-medium">{t.conway.patternLabel}:</span>
+            <span className="text-xs text-slate-400 font-medium">{t?.conway?.patternLabel || "Presets"}:</span>
             <div className="flex items-center space-x-1.5">
               {PRESET_PATTERNS.map((pattern, idx) => (
                 <button
@@ -260,28 +260,28 @@ export const ConwayVisualizer: React.FC<ConwayVisualizerProps> = ({
         {/* Live Metrics Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs">
           <div>
-            <span className="text-slate-500 block">{t.conway.generation}</span>
+            <span className="text-slate-500 block">{t?.conway?.generation || "Generation"}</span>
             <span className="font-mono text-base font-bold text-cyan-300">
               #{generation}
             </span>
           </div>
 
           <div>
-            <span className="text-slate-500 block">{t.conway.activeCells}</span>
+            <span className="text-slate-500 block">{t?.conway?.activeCells || "Living Cells"}</span>
             <span className="font-mono text-base font-bold text-emerald-400">
               {livingCount} cells
             </span>
           </div>
 
           <div>
-            <span className="text-slate-500 block">{t.conway.synergyFactor}</span>
+            <span className="text-slate-500 block">{t?.conway?.synergyFactor || "Synergy"}</span>
             <span className="font-mono text-base font-bold text-indigo-400">
               {synergyScore}%
             </span>
           </div>
 
           <div>
-            <span className="text-slate-500 block">{t.conway.speedLabel}</span>
+            <span className="text-slate-500 block">{t?.conway?.speedLabel || "Tick Speed"}</span>
             <div className="flex items-center space-x-2 mt-1">
               <input
                 type="range"

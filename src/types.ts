@@ -196,4 +196,9 @@ export interface TranslationStrings {
     downloadPdf: string;
     tableOfContents: string;
   };
+  faucet?: {
+    title: string;
+    subtitle: string;
+    claimButton: string;
+  };
 }
