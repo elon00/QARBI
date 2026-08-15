@@ -163,6 +163,33 @@ npm start
 
 ---
 
+## 🌐 Deploy to Netlify (Live UI/UX Demo)
+
+The project includes built-in configuration ([`netlify.toml`](netlify.toml)) and Netlify Serverless Functions for seamless 1-click deployment on Netlify.
+
+### Option A: Deploy via Netlify Web UI (Recommended)
+1. Log in to [Netlify](https://app.netlify.com/).
+2. Click **"Add new site"** > **"Import an existing project"**.
+3. Select **GitHub** and choose repository [`elon00/QARBI`](https://github.com/elon00/QARBI).
+4. Netlify will automatically detect settings from `netlify.toml`:
+   - **Build command:** `npm run build`
+   - **Publish directory:** `dist`
+   - **Functions directory:** `netlify/functions`
+5. *(Optional)* Add your `GEMINI_API_KEY` under **Site configuration > Environment variables**.
+6. Click **"Deploy QARBI"**. Your live demo URL will be ready in under 1 minute!
+
+### Option B: Deploy via Netlify CLI
+```bash
+# Install Netlify CLI
+npm install -g netlify-cli
+
+# Login to Netlify
+netlify login
+
+# Deploy to production
+netlify deploy --prod --build
+```
+
 ## 📡 API Reference
 
 The server exposes REST endpoints to manage agent identities, simulate Stylus state transitions, and execute AI reasoning tasks.

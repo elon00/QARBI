@@ -84,30 +84,41 @@ export const AgentTerminal: React.FC<AgentTerminalProps> = ({
     setPipelineState({ step: "PLANNING" });
 
     try {
-      // Step 1: Gemini AI Plan Generation
-      const planRes = await fetch("/api/gemini/plan-task", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: rawPrompt,
-          agentContext: {
-            name: activeAgent?.name,
-            archetype: activeAgent?.archetype,
-            reputation: activeAgent?.reputation,
-            singleTxLimit: activeAgent?.singleTxLimit,
-          },
-        }),
-      });
+      let plan: any = null;
+      try {
+        const planRes = await fetch("/api/gemini/plan-task", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: rawPrompt,
+            agentContext: {
+              name: activeAgent?.name,
+              archetype: activeAgent?.archetype,
+              reputation: activeAgent?.reputation,
+              singleTxLimit: activeAgent?.singleTxLimit,
+            },
+          }),
+        });
 
-      const planJson = await planRes.json();
-      const plan = planJson.plan || {
-        taskTitle: `Execute: ${rawPrompt.slice(0, 36)}`,
-        taskDescription: rawPrompt,
-        rewardQarbi: 15,
-        estimatedGasUnits: 4120,
-        policyVerification: { isWithinSingleTxLimit: true },
-        executionSummary: "Autonomous task scheduled on Arbitrum Sepolia.",
-      };
+        if (planRes.ok) {
+          const planJson = await planRes.json();
+          plan = planJson.plan;
+        }
+      } catch {
+        // Graceful offline/demo fallback
+      }
+
+      if (!plan) {
+        plan = {
+          taskTitle: `Execute: ${rawPrompt.slice(0, 36)}`,
+          taskDescription: rawPrompt,
+          suggestedArchetype: activeAgent?.archetype || "RESEARCHER",
+          rewardQarbi: 15,
+          estimatedGasUnits: 4120,
+          policyVerification: { isWithinSingleTxLimit: true, securityRisk: "LOW" },
+          executionSummary: "Autonomous task scheduled on Arbitrum Sepolia.",
+        };
+      }
 
       setPipelineState({ step: "POLICY_CHECK", planData: plan });
 
