@@ -142,15 +142,25 @@ export const ArbitrumExplorer: React.FC<ArbitrumExplorerProps> = ({
                     </span>
                   </td>
                   <td className="py-3 font-mono text-[11px]">
-                    <div className="flex items-center space-x-1 text-cyan-300">
+                    <div className="flex items-center space-x-1.5 text-cyan-300">
                       <span>{contract.address}</span>
                       <button
                         type="button"
                         onClick={() => copyToClipboard(contract.address, contract.name)}
-                        className="text-slate-500 hover:text-white"
+                        className="text-slate-500 hover:text-white cursor-pointer"
+                        title="Copy Address"
                       >
                         <Copy className="w-3 h-3" />
                       </button>
+                      <a
+                        href={`https://sepolia.arbiscan.io/address/${contract.address}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-cyan-400 hover:text-cyan-200"
+                        title="View on Arbiscan Sepolia"
+                      >
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </a>
                     </div>
                   </td>
                   <td className="py-3 text-slate-400 text-[11px]">
@@ -162,6 +172,7 @@ export const ArbitrumExplorer: React.FC<ArbitrumExplorerProps> = ({
           </table>
         </div>
       </div>
+
 
       {/* Live Transaction Ledger */}
       <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
@@ -197,10 +208,18 @@ export const ArbitrumExplorer: React.FC<ArbitrumExplorerProps> = ({
                   >
                     {tx.type}
                   </span>
-                  <span className="font-mono text-cyan-400 font-semibold truncate max-w-[220px]">
-                    {tx.hash}
-                  </span>
+                  <a
+                    href={`https://sepolia.arbiscan.io/tx/${tx.hash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-cyan-400 hover:text-cyan-200 font-semibold truncate max-w-[220px] flex items-center space-x-1"
+                    title="View on Arbiscan"
+                  >
+                    <span>{tx.hash}</span>
+                    <ArrowUpRight className="w-3 h-3 shrink-0" />
+                  </a>
                   <span className="text-slate-500 font-mono text-[10px]">
+
                     Block #{tx.blockNumber}
                   </span>
                 </div>

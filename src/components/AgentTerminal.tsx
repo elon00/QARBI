@@ -20,20 +20,24 @@ import { generateTxHash } from "../lib/crypto";
 interface AgentTerminalProps {
   agents: Agent[];
   activeAgentName?: string;
-  onPostTask: (task: TaskItem, txRecord: TransactionRecord) => void;
+  defaultAgentName?: string;
+  onPostTask?: (task: TaskItem, txRecord: TransactionRecord) => void;
   t: TranslationStrings;
-  isEmergencyLocked: boolean;
+  isEmergencyLocked?: boolean;
+  currentLanguage?: string;
 }
 
 export const AgentTerminal: React.FC<AgentTerminalProps> = ({
   agents,
   activeAgentName,
+  defaultAgentName,
   onPostTask,
   t,
-  isEmergencyLocked,
+  isEmergencyLocked = false,
 }) => {
+  const initialAgentName = defaultAgentName || activeAgentName;
   const [selectedAgentId, setSelectedAgentId] = useState<number>(
-    agents.find((a) => a.name === activeAgentName)?.id || agents[0]?.id || 1
+    agents.find((a) => a.name === initialAgentName)?.id || agents[0]?.id || 1
   );
   const [promptInput, setPromptInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
