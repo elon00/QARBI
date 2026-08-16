@@ -1,5 +1,5 @@
 import React from "react";
-import { ShieldCheck, Cpu, Globe, Droplets, Wallet, Sparkles, ChevronDown, CheckCircle2, AlertCircle } from "lucide-react";
+import { ShieldCheck, Cpu, Globe, Droplets, Wallet, Sparkles, ChevronDown, CheckCircle2, AlertCircle, Rocket } from "lucide-react";
 import { LanguageCode, TranslationStrings } from "../types";
 import { LANGUAGE_OPTIONS } from "../data/translations";
 
@@ -10,6 +10,7 @@ interface HeaderProps {
   userBalanceQarbi: number;
   userBalanceEth: number;
   onOpenFaucet: () => void;
+  onOpenDeployer?: () => void;
   isEmergencyLocked: boolean;
   walletAddress?: string | null;
   isWalletConnected?: boolean;
@@ -24,6 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
   userBalanceQarbi,
   userBalanceEth,
   onOpenFaucet,
+  onOpenDeployer,
   isEmergencyLocked,
   walletAddress,
   isWalletConnected,
@@ -143,6 +145,20 @@ export const Header: React.FC<HeaderProps> = ({
                 </>
               )}
             </div>
+
+            {/* 1-Click Onchain Deployer Button */}
+            {onOpenDeployer && (
+              <button
+                type="button"
+                onClick={onOpenDeployer}
+                className="flex items-center space-x-1.5 px-3 py-2 text-xs font-bold rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-md shadow-emerald-900/30 transition active:scale-95 cursor-pointer"
+                title="Deploy Real Contracts on Arbitrum Sepolia"
+              >
+                <Rocket className="w-3.5 h-3.5 text-emerald-200" />
+                <span className="hidden sm:inline">1-Click Deploy</span>
+                <span className="sm:hidden">Deploy</span>
+              </button>
+            )}
 
             {/* Testnet Faucet Button */}
             <button

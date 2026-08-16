@@ -60,7 +60,7 @@ export interface TransactionRecord {
   blockNumber: number;
   from: string;
   to: string;
-  type: "AGENT_REGISTER" | "CONWAY_EVOLUTION" | "TASK_ESCROW" | "REWARD_PAYOUT" | "KILL_SWITCH" | "FAUCET_CLAIM";
+  type: "AGENT_REGISTER" | "CONWAY_EVOLUTION" | "TASK_ESCROW" | "REWARD_PAYOUT" | "KILL_SWITCH" | "FAUCET_CLAIM" | "TOKEN_DEPLOY";
   value: string;
   status: "CONFIRMED" | "PENDING" | "REVERTED";
   timestamp: number;

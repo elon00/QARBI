@@ -9,6 +9,7 @@ import { SecurityEnclave } from "./components/SecurityEnclave";
 import { ArbitrumExplorer } from "./components/ArbitrumExplorer";
 import { WhitepaperViewer } from "./components/WhitepaperViewer";
 import { FaucetModal } from "./components/FaucetModal";
+import { OnchainDeployerModal } from "./components/OnchainDeployerModal";
 import {
   INITIAL_AGENTS,
   INITIAL_TASKS,
@@ -31,6 +32,7 @@ export function App() {
   const [userBalanceEth, setUserBalanceEth] = useState<number>(0.245);
   const [isEmergencyLocked, setIsEmergencyLocked] = useState<boolean>(false);
   const [isFaucetOpen, setIsFaucetOpen] = useState<boolean>(false);
+  const [isDeployerOpen, setIsDeployerOpen] = useState<boolean>(false);
   const [terminalActiveAgent, setTerminalActiveAgent] = useState<string | undefined>(undefined);
 
   const [wallet, setWallet] = useState<WalletState>({
@@ -132,6 +134,19 @@ export function App() {
     }
   };
 
+  const handleDeploymentSuccess = (
+    _newContracts: Record<string, string>,
+    createdTxRecords: TransactionRecord[]
+  ) => {
+    setTransactions((prev) => [...createdTxRecords, ...prev]);
+    if (wallet.address) {
+      fetchLiveBalances(wallet.address).then((b) => {
+        setUserBalanceQarbi(b.qarbiBalance);
+        setUserBalanceEth(b.ethBalance);
+      });
+    }
+  };
+
   const handleAddAgent = (newAgent: Agent, tx: TransactionRecord) => {
     setAgents((prev) => [newAgent, ...prev]);
     setTransactions((prev) => [tx, ...prev]);
@@ -207,6 +222,7 @@ export function App() {
         userBalanceQarbi={userBalanceQarbi}
         userBalanceEth={userBalanceEth}
         onOpenFaucet={() => setIsFaucetOpen(true)}
+        onOpenDeployer={() => setIsDeployerOpen(true)}
         isEmergencyLocked={isEmergencyLocked}
         walletAddress={wallet.address}
         isWalletConnected={wallet.isConnected}
@@ -276,8 +292,8 @@ export function App() {
         {activeTab === "explorer" && (
           <ArbitrumExplorer
             transactions={transactions}
-            agents={agents}
             t={t}
+            onOpenDeployer={() => setIsDeployerOpen(true)}
           />
         )}
 
@@ -287,6 +303,18 @@ export function App() {
           />
         )}
       </main>
+
+      {/* 1-Click Onchain Deployer Modal */}
+      <OnchainDeployerModal
+        isOpen={isDeployerOpen}
+        onClose={() => setIsDeployerOpen(false)}
+        signer={wallet.signer}
+        walletAddress={wallet.address}
+        isWalletConnected={wallet.isConnected}
+        ethBalance={wallet.ethBalance}
+        onDeploymentSuccess={handleDeploymentSuccess}
+        t={t}
+      />
 
       {/* Testnet Token Faucet Modal */}
       <FaucetModal

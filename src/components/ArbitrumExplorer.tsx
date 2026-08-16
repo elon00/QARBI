@@ -15,11 +15,13 @@ import { VERIFIED_CONTRACTS } from "../data/initialState";
 interface ArbitrumExplorerProps {
   transactions: TransactionRecord[];
   t: TranslationStrings;
+  onOpenDeployer?: () => void;
 }
 
 export const ArbitrumExplorer: React.FC<ArbitrumExplorerProps> = ({
   transactions,
   t,
+  onOpenDeployer,
 }) => {
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
@@ -47,16 +49,29 @@ export const ArbitrumExplorer: React.FC<ArbitrumExplorerProps> = ({
           </p>
         </div>
 
-        <a
-          href="https://sepolia.arbiscan.io"
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center space-x-1.5 px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition"
-        >
-          <span>{t?.explorer?.viewOnArbiscan || "View on Sepolia Arbiscan"}</span>
-          <ExternalLink className="w-3.5 h-3.5" />
-        </a>
+        <div className="flex items-center space-x-3">
+          {onOpenDeployer && (
+            <button
+              type="button"
+              onClick={onOpenDeployer}
+              className="flex items-center space-x-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-950/40 transition cursor-pointer"
+            >
+              <span>🚀 1-Click Deploy On-Chain</span>
+            </button>
+          )}
+
+          <a
+            href="https://sepolia.arbiscan.io"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center space-x-1.5 px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition"
+          >
+            <span>{t?.explorer?.viewOnArbiscan || "View on Sepolia Arbiscan"}</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
       </div>
+
 
       {/* Gas Benchmark Grid */}
       <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
