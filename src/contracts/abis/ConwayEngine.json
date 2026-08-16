@@ -1,0 +1,117 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "livingCount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "entropyScore",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "synergyScore",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "GridStepped",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "COLS",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ROWS",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "livingCells",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "agentCount",
+        "type": "uint256"
+      }
+    ],
+    "name": "calculateAgentSynergy",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint64[24]",
+        "name": "livingGrid",
+        "type": "uint64[24]"
+      }
+    ],
+    "name": "stepGrid",
+    "outputs": [
+      {
+        "internalType": "uint64[24]",
+        "name": "nextGrid",
+        "type": "uint64[24]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "livingCount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "entropyScore",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "synergyScore",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

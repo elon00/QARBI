@@ -1,5 +1,5 @@
 import React from "react";
-import { ShieldCheck, Cpu, Globe, Droplets, Wallet, Sparkles, ChevronDown } from "lucide-react";
+import { ShieldCheck, Cpu, Globe, Droplets, Wallet, Sparkles, ChevronDown, CheckCircle2, AlertCircle } from "lucide-react";
 import { LanguageCode, TranslationStrings } from "../types";
 import { LANGUAGE_OPTIONS } from "../data/translations";
 
@@ -11,6 +11,10 @@ interface HeaderProps {
   userBalanceEth: number;
   onOpenFaucet: () => void;
   isEmergencyLocked: boolean;
+  walletAddress?: string | null;
+  isWalletConnected?: boolean;
+  isCorrectNetwork?: boolean;
+  onConnectWallet?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,9 +25,17 @@ export const Header: React.FC<HeaderProps> = ({
   userBalanceEth,
   onOpenFaucet,
   isEmergencyLocked,
+  walletAddress,
+  isWalletConnected,
+  isCorrectNetwork,
+  onConnectWallet,
 }) => {
   const [isLangMenuOpen, setIsLangMenuOpen] = React.useState(false);
   const currentLangObj = LANGUAGE_OPTIONS.find((l) => l.code === currentLanguage) || LANGUAGE_OPTIONS[0];
+
+  const shortAddress = walletAddress
+    ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+    : null;
 
   return (
     <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 shadow-xl backdrop-blur-md bg-opacity-95">
@@ -143,18 +155,38 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="sm:hidden">Faucet</span>
             </button>
 
-            {/* Simulated Wallet Pill */}
-            <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-xs">
-              <Wallet className="w-3.5 h-3.5 text-slate-400" />
-              <div className="text-right">
-                <div className="font-mono text-cyan-300 font-semibold leading-tight">
-                  {userBalanceQarbi} <span className="text-[10px] text-slate-400">$QARBI</span>
+            {/* Web3 / Trust Wallet Pill */}
+            <button
+              type="button"
+              onClick={onConnectWallet}
+              className={`flex items-center space-x-2.5 px-3 py-1.5 rounded-lg border text-xs transition cursor-pointer ${
+                isWalletConnected
+                  ? "bg-slate-950/90 border-cyan-800/80 hover:border-cyan-500 text-slate-200"
+                  : "bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-600 hover:to-indigo-600 border-indigo-500 text-white font-medium shadow-md shadow-indigo-900/40"
+              }`}
+              title={isWalletConnected ? `Connected: ${walletAddress}` : "Connect Trust Wallet / Web3"}
+            >
+              <Wallet className={`w-3.5 h-3.5 ${isWalletConnected ? "text-cyan-400" : "text-white"}`} />
+              {isWalletConnected ? (
+                <div className="text-right">
+                  <div className="flex items-center space-x-1 font-mono text-cyan-300 font-semibold leading-tight">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                    <span>{shortAddress}</span>
+                    <span className="text-[10px] text-slate-400">({userBalanceQarbi} $QARBI)</span>
+                  </div>
+                  <div className="font-mono text-[10px] text-slate-400 leading-tight">
+                    {userBalanceEth.toFixed(3)} Sepolia ETH
+                  </div>
                 </div>
-                <div className="font-mono text-[10px] text-slate-400 leading-tight">
-                  {userBalanceEth.toFixed(3)} Sepolia ETH
+              ) : (
+                <div className="flex items-center space-x-1.5">
+                  <span>Connect Wallet</span>
+                  <span className="px-1.5 py-0.5 text-[9px] uppercase tracking-wider rounded bg-indigo-900/80 text-indigo-200">
+                    Trust / Web3
+                  </span>
                 </div>
-              </div>
-            </div>
+              )}
+            </button>
           </div>
         </div>
       </div>

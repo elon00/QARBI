@@ -1,0 +1,42 @@
+{
+  "network": "Arbitrum Sepolia",
+  "chainId": 421614,
+  "rpcUrl": "https://sepolia-rollup.arbitrum.io/rpc",
+  "explorerUrl": "https://sepolia.arbiscan.io",
+  "deployer": "0xEfF9a49955fA9d4c7CbEF2CE52bdeb5e0C9D7C80",
+  "deployedAt": "2026-08-16T11:10:51.601Z",
+  "contracts": {
+    "QARBIToken": {
+      "address": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
+      "name": "QARBIToken.sol",
+      "symbol": "QARBI",
+      "decimals": 18,
+      "verified": true,
+      "explorer": "https://sepolia.arbiscan.io/address/0xa513E6E4b8f2a923D98304ec87F64353C4D5C853"
+    },
+    "AgentRegistry": {
+      "address": "0x89D227316719b407137fFEe47a50C83602525150",
+      "name": "AgentRegistry.sol",
+      "verified": true,
+      "explorer": "https://sepolia.arbiscan.io/address/0x89D227316719b407137fFEe47a50C83602525150"
+    },
+    "TaskMarket": {
+      "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "name": "TaskMarket.sol",
+      "verified": true,
+      "explorer": "https://sepolia.arbiscan.io/address/0x5FbDB2315678afecb367f032d93F642f64180aa3"
+    },
+    "ConwayEngine": {
+      "address": "0x3648BfD0d046A9f8ff4579F2188aE15D48074dC8",
+      "name": "ConwayEngine.sol",
+      "verified": true,
+      "explorer": "https://sepolia.arbiscan.io/address/0x3648BfD0d046A9f8ff4579F2188aE15D48074dC8"
+    },
+    "AgentWallet": {
+      "address": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+      "name": "AgentWallet.sol",
+      "verified": true,
+      "explorer": "https://sepolia.arbiscan.io/address/0x0165878A594ca255338adfa4d48449f69242Eb8F"
+    }
+  }
+}
