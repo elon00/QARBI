@@ -21,6 +21,44 @@ export interface WalletState {
   signer: ethers.JsonRpcSigner | null;
 }
 
+// Fallback safety for BroadcastChannel in restricted/sandboxed browser environments
+if (typeof window !== "undefined") {
+  if (typeof (window as any).BroadcastChannel === "undefined") {
+    try {
+      (window as any).BroadcastChannel = class {
+        name: string;
+        onmessage: any = null;
+        constructor(name: string) {
+          this.name = name;
+        }
+        postMessage() {}
+        close() {}
+      };
+    } catch {
+      // Ignore
+    }
+  }
+}
+
+export function getInjectedProvider(): any {
+  if (typeof window === "undefined") return null;
+  const win = window as any;
+
+  // Check Trust Wallet specific provider first
+  if (win.trustwallet?.ethereum) return win.trustwallet.ethereum;
+  if (win.trustwallet) return win.trustwallet;
+
+  // Check multi-provider list (e.g. MetaMask + Trust Wallet)
+  if (win.ethereum?.providers?.length) {
+    const trust = win.ethereum.providers.find((p: any) => p.isTrust || p.isTrustWallet);
+    if (trust) return trust;
+    return win.ethereum.providers[0];
+  }
+
+  if (win.ethereum) return win.ethereum;
+  return null;
+}
+
 export function getPublicRpcProvider(): ethers.JsonRpcProvider {
   return new ethers.JsonRpcProvider(ARBITRUM_SEPOLIA_RPC);
 }
@@ -30,12 +68,12 @@ export async function checkWalletConnection(): Promise<{
   chainId: number | null;
   isCorrectNetwork: boolean;
 }> {
-  if (typeof window === "undefined" || !(window as any).ethereum) {
+  const ethereum = getInjectedProvider();
+  if (!ethereum) {
     return { address: null, chainId: null, isCorrectNetwork: false };
   }
 
   try {
-    const ethereum = (window as any).ethereum;
     const accounts = await ethereum.request({ method: "eth_accounts" });
     const chainIdHex = await ethereum.request({ method: "eth_chainId" });
     const chainId = parseInt(chainIdHex, 16);
@@ -48,7 +86,7 @@ export async function checkWalletConnection(): Promise<{
       };
     }
   } catch (error) {
-    console.error("Error checking wallet connection:", error);
+    console.warn("Silent check of wallet connection:", error);
   }
 
   return { address: null, chainId: null, isCorrectNetwork: false };
@@ -61,61 +99,65 @@ export async function connectWallet(): Promise<{
   provider: ethers.BrowserProvider;
   signer: ethers.JsonRpcSigner;
 }> {
-  if (typeof window === "undefined" || !(window as any).ethereum) {
-    throw new Error("No Web3 wallet (Trust Wallet / MetaMask) found. Please install or enable Trust Wallet.");
+  const ethereum = getInjectedProvider();
+  if (!ethereum) {
+    throw new Error("No Web3 wallet (Trust Wallet / MetaMask) detected. Please ensure your wallet is active.");
   }
 
-  const ethereum = (window as any).ethereum;
-  const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-  if (!accounts || accounts.length === 0) {
-    throw new Error("No accounts selected");
-  }
+  try {
+    const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+    if (!accounts || accounts.length === 0) {
+      throw new Error("No accounts selected in wallet");
+    }
 
-  const provider = new ethers.BrowserProvider(ethereum);
-  const network = await provider.getNetwork();
-  let chainId = Number(network.chainId);
+    const provider = new ethers.BrowserProvider(ethereum, "any");
+    let network = await provider.getNetwork();
+    let chainId = Number(network.chainId);
 
-  if (chainId !== ARBITRUM_SEPOLIA_CHAIN_ID) {
-    try {
-      await ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: ARBITRUM_SEPOLIA_HEX_CHAIN_ID }],
-      });
-      chainId = ARBITRUM_SEPOLIA_CHAIN_ID;
-    } catch (switchError: any) {
-      // If chain has not been added to MetaMask / Trust Wallet, request to add it
-      if (switchError.code === 4902) {
+    if (chainId !== ARBITRUM_SEPOLIA_CHAIN_ID) {
+      try {
         await ethereum.request({
-          method: "wallet_addEthereumChain",
-          params: [
-            {
-              chainId: ARBITRUM_SEPOLIA_HEX_CHAIN_ID,
-              chainName: "Arbitrum Sepolia Testnet",
-              nativeCurrency: {
-                name: "Ethereum",
-                symbol: "ETH",
-                decimals: 18,
-              },
-              rpcUrls: [ARBITRUM_SEPOLIA_RPC, "https://arbitrum-sepolia-rpc.publicnode.com"],
-              blockExplorerUrls: ["https://sepolia.arbiscan.io"],
-            },
-          ],
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: ARBITRUM_SEPOLIA_HEX_CHAIN_ID }],
         });
         chainId = ARBITRUM_SEPOLIA_CHAIN_ID;
-      } else {
-        throw switchError;
+      } catch (switchError: any) {
+        if (switchError.code === 4902 || switchError.message?.includes("Unrecognized chain")) {
+          await ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainId: ARBITRUM_SEPOLIA_HEX_CHAIN_ID,
+                chainName: "Arbitrum Sepolia Testnet",
+                nativeCurrency: {
+                  name: "Ethereum",
+                  symbol: "ETH",
+                  decimals: 18,
+                },
+                rpcUrls: [ARBITRUM_SEPOLIA_RPC, "https://arbitrum-sepolia-rpc.publicnode.com"],
+                blockExplorerUrls: ["https://sepolia.arbiscan.io"],
+              },
+            ],
+          });
+          chainId = ARBITRUM_SEPOLIA_CHAIN_ID;
+        } else {
+          console.warn("Chain switch error ignored:", switchError);
+        }
       }
     }
-  }
 
-  const signer = await provider.getSigner();
-  return {
-    address: accounts[0],
-    chainId,
-    isCorrectNetwork: chainId === ARBITRUM_SEPOLIA_CHAIN_ID,
-    provider,
-    signer,
-  };
+    const signer = await provider.getSigner();
+    return {
+      address: accounts[0],
+      chainId,
+      isCorrectNetwork: chainId === ARBITRUM_SEPOLIA_CHAIN_ID,
+      provider,
+      signer,
+    };
+  } catch (error: any) {
+    console.error("Connect wallet error:", error);
+    throw new Error(error.message || "Failed to connect wallet");
+  }
 }
 
 export function getContractInstances(signerOrProvider?: ethers.Signer | ethers.Provider) {

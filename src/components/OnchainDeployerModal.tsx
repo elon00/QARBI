@@ -11,6 +11,8 @@ import {
   ArrowRight,
   RefreshCw,
   Coins,
+  Key,
+  Wallet,
 } from "lucide-react";
 import { ethers } from "ethers";
 import {
@@ -21,6 +23,7 @@ import {
   AgentWalletArtifact,
 } from "../contracts/contractArtifacts";
 import { TranslationStrings, TransactionRecord } from "../types";
+import { ARBITRUM_SEPOLIA_RPC, getPublicRpcProvider } from "../lib/web3";
 
 interface DeployStep {
   name: string;
@@ -52,6 +55,8 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
   onDeploymentSuccess,
   t,
 }) => {
+  const [deployMode, setDeployMode] = useState<"WALLET" | "PRIVATE_KEY">("WALLET");
+  const [customPrivateKey, setCustomPrivateKey] = useState("");
   const [isDeployingAll, setIsDeployingAll] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [steps, setSteps] = useState<DeployStep[]>([
@@ -65,9 +70,27 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
   if (!isOpen) return null;
 
   const handleStartDeployment = async () => {
-    if (!signer || !isWalletConnected) {
-      alert("Please connect your Trust Wallet or Web3 wallet first.");
-      return;
+    let activeSigner: ethers.Signer | null = null;
+    let activeSenderAddress = walletAddress;
+
+    if (deployMode === "PRIVATE_KEY") {
+      try {
+        const pk = customPrivateKey.trim();
+        const formattedKey = pk.startsWith("0x") ? pk : `0x${pk}`;
+        const provider = getPublicRpcProvider();
+        const pkWallet = new ethers.Wallet(formattedKey, provider);
+        activeSigner = pkWallet;
+        activeSenderAddress = pkWallet.address;
+      } catch (err: any) {
+        alert("Invalid Private Key format: " + err.message);
+        return;
+      }
+    } else {
+      if (!signer || !isWalletConnected) {
+        alert("Please connect your Trust Wallet first, or switch to 'Direct Private Key' mode.");
+        return;
+      }
+      activeSigner = signer;
     }
 
     setIsDeployingAll(true);
@@ -84,7 +107,7 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
       const tokenFactory = new ethers.ContractFactory(
         QARBITokenArtifact.abi,
         QARBITokenArtifact.bytecode,
-        signer
+        activeSigner
       );
       const tokenContract = await tokenFactory.deploy(10000000n);
       const tokenTx = tokenContract.deploymentTransaction();
@@ -101,7 +124,7 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
       createdTxRecords.push({
         hash: tokenTx?.hash || "0x0",
         blockNumber: 18492400,
-        from: walletAddress || "Trust Wallet",
+        from: activeSenderAddress || "Deployer",
         to: tokenAddress,
         type: "TOKEN_DEPLOY",
         value: "10,000,000 QARBI Initial Supply",
@@ -120,7 +143,7 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
       const registryFactory = new ethers.ContractFactory(
         AgentRegistryArtifact.abi,
         AgentRegistryArtifact.bytecode,
-        signer
+        activeSigner
       );
       const registryContract = await registryFactory.deploy();
       const registryTx = registryContract.deploymentTransaction();
@@ -137,7 +160,7 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
       createdTxRecords.push({
         hash: registryTx?.hash || "0x0",
         blockNumber: 18492401,
-        from: walletAddress || "Trust Wallet",
+        from: activeSenderAddress || "Deployer",
         to: registryAddress,
         type: "AGENT_REGISTER",
         value: "PQC Genesis Registry",
@@ -156,7 +179,7 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
       const marketFactory = new ethers.ContractFactory(
         TaskMarketArtifact.abi,
         TaskMarketArtifact.bytecode,
-        signer
+        activeSigner
       );
       const marketContract = await marketFactory.deploy(tokenAddress, registryAddress);
       const marketTx = marketContract.deploymentTransaction();
@@ -178,7 +201,7 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
       const conwayFactory = new ethers.ContractFactory(
         ConwayEngineArtifact.abi,
         ConwayEngineArtifact.bytecode,
-        signer
+        activeSigner
       );
       const conwayContract = await conwayFactory.deploy();
       const conwayTx = conwayContract.deploymentTransaction();
@@ -200,11 +223,11 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
       const walletFactory = new ethers.ContractFactory(
         AgentWalletArtifact.abi,
         AgentWalletArtifact.bytecode,
-        signer
+        activeSigner
       );
       const walletContract = await walletFactory.deploy(
-        walletAddress,
-        walletAddress,
+        activeSenderAddress,
+        activeSenderAddress,
         ethers.parseEther("50"),
         ethers.parseEther("250")
       );
@@ -225,7 +248,10 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
     } catch (error: any) {
       console.error("On-chain deployment error:", error);
       updatedSteps[currentStepIndex].status = "FAILED";
-      updatedSteps[currentStepIndex].error = error?.message || "User rejected transaction or insufficient gas ETH";
+      const rawMsg = error?.message || "Transaction failed";
+      updatedSteps[currentStepIndex].error = rawMsg.includes("Broadcast channel")
+        ? "Browser extension channel error. Switch to 'Direct Private Key' mode below for 100% reliable deployment."
+        : rawMsg;
       setSteps([...updatedSteps]);
       setIsDeployingAll(false);
     }
@@ -247,7 +273,7 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
                 1-Click Arbitrum Sepolia On-Chain Deployer
               </h2>
               <p className="text-xs text-slate-400">
-                Deploy real smart contracts directly to Arbitrum Sepolia with your Trust Wallet
+                Deploy real smart contracts directly to Arbitrum Sepolia
               </p>
             </div>
           </div>
@@ -259,6 +285,53 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
             ✕
           </button>
         </div>
+
+        {/* Mode Selector Tabs */}
+        <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-800 text-xs">
+          <button
+            type="button"
+            onClick={() => setDeployMode("WALLET")}
+            className={`flex-1 flex items-center justify-center space-x-2 py-2 rounded-lg font-medium transition cursor-pointer ${
+              deployMode === "WALLET"
+                ? "bg-slate-800 text-cyan-300 font-bold shadow"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <Wallet className="w-3.5 h-3.5" />
+            <span>Trust Wallet / Extension</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setDeployMode("PRIVATE_KEY")}
+            className={`flex-1 flex items-center justify-center space-x-2 py-2 rounded-lg font-medium transition cursor-pointer ${
+              deployMode === "PRIVATE_KEY"
+                ? "bg-indigo-900/60 text-indigo-300 font-bold border border-indigo-700/50"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <Key className="w-3.5 h-3.5" />
+            <span>Direct Private Key (Bypass Extension Issues)</span>
+          </button>
+        </div>
+
+        {/* Private Key Input (if active) */}
+        {deployMode === "PRIVATE_KEY" && (
+          <div className="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-800/60 space-y-2 text-xs">
+            <label className="block text-indigo-200 font-semibold">
+              Enter Deployer Private Key (with Arbitrum Sepolia ETH):
+            </label>
+            <input
+              type="password"
+              value={customPrivateKey}
+              onChange={(e) => setCustomPrivateKey(e.target.value)}
+              placeholder="0x... (64 hex characters)"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-indigo-700/60 text-indigo-100 font-mono text-xs focus:outline-none focus:border-cyan-400"
+            />
+            <p className="text-[11px] text-indigo-300/80">
+              💡 Bypasses browser extension cross-tab / broadcast channel errors. Keys are only used locally in memory to sign the 5 deployment transactions.
+            </p>
+          </div>
+        )}
 
         {/* Network & Wallet Status Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
@@ -412,21 +485,21 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
             <button
               type="button"
               onClick={handleStartDeployment}
-              disabled={isDeployingAll || !isWalletConnected}
+              disabled={isDeployingAll || (deployMode === "WALLET" && !isWalletConnected)}
               className="w-full flex items-center justify-center space-x-2.5 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-cyan-900/40 transition disabled:opacity-50 active:scale-[0.99] cursor-pointer"
             >
               <Sparkles className="w-4 h-4" />
               <span>
                 {isDeployingAll
-                  ? "Broadcasting to Arbitrum Sepolia (Approve in Trust Wallet)..."
+                  ? "Broadcasting to Arbitrum Sepolia..."
                   : "Deploy 5 QARBI Contracts to Arbitrum Sepolia"}
               </span>
             </button>
           )}
 
-          {!isWalletConnected && (
+          {deployMode === "WALLET" && !isWalletConnected && (
             <p className="text-[11px] text-center text-amber-400">
-              ⚠️ Please connect your Trust Wallet in the top right to deploy.
+              ⚠️ Please connect your Trust Wallet in the top right to deploy, or switch to &quot;Direct Private Key&quot; mode above.
             </p>
           )}
         </div>
