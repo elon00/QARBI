@@ -20,7 +20,7 @@ export function assertConfiguredTestnet(): void {
   const contracts = deployedAddresses.contracts;
   Object.entries(contracts).forEach(([name, value]) => {
     assertAddress(value.address, name);
-    if (value.verified !== true || !value.deploymentTxHash) {
+    if (value.verified !== true || !('deploymentTxHash' in value) || !value.deploymentTxHash) {
       throw new Error(`${name} is not backed by verified Arbitrum Sepolia deployment evidence.`);
     }
   });
