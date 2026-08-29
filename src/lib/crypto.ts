@@ -1,44 +1,37 @@
-/**
- * Development-only PQC identity adapter.
- *
- * This module deliberately does NOT claim to implement ML-DSA-65.
- * A production ML-DSA implementation must come from a vetted cryptographic
- * library and should be integrated behind this interface before mainnet use.
- */
+import { createHash } from 'node:crypto';
+import { createMlDsa65Provider } from './mlDsa65Provider';
 
 export interface PQCIdentityResult {
-  algorithm: "UNVERIFIED-PQC-COMMITMENT";
+  algorithm: 'ML-DSA-65';
   publicKeyHex: string;
   publicKeyPreview: string;
   pqcCommitmentHash: string;
-  delegatedWalletAddress: string;
+  signatureHex: string;
   signaturePreview: string;
   createdAt: number;
 }
 
-function randomHex(length: number): string {
-  const bytes = new Uint8Array(Math.ceil(length / 2));
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("").slice(0, length);
-}
+const encoder = new TextEncoder();
 
-/**
- * Produces a locally generated commitment placeholder for testnet UX only.
- * It must never be advertised as a real ML-DSA keypair/signature.
- */
-export function generatePQCIdentity(_agentName?: string): PQCIdentityResult {
-  const publicKeyHex = `0x${randomHex(3904)}`;
-  const pqcCommitmentHash = `0x${randomHex(64)}`;
-  const delegatedWalletAddress = `0x${randomHex(40)}`;
-  const signaturePreview = `0x${randomHex(130)}`;
+export async function generatePQCIdentity(agentName = 'QARBI-Agent'): Promise<PQCIdentityResult> {
+  const provider = await createMlDsa65Provider();
+  const { publicKey, secretKey } = await provider.keygen();
+  const message = encoder.encode(`QARBI:PQC-IDENTITY:${agentName}`);
+  const signature = await provider.sign(message, secretKey);
+  const valid = await provider.verify(message, signature, publicKey);
+  if (!valid) throw new Error('ML-DSA-65 self-verification failed');
+
+  const publicKeyHex = `0x${Buffer.from(publicKey).toString('hex')}`;
+  const signatureHex = `0x${Buffer.from(signature).toString('hex')}`;
+  const pqcCommitmentHash = `0x${createHash('sha256').update(publicKey).digest('hex')}`;
 
   return {
-    algorithm: "UNVERIFIED-PQC-COMMITMENT",
+    algorithm: 'ML-DSA-65',
     publicKeyHex,
-    publicKeyPreview: `${publicKeyHex.slice(0, 10)}...${publicKeyHex.slice(-8)} (development placeholder)`,
+    publicKeyPreview: `${publicKeyHex.slice(0, 10)}...${publicKeyHex.slice(-8)}`,
     pqcCommitmentHash,
-    delegatedWalletAddress,
-    signaturePreview,
+    signatureHex,
+    signaturePreview: `${signatureHex.slice(0, 10)}...${signatureHex.slice(-8)}`,
     createdAt: Date.now(),
   };
 }
@@ -48,9 +41,8 @@ export function formatAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
-/** Local UI correlation ID. This is NOT a blockchain transaction hash. */
 export function generateOperationId(): string {
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
 }
