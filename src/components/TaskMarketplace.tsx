@@ -54,7 +54,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
 
     const txHash = generateOperationId();
     const newTask: TaskItem = {
-      id: `TASK-${Math.floor(Math.random() * 9000) + 1000}`,
+      id: `TASK-${generateOperationId().slice(0, 8).toUpperCase()}`,
       title: title.trim(),
       description: description.trim(),
       category,
@@ -115,7 +115,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
 
   const handleSubmitProof = (task: TaskItem) => {
     const txHash = generateOperationId();
-    const proofHash = "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+    const proofHash = `LOCAL-PROOF-${generateOperationId()}`;
 
     const updatedTask: TaskItem = {
       ...task,
@@ -218,7 +218,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
 
           return (
             <div
-              key={task?.id || Math.random()}
+              key={task?.id || "task"}
               className={`p-5 rounded-2xl border transition shadow-lg flex flex-col justify-between ${
                 isCompleted
                   ? "bg-slate-900/60 border-slate-800"
