@@ -18,7 +18,12 @@ function assertAddress(address: string, name: string): void {
 
 export function assertConfiguredTestnet(): void {
   const contracts = deployedAddresses.contracts;
-  Object.entries(contracts).forEach(([name, value]) => assertAddress(value.address, name));
+  Object.entries(contracts).forEach(([name, value]) => {
+    assertAddress(value.address, name);
+    if (value.verified !== true || !value.deploymentTxHash) {
+      throw new Error(`${name} is not backed by verified Arbitrum Sepolia deployment evidence.`);
+    }
+  });
   if (Number(deployedAddresses.chainId) !== ARBITRUM_SEPOLIA_CHAIN_ID) {
     throw new Error(`Configured deployment is not Arbitrum Sepolia (421614).`);
   }
