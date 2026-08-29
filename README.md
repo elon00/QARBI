@@ -46,7 +46,7 @@ For ai developers and defi users
 
 ### 2. 🌌 Conway Cellular Automaton
 - **Cellular Entropy State Engine**: Simulates agent lifecycles, synergy accumulation, energy depletion, and evolution on a dynamic grid.
-- **Rust WASM Throughput**: Compiled to WebAssembly via **Arbitrum Stylus**, yielding **10x to 100x gas compression** compared to standard EVM bytecode.
+- **Current execution status**: the checked-in Conway engine is Solidity; a Stylus/Rust deployment is not yet independently verified.
 - **Emergent Multi-Agent Synergy**: Neighboring agent cells share energy, earn reputation boosts, and unlock collaborative archetypes.
 
 ### 3. 🧠 Gemini Agentic Intent Planning
@@ -55,8 +55,8 @@ For ai developers and defi users
 - **Archetype Auto-Assignment**: Categorizes tasks across `RESEARCHER`, `SECURITY_AUDITOR`, `QUANT_TRADER`, `DEFI_OPTIMIZER`, `VALIDATOR`, and `CREATIVE_SYNTH`.
 
 ### 4. 💼 Task Escrow Marketplace Prototype
-- **Smart Escrow Bounties**: Users and parent agents fund tasks with locked `$QARBI` rewards.
-- **Autonomous Task Claiming & Fulfillment**: Autonomous agents evaluate tasks, lock collateral, execute compute, and submit cryptographic proofs of completion.
+- **Escrow design**: smart-contract escrow code exists; live end-to-end settlement evidence remains a release requirement.
+- **Task workflow**: claiming and settlement must be demonstrated against a deployed testnet contract before production claims.
 - **Verifiable Reputation Loop**: Successful executions boost agent reputation scores (0-1000) and unlock higher tier bounties.
 
 ### 5. 🛡️ Autonomous Security Enclave & Emergency Killswitch
@@ -65,7 +65,7 @@ For ai developers and defi users
 - **Interactive Threat Simulator**: Live simulation suite for penetration testing policy limits under adverse network conditions.
 
 ### 6. 🌐 Arbitrum Sepolia Block Explorer & Multi-Language Support
-- **Live Transaction Ledger**: Visualizes block numbers, transaction hashes, gas units consumed, and Stylus gas efficiency savings.
+- **Transaction ledger UI**: local development records are not blockchain evidence; production requires verified receipts and explorer links.
 - **Internationalization (i18n)**: Fully localized across **11 languages** (English, Hindi, Spanish, Japanese, Chinese, Korean, French, German, Portuguese, Russian, Arabic).
 
 ---
@@ -87,7 +87,7 @@ For ai developers and defi users
                                                       v
                                   +---------------------------------------+
                                   |       Policy & Security Enclave       |
-                                  |  - NIST ML-DSA-65 Identity Attestation|
+                                  |  - PQC attestation (release blocker)  |
                                   |  - Spending Limits & Whitelist Check  |
                                   |  - Real-time Threat Guardrails        |
                                   +-------------------+-------------------+
@@ -96,7 +96,7 @@ For ai developers and defi users
                          |                                                         |
                          v                                                         v
     +-----------------------------------------+               +-----------------------------------------+
-    |       Arbitrum Stylus (Rust WASM)       |               |          Arbitrum Sepolia L2            |
+    |       Verified on-chain execution TBD    |               |          Arbitrum Sepolia L2            |
     |      Conway Automata State Engine       |               |        Task & Bounty Escrow             |
     |  - High-throughput Grid Matrix State    |               |  - Agent Registry & Reputations         |
     |  - Sub-microsecond Gas Optimization     |               |  - $QARBI Token Settlements             |
