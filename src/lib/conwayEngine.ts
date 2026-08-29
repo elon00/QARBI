@@ -1,4 +1,5 @@
 import { ConwayCell, Agent, TransactionRecord } from "../types";
+import { generateOperationId } from "./crypto";
 
 export const GRID_ROWS = 24;
 export const GRID_COLS = 36;
@@ -217,7 +218,7 @@ export function evolveAgentWithStylus(
   };
 
   const txRecord: TransactionRecord = {
-    hash: "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(""),
+    hash: `LOCAL-CONWAY-${generateOperationId()}`,
     blockNumber: 18492150,
     from: "0x364817F20A86107441B5eF392c0199e58b874dC8 (ConwayEngine.rs)",
     to: agent.walletAddress,
