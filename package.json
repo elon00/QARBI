@@ -48,7 +48,9 @@
     "pqc:gate": "node scripts/pqc-truthfulness-gate.js",
     "security:taskmarket": "node scripts/taskmarket-security-gate.js",
     "pqc:provider-gate": "node scripts/pqc-provider-gate.js",
-    "pqc:boundary": "node scripts/pqc-boundary-gate.js"
+    "pqc:boundary": "node scripts/pqc-boundary-gate.js",
+    "pqc:smoke": "node scripts/ml-dsa65-smoke.mjs",
+    "pqc:real": "npm run pqc:provider-gate && npm run pqc:boundary && npm run pqc:smoke"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
