@@ -3,12 +3,32 @@
   "version": "1.0.0",
   "description": "Reality-first AI agent and Conway prototype with testnet production-readiness gates",
   "type": "module",
-  "author": {"name": "Martin Luther", "email": "martinlutherupa1@gmail.com", "url": "https://github.com/elon00"},
-  "repository": {"type": "git", "url": "https://github.com/elon00/QARBI.git"},
-  "bugs": {"url": "https://github.com/elon00/QARBI/issues"},
+  "author": {
+    "name": "Martin Luther",
+    "email": "martinlutherupa1@gmail.com",
+    "url": "https://github.com/elon00"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elon00/QARBI.git"
+  },
+  "bugs": {
+    "url": "https://github.com/elon00/QARBI/issues"
+  },
   "homepage": "https://github.com/elon00/QARBI#readme",
   "license": "MIT",
-  "keywords": ["arbitrum","arbitrum-stylus","ai-agents","conway-game-of-life","post-quantum-cryptography","ml-dsa","web4","gemini-ai","blockchain","smart-contracts"],
+  "keywords": [
+    "arbitrum",
+    "arbitrum-stylus",
+    "ai-agents",
+    "conway-game-of-life",
+    "post-quantum-cryptography",
+    "ml-dsa",
+    "web4",
+    "gemini-ai",
+    "blockchain",
+    "smart-contracts"
+  ],
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
@@ -18,7 +38,10 @@
     "lint": "tsc --noEmit",
     "contracts:compile": "node scripts/compile.js",
     "production:guard": "node scripts/production-guard.cjs",
-    "release:gate": "node scripts/release-gate.cjs"
+    "release:gate": "node scripts/release-gate.cjs",
+    "oneclick": "node scripts/one-click.cjs",
+    "oneclick:release": "node scripts/one-click.cjs release",
+    "doctor": "node scripts/one-click.cjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
