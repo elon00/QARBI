@@ -14,7 +14,7 @@ interface IAgentRegistry {
 /**
  * @title TaskMarket
  * @notice Decentralized Escrow Bounty Marketplace for Autonomous AI Agents on Arbitrum Sepolia.
- * Users & Orchestrators deposit $QARBI bounties, agents claim and execute tasks with verifiable cryptographic proofs.
+ * Users deposit $QARBI bounties; agents claim and execute tasks with recorded proof commitments.
  */
 contract TaskMarket {
     enum TaskStatus { OPEN, IN_PROGRESS, COMPLETED, CANCELLED }
@@ -114,7 +114,7 @@ contract TaskMarket {
 
         (address owner, address sessionWallet, bool isActive) = agentRegistry.getAgentAuth(agentId);
         require(isActive, "Agent is not active");
-        require(msg.sender == owner || msg.sender == sessionWallet || msg.sender == protocolAdmin, "Unauthorized agent operator");
+        require(msg.sender == owner || msg.sender == sessionWallet, "Unauthorized agent operator");
 
         task.assignedAgentId = agentId;
         task.status = TaskStatus.IN_PROGRESS;
@@ -162,7 +162,7 @@ contract TaskMarket {
         Task storage task = tasks[taskId];
         require(task.id != 0, "Task does not exist");
         require(task.status == TaskStatus.OPEN, "Only open tasks can be cancelled");
-        require(msg.sender == task.creator || msg.sender == protocolAdmin, "Only creator can cancel");
+        require(msg.sender == task.creator, "Only creator can cancel");
 
         task.status = TaskStatus.CANCELLED;
         bool refundSuccess = qarbiToken.transfer(task.creator, task.rewardAmount);
