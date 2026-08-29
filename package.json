@@ -1,7 +1,7 @@
 {
   "name": "qarbi-protocol",
   "version": "1.0.0",
-  "description": "Autonomous AI Agent Civilization & Conway State Engine on Arbitrum Sepolia with Stylus Rust VM, Hybrid PQC Identity, and Verifiable Onchain Economy",
+  "description": "Autonomous AI Agent Civilization & Conway State Engine on Arbitrum Sepolia with verified on-chain execution gates",
   "type": "module",
   "author": {
     "name": "Martin Luther",
@@ -24,7 +24,7 @@
     "autonomous-agents",
     "conway-game-of-life",
     "post-quantum-cryptography",
-    "dilithium3",
+    "ml-dsa",
     "web4",
     "gemini-ai",
     "blockchain",
@@ -36,7 +36,9 @@
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist server.js",
     "typecheck": "tsc --noEmit",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "contracts:compile": "node scripts/compile.js",
+    "production:guard": "node scripts/production-guard.cjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
