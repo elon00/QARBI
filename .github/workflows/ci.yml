@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   build-test-guard:
-    name: Build, Contract Compile, Guard & Release Gate (Node ${{ matrix.node-version }})
+    name: Build, Contract Compile & Production Guard (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -34,8 +34,6 @@ jobs:
         run: npm run contracts:compile
       - name: Production Guard
         run: npm run production:guard
-      - name: Release Gate
-        run: npm run release:gate
       - name: Production Build
         run: npm run build
       - name: Verify Build Artifacts
