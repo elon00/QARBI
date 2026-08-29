@@ -47,3 +47,10 @@ export function formatAddress(address: string): string {
   if (!address || address.length < 10) return address;
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
+
+/** Local UI correlation ID. This is NOT a blockchain transaction hash. */
+export function generateOperationId(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
