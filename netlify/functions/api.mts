@@ -24,7 +24,7 @@ export default async (req: Request) => {
         network: "Arbitrum Sepolia",
         chainId: 421614,
         stylusEngine: "active",
-        pqcVersion: "ML-DSA-65 (Dilithium3)",
+        pqcVersion: "UNVERIFIED-PQC-COMMITMENT",
         timestamp: Date.now(),
       }),
       { status: 200, headers }
@@ -33,19 +33,20 @@ export default async (req: Request) => {
 
   // 2. Post-Quantum Identity Generation
   if (path === "/crypto/pqc-generate" && req.method === "POST") {
-    const mockPubKeyBytes = crypto.randomBytes(1952);
-    const pqcCommitmentHash = "0x" + crypto.createHash("sha3-256").update(mockPubKeyBytes).digest("hex");
+    const placeholderPubKeyBytes = crypto.randomBytes(1952);
+    const pqcCommitmentHash = "0x" + crypto.createHash("sha3-256").update(placeholderPubKeyBytes).digest("hex");
     const ephemeralWallet = "0x" + crypto.randomBytes(20).toString("hex");
 
     return new Response(
       JSON.stringify({
         success: true,
-        algorithm: "ML-DSA-65 (NIST FIPS 204)",
+        algorithm: "UNVERIFIED-PQC-COMMITMENT",
         publicKeyBytesLength: 1952,
-        publicKeyPreview: "0x" + mockPubKeyBytes.slice(0, 16).toString("hex") + "..." + mockPubKeyBytes.slice(-16).toString("hex"),
+        publicKeyPreview: "0x" + placeholderPubKeyBytes.slice(0, 16).toString("hex") + "..." + placeholderPubKeyBytes.slice(-16).toString("hex"),
+        warning: "Development placeholder only; not an ML-DSA-65 key or signature.",
         pqcCommitmentHash,
         delegatedSessionWallet: ephemeralWallet,
-        attestationSignature: "0x" + crypto.randomBytes(65).toString("hex"),
+        attestationSignature: null,
         generatedAt: new Date().toISOString(),
       }),
       { status: 200, headers }
