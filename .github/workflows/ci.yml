@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   build-test-guard:
-    name: Build, Typecheck & Production Guard (Node ${{ matrix.node-version }})
+    name: Build, Contract Compile, Guard & Release Gate (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -21,28 +21,23 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
-
       - name: Install Dependencies
         run: npm ci
-
       - name: Typecheck
         run: npm run typecheck
-
       - name: Compile Smart Contracts
         run: npm run contracts:compile
-
       - name: Production Guard
         run: npm run production:guard
-
+      - name: Release Gate
+        run: npm run release:gate
       - name: Production Build
         run: npm run build
-
       - name: Verify Build Artifacts
         run: |
           test -d dist
