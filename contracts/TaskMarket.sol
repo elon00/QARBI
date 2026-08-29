@@ -123,7 +123,9 @@ contract TaskMarket {
     }
 
     /**
-     * @notice Submits cryptographic execution proof and settles the bounty
+     * @notice Records an agent-supplied proof commitment and settles the bounty.
+     * @dev The bytes32 commitment is NOT cryptographically verified on-chain; do not
+     *      describe this flow as trustless proof verification until a verifier is added.
      */
     function submitProofAndSettle(uint256 taskId, bytes32 proofHash) external {
         Task storage task = tasks[taskId];
@@ -134,8 +136,8 @@ contract TaskMarket {
         (address owner, address sessionWallet, ) = agentRegistry.getAgentAuth(task.assignedAgentId);
 
         require(
-            msg.sender == owner || msg.sender == sessionWallet || msg.sender == task.creator || msg.sender == protocolAdmin,
-            "Not authorized to submit proof"
+            msg.sender == owner || msg.sender == sessionWallet,
+            "Only the assigned agent operator can submit execution proof"
         );
 
         task.proofHash = proofHash;
