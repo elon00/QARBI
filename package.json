@@ -46,7 +46,8 @@
     "verify:testnet": "node scripts/verify-testnet-deployment.js",
     "testnet:ready": "npm run oneclick && npm run verify:testnet",
     "pqc:gate": "node scripts/pqc-truthfulness-gate.js",
-    "security:taskmarket": "node scripts/taskmarket-security-gate.js"
+    "security:taskmarket": "node scripts/taskmarket-security-gate.js",
+    "pqc:provider-gate": "node scripts/pqc-provider-gate.js"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
