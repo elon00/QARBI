@@ -1,7 +1,7 @@
 {
   "name": "qarbi-protocol",
   "version": "1.0.0",
-  "description": "Autonomous AI Agent Civilization & Conway State Engine on Arbitrum Sepolia with verified on-chain execution gates",
+  "description": "Reality-first AI agent and Conway prototype with testnet production-readiness gates",
   "type": "module",
   "author": {"name": "Martin Luther", "email": "martinlutherupa1@gmail.com", "url": "https://github.com/elon00"},
   "repository": {"type": "git", "url": "https://github.com/elon00/QARBI.git"},
