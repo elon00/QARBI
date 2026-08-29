@@ -22,7 +22,7 @@ import {
   applyPatternToGrid,
   evolveAgentWithStylus,
 } from "../lib/conwayEngine";
-import { generateTxHash } from "../lib/crypto";
+import { generateOperationId } from "../lib/crypto";
 
 interface ConwayVisualizerProps {
   agents: Agent[];
@@ -130,7 +130,7 @@ export const ConwayVisualizer: React.FC<ConwayVisualizerProps> = ({
       return updatedAgent;
     });
 
-    const txHash = generateTxHash();
+    const txHash = generateOperationId();
     const txRecord: TransactionRecord = {
       hash: txHash,
       blockNumber: 18492140 + generation,
