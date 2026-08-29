@@ -49,7 +49,7 @@
     "security:taskmarket": "node scripts/taskmarket-security-gate.js",
     "pqc:provider-gate": "node scripts/pqc-provider-gate.js",
     "pqc:boundary": "node scripts/pqc-boundary-gate.js",
-    "pqc:smoke": "node scripts/ml-dsa65-smoke.mjs",
+    "pqc:smoke": "tsx scripts/ml-dsa65-smoke.mjs",
     "pqc:real": "npm run pqc:provider-gate && npm run pqc:boundary && npm run pqc:smoke"
   },
   "dependencies": {
@@ -64,7 +64,8 @@
     "react-dom": "^19.0.1",
     "express": "^4.21.2",
     "solc": "^0.8.24",
-    "vite": "^6.2.3"
+    "vite": "^6.2.3",
+    "@noble/post-quantum": "0.7.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
