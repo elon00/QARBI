@@ -1,15 +1,17 @@
 #!/usr/bin/env node
 import fs from 'fs';
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
-const src=fs.readFileSync('src/lib/crypto.ts','utf8');
 const deps={...pkg.dependencies,...pkg.devDependencies};
-const hasProvider=Object.keys(deps).some(n=>/ml-dsa|dilithium|post-quantum/i.test(n));
-if(hasProvider && src.includes('UNVERIFIED-PQC-COMMITMENT')){
- console.error('FAIL: PQC dependency exists but placeholder adapter remains; complete integration or remove dependency.');
- process.exit(1);
+const hasProvider=Boolean(deps['@noble/post-quantum']);
+const adapter=fs.readFileSync('src/lib/mlDsa65Provider.ts','utf8');
+const placeholder=fs.readFileSync('src/lib/crypto.ts','utf8');
+if(!hasProvider){
+ console.error('FAIL: @noble/post-quantum is not declared.'); process.exit(1);
 }
-if(!hasProvider && !src.includes('UNVERIFIED-PQC-COMMITMENT')){
- console.error('FAIL: real PQC claim without a declared PQC provider.');
- process.exit(1);
+if(!adapter.includes("@noble/post-quantum/ml-dsa.js") || !adapter.includes('ml_dsa65')){
+ console.error('FAIL: ML-DSA-65 adapter is not wired to the provider.'); process.exit(1);
 }
-console.log(hasProvider?'PQC provider declared; implementation evidence still required.':'PQC placeholder state is explicit and honest.');
+if(placeholder.includes('UNVERIFIED-PQC-COMMITMENT')){
+ console.error('FAIL: legacy crypto.ts placeholder remains in the production-facing adapter.'); process.exit(1);
+}
+console.log('PQC PROVIDER GATE: PASS');
