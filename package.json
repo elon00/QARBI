@@ -25,7 +25,7 @@
     "deploy:testnet":"npm run contracts:compile && node scripts/deploy.js",
     "verify:testnet":"node scripts/verify-testnet-deployment.js",
     "testnet:ready":"npm run oneclick && npm run verify:testnet",
-    "test":"npm run pqc:real && npm run security:taskmarket && npm run contracts:compile && npm run typecheck && npm run build",
+    "test":"npm run pqc:real && npm run security:taskmarket && npm run contracts:compile && npm run typecheck && npm run build && node scripts/test-noop.mjs",
     "pqc:gate":"node scripts/pqc-truthfulness-gate.js",
     "security:taskmarket":"node scripts/taskmarket-security-gate.js",
     "pqc:provider-gate":"node scripts/pqc-provider-gate.js",
@@ -55,7 +55,7 @@
     "autoprefixer":"^10.4.21",
     "tailwindcss":"^4.1.14",
     "esbuild":"^0.25.0",
-    "tsx":"^4.21.0",
-    "typescript":"~5.8.2"
+    "typescript":"~5.8.2",
+    "tsx":"^4.21.0"
   }
 }
