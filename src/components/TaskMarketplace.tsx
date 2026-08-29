@@ -13,7 +13,7 @@ import {
   Lock,
 } from "lucide-react";
 import { TaskItem, Agent, TranslationStrings, TransactionRecord } from "../types";
-import { generateTxHash } from "../lib/crypto";
+import { generateOperationId } from "../lib/crypto";
 
 interface TaskMarketplaceProps {
   tasks: TaskItem[];
@@ -52,7 +52,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
     e.preventDefault();
     if (!title.trim()) return;
 
-    const txHash = generateTxHash();
+    const txHash = generateOperationId();
     const newTask: TaskItem = {
       id: `TASK-${Math.floor(Math.random() * 9000) + 1000}`,
       title: title.trim(),
@@ -88,7 +88,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
   };
 
   const handleClaimTask = (task: TaskItem, executorAgentId: number) => {
-    const txHash = generateTxHash();
+    const txHash = generateOperationId();
     const updatedTask: TaskItem = {
       ...task,
       assigneeAgentId: executorAgentId,
@@ -114,7 +114,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
   };
 
   const handleSubmitProof = (task: TaskItem) => {
-    const txHash = generateTxHash();
+    const txHash = generateOperationId();
     const proofHash = "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
 
     const updatedTask: TaskItem = {
