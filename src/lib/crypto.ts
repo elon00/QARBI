@@ -1,49 +1,46 @@
 /**
- * Hybrid Post-Quantum Cryptography (PQC) & EVM Commitment Helper
- * Simulates NIST FIPS 204 ML-DSA-65 (CRYSTALS-Dilithium3) keypair generation
- * and derives on-chain compatible bytes32 Keccak-256 commitment hash.
+ * Development-only PQC identity adapter.
+ *
+ * This module deliberately does NOT claim to implement ML-DSA-65.
+ * A production ML-DSA implementation must come from a vetted cryptographic
+ * library and should be integrated behind this interface before mainnet use.
  */
 
 export interface PQCIdentityResult {
-  algorithm: string;
+  algorithm: "UNVERIFIED-PQC-COMMITMENT";
   publicKeyHex: string;
   publicKeyPreview: string;
-  pqcCommitmentHash: string; // 0x... bytes32
+  pqcCommitmentHash: string;
   delegatedWalletAddress: string;
   signaturePreview: string;
   createdAt: number;
 }
 
-// Deterministic / Secure pseudo-random hex generator for client
-function generateRandomHex(length: number): string {
-  const chars = "0123456789abcdef";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return result;
+function randomHex(length: number): string {
+  const bytes = new Uint8Array(Math.ceil(length / 2));
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("").slice(0, length);
 }
 
-export function generatePQCIdentity(agentName?: string): PQCIdentityResult {
-  // ML-DSA-65 public keys are 1952 bytes (3904 hex chars)
-  const simulatedPubKeyHex = "0x" + generateRandomHex(3904);
-  const pqcCommitmentHash = "0x" + generateRandomHex(64); // 32-byte Keccak-256 hash
-  const delegatedWalletAddress = "0x" + generateRandomHex(40);
-  const signaturePreview = "0x" + generateRandomHex(130);
+/**
+ * Produces a locally generated commitment placeholder for testnet UX only.
+ * It must never be advertised as a real ML-DSA keypair/signature.
+ */
+export function generatePQCIdentity(_agentName?: string): PQCIdentityResult {
+  const publicKeyHex = `0x${randomHex(3904)}`;
+  const pqcCommitmentHash = `0x${randomHex(64)}`;
+  const delegatedWalletAddress = `0x${randomHex(40)}`;
+  const signaturePreview = `0x${randomHex(130)}`;
 
   return {
-    algorithm: "ML-DSA-65 (NIST FIPS 204 / Dilithium3)",
-    publicKeyHex: simulatedPubKeyHex,
-    publicKeyPreview: `${simulatedPubKeyHex.slice(0, 10)}...${simulatedPubKeyHex.slice(-8)} (1952 Bytes)`,
+    algorithm: "UNVERIFIED-PQC-COMMITMENT",
+    publicKeyHex,
+    publicKeyPreview: `${publicKeyHex.slice(0, 10)}...${publicKeyHex.slice(-8)} (development placeholder)`,
     pqcCommitmentHash,
     delegatedWalletAddress,
     signaturePreview,
     createdAt: Date.now(),
   };
-}
-
-export function generateTxHash(): string {
-  return "0x" + generateRandomHex(64);
 }
 
 export function formatAddress(address: string): string {
