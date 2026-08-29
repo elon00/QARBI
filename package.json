@@ -41,7 +41,10 @@
     "release:gate": "node scripts/release-gate.cjs",
     "oneclick": "node scripts/one-click.cjs",
     "oneclick:release": "node scripts/one-click.cjs release",
-    "doctor": "node scripts/one-click.cjs"
+    "doctor": "node scripts/one-click.cjs",
+    "deploy:testnet": "npm run contracts:compile && node scripts/deploy.js",
+    "verify:testnet": "node scripts/verify-testnet-deployment.js",
+    "testnet:ready": "npm run oneclick && npm run verify:testnet"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
