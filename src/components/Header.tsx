@@ -15,7 +15,7 @@ interface HeaderProps {
   walletAddress?: string | null;
   isWalletConnected?: boolean;
   isCorrectNetwork?: boolean;
-  onConnectWallet?: () => void;
+  onConnectWallet?: (walletType: "metamask" | "trust") => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -33,6 +33,7 @@ export const Header: React.FC<HeaderProps> = ({
   onConnectWallet,
 }) => {
   const [isLangMenuOpen, setIsLangMenuOpen] = React.useState(false);
+  const [isWalletMenuOpen, setIsWalletMenuOpen] = React.useState(false);
   const currentLangObj = LANGUAGE_OPTIONS.find((l) => l.code === currentLanguage) || LANGUAGE_OPTIONS[0];
 
   const shortAddress = walletAddress
@@ -171,38 +172,19 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="sm:hidden">Faucet</span>
             </button>
 
-            {/* Web3 / Trust Wallet Pill */}
-            <button
-              type="button"
-              onClick={onConnectWallet}
-              className={`flex items-center space-x-2.5 px-3 py-1.5 rounded-lg border text-xs transition cursor-pointer ${
-                isWalletConnected
-                  ? "bg-slate-950/90 border-cyan-800/80 hover:border-cyan-500 text-slate-200"
-                  : "bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-600 hover:to-indigo-600 border-indigo-500 text-white font-medium shadow-md shadow-indigo-900/40"
-              }`}
-              title={isWalletConnected ? `Connected: ${walletAddress}` : "Connect Trust Wallet / Web3"}
-            >
-              <Wallet className={`w-3.5 h-3.5 ${isWalletConnected ? "text-cyan-400" : "text-white"}`} />
-              {isWalletConnected ? (
-                <div className="text-right">
-                  <div className="flex items-center space-x-1 font-mono text-cyan-300 font-semibold leading-tight">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                    <span>{shortAddress}</span>
-                    <span className="text-[10px] text-slate-400">({userBalanceQarbi} $QARBI)</span>
-                  </div>
-                  <div className="font-mono text-[10px] text-slate-400 leading-tight">
-                    {userBalanceEth.toFixed(3)} Sepolia ETH
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-1.5">
-                  <span>Connect Wallet</span>
-                  <span className="px-1.5 py-0.5 text-[9px] uppercase tracking-wider rounded bg-indigo-900/80 text-indigo-200">
-                    Trust / Web3
-                  </span>
+            {/* Explicit wallet selector */}
+            <div className="relative">
+              <button type="button" onClick={() => setIsWalletMenuOpen(!isWalletMenuOpen)} className="flex items-center space-x-2.5 px-3 py-1.5 rounded-lg border text-xs transition cursor-pointer bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-600 hover:to-indigo-600 border-indigo-500 text-white font-medium shadow-md shadow-indigo-900/40">
+                <Wallet className="w-3.5 h-3.5 text-white" />
+                <span>{isWalletConnected ? shortAddress : "Connect Wallet"}</span>
+              </button>
+              {isWalletMenuOpen && (
+                <div className="absolute right-0 mt-2 w-56 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-50 p-2 space-y-2">
+                  <button type="button" onClick={() => { setIsWalletMenuOpen(false); onConnectWallet?.("metamask"); }} className="w-full text-left px-3 py-3 rounded-lg hover:bg-slate-800 border border-slate-700"><strong>🦊 MetaMask</strong><span className="block text-[10px] text-slate-400 mt-1">Connect MetaMask</span></button>
+                  <button type="button" onClick={() => { setIsWalletMenuOpen(false); onConnectWallet?.("trust"); }} className="w-full text-left px-3 py-3 rounded-lg hover:bg-slate-800 border border-slate-700"><strong>🛡️ Trust Wallet</strong><span className="block text-[10px] text-slate-400 mt-1">Connect Trust Wallet</span></button>
                 </div>
               )}
-            </button>
+            </div>
           </div>
         </div>
       </div>
