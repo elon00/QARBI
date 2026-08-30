@@ -38,8 +38,9 @@ app.get("/api/health", (_req, res) => {
     status: "ok",
     network: "Arbitrum Sepolia",
     chainId: 421614,
-    stylusEngine: "active",
-    pqcVersion: "ML-DSA-65 (Dilithium3)",
+    stylusEngine: "not_runtime_verified",
+    pqcVersion: "not_cryptographically_verified",
+    statusNote: "This health endpoint does not certify a live Stylus deployment or ML-DSA implementation.",
     timestamp: Date.now(),
   });
 });
@@ -48,7 +49,7 @@ app.get("/api/health", (_req, res) => {
 app.post("/api/crypto/pqc-generate", (req, res) => {
   try {
     const { agentName } = req.body || {};
-    // Simulate ML-DSA-65 (Dilithium3) 1952-byte public key and 32-byte Keccak commitment
+    // Demonstration only: random bytes are not an ML-DSA-65 keypair or signature.
     const rawEntropy = crypto.randomBytes(64);
     const mockPubKeyBytes = crypto.randomBytes(1952);
     const pqcCommitmentHash = "0x" + crypto.createHash("sha3-256").update(mockPubKeyBytes).digest("hex");
@@ -57,12 +58,13 @@ app.post("/api/crypto/pqc-generate", (req, res) => {
     res.json({
       success: true,
       agentName: agentName || "Autonomous-Agent",
-      algorithm: "ML-DSA-65 (NIST FIPS 204)",
+      algorithm: "SIMULATION ONLY — not an ML-DSA-65 keypair",
       publicKeyBytesLength: 1952,
       publicKeyPreview: "0x" + mockPubKeyBytes.slice(0, 16).toString("hex") + "..." + mockPubKeyBytes.slice(-16).toString("hex"),
       pqcCommitmentHash,
       delegatedSessionWallet: ephemeralWallet,
-      attestationSignature: "0x" + crypto.randomBytes(65).toString("hex"),
+      attestationSignature: null,
+      cryptographicVerification: "NOT PERFORMED",
       generatedAt: new Date().toISOString(),
     });
   } catch (error: any) {
@@ -121,7 +123,7 @@ Respond ONLY with a valid JSON object with the following structure:
       }
     }
 
-    // High-quality local fallback if Gemini key is not set or network fails
+    // Explicit demonstration fallback when Gemini is unavailable: no on-chain execution is performed.
     if (!planData) {
       const isSecurity = /security|audit|vulnerability|exploit|bug|safe/i.test(prompt);
       const isTrader = /trade|swap|arbitrage|price|liquidity|yield/i.test(prompt);
@@ -137,19 +139,19 @@ Respond ONLY with a valid JSON object with the following structure:
 
       planData = {
         taskTitle: `Execute: ${prompt.slice(0, 40)}...`,
-        taskDescription: `Autonomous on-chain task created by Qarbi Protocol. Intent: ${prompt}. Agent will verify invariants, execute Wasm state mutation on Stylus, and settle on Arbitrum Sepolia.`,
+        taskDescription: `Demonstration plan created locally. Intent: ${prompt}. No Stylus mutation, contract dispatch, or Arbitrum settlement is executed by this fallback.`,
         suggestedArchetype: archetype,
         estimatedGasUnits: Math.floor(Math.random() * 45000) + 32000,
         rewardQarbi: Math.floor(Math.random() * 20) + 10,
         policyVerification: {
-          isWithinSingleTxLimit: true,
-          whitelistedTarget: "0x5FbDB2315678afecb367f032d93F642f64180aa3 (TaskMarket.sol)",
-          securityRisk: "LOW",
-          riskAnalysis: "Deterministic spending limit satisfied (<= 25 QARBI). Target contract whitelisted on Arbitrum Sepolia.",
+          isWithinSingleTxLimit: null,
+          whitelistedTarget: "NOT VERIFIED — demonstration placeholder",
+          securityRisk: "UNKNOWN",
+          riskAnalysis: "No live policy contract or target whitelist was queried in fallback mode.",
         },
-        stylusExecutionLogic: "ConwayEngine.rs evaluate_transition() triggered with +15 reputation reward and +10 energy units.",
+        stylusExecutionLogic: "SIMULATION ONLY — no Stylus runtime call executed.",
         expectedStateOutcome: "Agent reputation increases; neighbor synergy coefficient evolves on the Conway grid.",
-        executionSummary: `Task successfully parsed. Agent will dispatch onchain call to TaskMarket and settle with verifiable tx proof on Arbitrum Sepolia.`,
+        executionSummary: "Task intent was parsed locally. No transaction was submitted and no on-chain proof exists.",
       };
     }
 
