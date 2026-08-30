@@ -40,23 +40,22 @@ if (typeof window !== "undefined") {
   }
 }
 
-export function getInjectedProvider(): any {
-  if (typeof window === "undefined") return null;
+export type WalletType = "metamask" | "trust";
+
+function getWalletProviders(): any[] {
+  if (typeof window === "undefined") return [];
   const win = window as any;
+  const providers = win.ethereum?.providers?.length ? [...win.ethereum.providers] : win.ethereum ? [win.ethereum] : [];
+  if (win.trustwallet?.ethereum && !providers.includes(win.trustwallet.ethereum)) providers.push(win.trustwallet.ethereum);
+  return providers;
+}
 
-  // Check Trust Wallet specific provider first
-  if (win.trustwallet?.ethereum) return win.trustwallet.ethereum;
-  if (win.trustwallet) return win.trustwallet;
-
-  // Check multi-provider list (e.g. MetaMask + Trust Wallet)
-  if (win.ethereum?.providers?.length) {
-    const trust = win.ethereum.providers.find((p: any) => p.isTrust || p.isTrustWallet);
-    if (trust) return trust;
-    return win.ethereum.providers[0];
-  }
-
-  if (win.ethereum) return win.ethereum;
-  return null;
+export function getInjectedProvider(walletType: WalletType = "metamask"): any {
+  const providers = getWalletProviders();
+  const selected = walletType === "metamask"
+    ? providers.find((p: any) => p.isMetaMask && !p.isTrust && !p.isTrustWallet)
+    : providers.find((p: any) => p.isTrust || p.isTrustWallet);
+  return selected || null;
 }
 
 export function getPublicRpcProvider(): ethers.JsonRpcProvider {
@@ -92,7 +91,7 @@ export async function checkWalletConnection(): Promise<{
   return { address: null, chainId: null, isCorrectNetwork: false };
 }
 
-export async function connectWallet(): Promise<{
+export async function connectWallet(walletType: WalletType = "metamask"): Promise<{
   address: string;
   chainId: number;
   isCorrectNetwork: boolean;
