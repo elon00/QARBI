@@ -16,6 +16,7 @@ interface HeaderProps {
   isWalletConnected?: boolean;
   isCorrectNetwork?: boolean;
   onConnectWallet?: (walletType: "metamask" | "trust") => void;
+  onDisconnectWallet?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -31,6 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
   isWalletConnected,
   isCorrectNetwork,
   onConnectWallet,
+  onDisconnectWallet,
 }) => {
   const [isLangMenuOpen, setIsLangMenuOpen] = React.useState(false);
   const [isWalletMenuOpen, setIsWalletMenuOpen] = React.useState(false);
@@ -180,8 +182,10 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
               {isWalletMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-50 p-2 space-y-2">
-                  <button type="button" onClick={() => { setIsWalletMenuOpen(false); onConnectWallet?.("metamask"); }} className="w-full text-left px-3 py-3 rounded-lg hover:bg-slate-800 border border-slate-700"><strong>🦊 MetaMask</strong><span className="block text-[10px] text-slate-400 mt-1">Connect MetaMask</span></button>
-                  <button type="button" onClick={() => { setIsWalletMenuOpen(false); onConnectWallet?.("trust"); }} className="w-full text-left px-3 py-3 rounded-lg hover:bg-slate-800 border border-slate-700"><strong>🛡️ Trust Wallet</strong><span className="block text-[10px] text-slate-400 mt-1">Connect Trust Wallet</span></button>
+                  <div className="px-2 pt-1 text-[10px] uppercase tracking-wider text-slate-500">Switch Wallet</div>
+                  <button type="button" onClick={() => { setIsWalletMenuOpen(false); onConnectWallet?.("metamask"); }} className="w-full text-left px-3 py-3 rounded-lg hover:bg-slate-800 border border-slate-700"><strong>🦊 MetaMask</strong><span className="block text-[10px] text-slate-400 mt-1">Connect or switch to MetaMask</span></button>
+                  <button type="button" onClick={() => { setIsWalletMenuOpen(false); onConnectWallet?.("trust"); }} className="w-full text-left px-3 py-3 rounded-lg hover:bg-slate-800 border border-slate-700"><strong>🛡️ Trust Wallet</strong><span className="block text-[10px] text-slate-400 mt-1">Connect or switch to Trust Wallet</span></button>
+                  {isWalletConnected && <button type="button" onClick={() => { setIsWalletMenuOpen(false); onDisconnectWallet?.(); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-rose-950/40 border border-slate-700 text-rose-300"><strong>Disconnect App Session</strong><span className="block text-[10px] text-slate-500 mt-1">Clears QARBI connection state; wallet permissions remain under your wallet control.</span></button>}
                 </div>
               )}
             </div>
