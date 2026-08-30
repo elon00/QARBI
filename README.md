@@ -3,7 +3,7 @@
 # ⚡ QARBI Protocol
 
 ### Autonomous AI Agent Civilization & Conway State Engine on Arbitrum Sepolia
-**Powered by Arbitrum Stylus (Rust VM) · NIST FIPS 204 (ML-DSA-65) PQC · Gemini 2.0 Flash**
+**Prototype architecture for Arbitrum Stylus, PQC research, and Gemini-powered planning — runtime integrations require independent verification**
 
 [![CI - Build & Quality Assurance](https://github.com/elon00/QARBI/actions/workflows/ci.yml/badge.svg)](https://github.com/elon00/QARBI/actions/workflows/ci.yml)
 [![CodeQL Security Scan](https://github.com/elon00/QARBI/actions/workflows/codeql.yml/badge.svg)](https://github.com/elon00/QARBI/actions/workflows/codeql.yml)
@@ -34,14 +34,14 @@ For ai developers and defi users
 ## 🚀 Key Features
 
 ### 1. 🧬 Agent Spawner & Sovereign PQC Identity
-- **Quantum-Resistant Identity**: Generates NIST FIPS 204 **ML-DSA-65 (Dilithium3)** 1952-byte public key commitments anchored on-chain with Keccak-256 hashes.
+- **PQC Identity Prototype**: The current API demonstration does not generate a verified ML-DSA-65 keypair or on-chain commitment.
 - **Granular Spending Limits**: Hardware-grade policy guardrails enforcing maximum single-transaction caps and daily limits in `$QARBI`.
 - **Target Whitelisting**: Restricts autonomous calls exclusively to verified smart contract addresses.
 - **ERC-4337 Session Wallets**: Disposable delegated cryptographic keypairs for friction-free sub-second agent transactions.
 
 ### 2. 🌌 Conway Cellular Automaton on Arbitrum Stylus (Rust VM)
 - **Cellular Entropy State Engine**: Simulates agent lifecycles, synergy accumulation, energy depletion, and evolution on a dynamic grid.
-- **Rust WASM Throughput**: Compiled to WebAssembly via **Arbitrum Stylus**, yielding **10x to 100x gas compression** compared to standard EVM bytecode.
+- **Stylus Research Target**: Stylus/WASM performance claims require deployment and benchmark evidence before being presented as achieved results.
 - **Emergent Multi-Agent Synergy**: Neighboring agent cells share energy, earn reputation boosts, and unlock collaborative archetypes.
 
 ### 3. 🧠 Gemini 2.0 Agentic Intent Orchestrator
@@ -51,7 +51,7 @@ For ai developers and defi users
 
 ### 4. 💼 Decentralized Task Escrow Marketplace
 - **Smart Escrow Bounties**: Users and parent agents fund tasks with locked `$QARBI` rewards.
-- **Autonomous Task Claiming & Fulfillment**: Autonomous agents evaluate tasks, lock collateral, execute compute, and submit cryptographic proofs of completion.
+- **Autonomous Task Workflow Prototype**: Task planning is implemented as a prototype; live collateral locking, execution, and cryptographic completion proofs require independently verified contracts.
 - **Verifiable Reputation Loop**: Successful executions boost agent reputation scores (0-1000) and unlock higher tier bounties.
 
 ### 5. 🛡️ Autonomous Security Enclave & Emergency Killswitch
