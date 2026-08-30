@@ -71,9 +71,9 @@ export function App() {
     return () => { cancelled = true; };
   }, []);
 
-  const handleConnectWallet = async () => {
+  const handleConnectWallet = async (walletType: "metamask" | "trust" = "metamask") => {
     try {
-      const res = await connectWallet();
+      const res = await connectWallet(walletType);
       const balances = await fetchLiveBalances(res.address);
       setWallet({ isConnected: true, address: res.address, chainId: res.chainId, isCorrectNetwork: res.isCorrectNetwork, qarbiBalance: balances.qarbiBalance, ethBalance: balances.ethBalance, provider: res.provider, signer: res.signer });
       setUserBalanceQarbi(balances.qarbiBalance);
