@@ -130,7 +130,7 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col">
-      <Header t={t} currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} userBalanceQarbi={userBalanceQarbi} userBalanceEth={userBalanceEth} onOpenFaucet={() => setIsFaucetOpen(true)} onOpenDeployer={() => setIsDeployerOpen(true)} isEmergencyLocked={isEmergencyLocked} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} isCorrectNetwork={wallet.isCorrectNetwork} onConnectWallet={handleConnectWallet} />
+      <Header t={t} currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} userBalanceQarbi={userBalanceQarbi} userBalanceEth={userBalanceEth} onOpenFaucet={() => setIsFaucetOpen(true)} onOpenDeployer={() => setIsDeployerOpen(true)} isEmergencyLocked={isEmergencyLocked} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} isCorrectNetwork={wallet.isCorrectNetwork} onConnectWallet={handleConnectWallet} onDisconnectWallet={handleDisconnectWallet} />
       <Navigation activeTab={activeTab} onSelectTab={setActiveTab} t={t} agentCount={agents.length} openTaskCount={tasks.filter((task) => task.status === "OPEN").length} isEmergencyLocked={isEmergencyLocked} />
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === "spawner" && <AgentSpawner agents={agents} onAddAgent={handleAddAgent} onEvolveAgent={handleEvolveAgent} t={t} onNavigateToTerminal={handleNavigateToTerminal} signer={wallet.signer} walletAddress={wallet.address} />}
