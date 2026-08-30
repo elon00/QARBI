@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Droplets, Sparkles, CheckCircle, ExternalLink, AlertCircle } from "lucide-react";
 import { TranslationStrings, TransactionRecord } from "../types";
-import { generateTxHash } from "../lib/crypto";
+import { generateOperationId } from "../lib/crypto";
 import { claimFaucetOnchain } from "../lib/web3";
 import { ethers } from "ethers";
 
@@ -65,7 +65,7 @@ export const FaucetModal: React.FC<FaucetModalProps> = ({
 
     // Fallback simulation / instant faucet
     setTimeout(() => {
-      const txHash = generateTxHash();
+      const txHash = generateOperationId();
       const txRecord: TransactionRecord = {
         hash: txHash,
         blockNumber: 18492310,

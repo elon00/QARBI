@@ -10,12 +10,7 @@ import { ArbitrumExplorer } from "./components/ArbitrumExplorer";
 import { WhitepaperViewer } from "./components/WhitepaperViewer";
 import { FaucetModal } from "./components/FaucetModal";
 import { OnchainDeployerModal } from "./components/OnchainDeployerModal";
-import {
-  INITIAL_AGENTS,
-  INITIAL_TASKS,
-  INITIAL_TRANSACTIONS,
-  INITIAL_SECURITY_LOGS,
-} from "./data/initialState";
+import { INITIAL_AGENTS, INITIAL_TASKS, INITIAL_TRANSACTIONS, INITIAL_SECURITY_LOGS } from "./data/initialState";
 import { TRANSLATIONS } from "./data/translations";
 import { LanguageCode, Agent, TaskItem, TransactionRecord, SecurityEvent } from "./types";
 import { evolveAgentWithStylus } from "./lib/conwayEngine";
@@ -28,20 +23,20 @@ export function App() {
   const [tasks, setTasks] = useState<TaskItem[]>(INITIAL_TASKS);
   const [transactions, setTransactions] = useState<TransactionRecord[]>(INITIAL_TRANSACTIONS);
   const [securityLogs, setSecurityLogs] = useState<SecurityEvent[]>(INITIAL_SECURITY_LOGS);
-  const [userBalanceQarbi, setUserBalanceQarbi] = useState<number>(250);
-  const [userBalanceEth, setUserBalanceEth] = useState<number>(0.245);
-  const [isEmergencyLocked, setIsEmergencyLocked] = useState<boolean>(false);
-  const [isFaucetOpen, setIsFaucetOpen] = useState<boolean>(false);
-  const [isDeployerOpen, setIsDeployerOpen] = useState<boolean>(false);
-  const [terminalActiveAgent, setTerminalActiveAgent] = useState<string | undefined>(undefined);
+  const [userBalanceQarbi, setUserBalanceQarbi] = useState<number>(0);
+  const [userBalanceEth, setUserBalanceEth] = useState<number>(0);
+  const [isEmergencyLocked, setIsEmergencyLocked] = useState(false);
+  const [isFaucetOpen, setIsFaucetOpen] = useState(false);
+  const [isDeployerOpen, setIsDeployerOpen] = useState(false);
+  const [terminalActiveAgent, setTerminalActiveAgent] = useState<string | undefined>();
 
   const [wallet, setWallet] = useState<WalletState>({
     isConnected: false,
     address: null,
     chainId: null,
     isCorrectNetwork: false,
-    qarbiBalance: 250,
-    ethBalance: 0.245,
+    qarbiBalance: 0,
+    ethBalance: 0,
     provider: null,
     signer: null,
   });
@@ -61,71 +56,26 @@ export function App() {
     faucet: { ...TRANSLATIONS.en.faucet, ...(rawT?.faucet || {}) },
   };
 
-  // Auto-detect attached Trust Wallet / Web3 on mount
   useEffect(() => {
+    let cancelled = false;
     async function initWallet() {
       const res = await checkWalletConnection();
-      if (res.address) {
-        const balances = await fetchLiveBalances(res.address);
-        setWallet((prev) => ({
-          ...prev,
-          isConnected: true,
-          address: res.address,
-          chainId: res.chainId,
-          isCorrectNetwork: res.isCorrectNetwork,
-          qarbiBalance: balances.qarbiBalance,
-          ethBalance: balances.ethBalance,
-        }));
-        setUserBalanceQarbi(balances.qarbiBalance);
-        setUserBalanceEth(balances.ethBalance);
-      }
+      if (!res.address || cancelled) return;
+      const balances = await fetchLiveBalances(res.address);
+      if (cancelled) return;
+      setWallet((prev) => ({ ...prev, isConnected: true, address: res.address, chainId: res.chainId, isCorrectNetwork: res.isCorrectNetwork, qarbiBalance: balances.qarbiBalance, ethBalance: balances.ethBalance }));
+      setUserBalanceQarbi(balances.qarbiBalance);
+      setUserBalanceEth(balances.ethBalance);
     }
-    initWallet();
-
-    if (typeof window !== "undefined" && (window as any).ethereum) {
-      const eth = (window as any).ethereum;
-      const handleAccounts = (accounts: string[]) => {
-        if (accounts.length > 0) {
-          initWallet();
-        } else {
-          setWallet({
-            isConnected: false,
-            address: null,
-            chainId: null,
-            isCorrectNetwork: false,
-            qarbiBalance: 250,
-            ethBalance: 0.245,
-            provider: null,
-            signer: null,
-          });
-        }
-      };
-      const handleChain = () => {
-        initWallet();
-      };
-      eth.on?.("accountsChanged", handleAccounts);
-      eth.on?.("chainChanged", handleChain);
-      return () => {
-        eth.removeListener?.("accountsChanged", handleAccounts);
-        eth.removeListener?.("chainChanged", handleChain);
-      };
-    }
+    void initWallet();
+    return () => { cancelled = true; };
   }, []);
 
   const handleConnectWallet = async () => {
     try {
       const res = await connectWallet();
       const balances = await fetchLiveBalances(res.address);
-      setWallet({
-        isConnected: true,
-        address: res.address,
-        chainId: res.chainId,
-        isCorrectNetwork: res.isCorrectNetwork,
-        qarbiBalance: balances.qarbiBalance,
-        ethBalance: balances.ethBalance,
-        provider: res.provider,
-        signer: res.signer,
-      });
+      setWallet({ isConnected: true, address: res.address, chainId: res.chainId, isCorrectNetwork: res.isCorrectNetwork, qarbiBalance: balances.qarbiBalance, ethBalance: balances.ethBalance, provider: res.provider, signer: res.signer });
       setUserBalanceQarbi(balances.qarbiBalance);
       setUserBalanceEth(balances.ethBalance);
     } catch (err: any) {
@@ -134,17 +84,8 @@ export function App() {
     }
   };
 
-  const handleDeploymentSuccess = (
-    _newContracts: Record<string, string>,
-    createdTxRecords: TransactionRecord[]
-  ) => {
+  const handleDeploymentSuccess = (_newContracts: Record<string, string>, createdTxRecords: TransactionRecord[]) => {
     setTransactions((prev) => [...createdTxRecords, ...prev]);
-    if (wallet.address) {
-      fetchLiveBalances(wallet.address).then((b) => {
-        setUserBalanceQarbi(b.qarbiBalance);
-        setUserBalanceEth(b.ethBalance);
-      });
-    }
   };
 
   const handleAddAgent = (newAgent: Agent, tx: TransactionRecord) => {
@@ -155,204 +96,54 @@ export function App() {
   const handleEvolveAgent = (agentId: number) => {
     const target = agents.find((a) => a.id === agentId);
     if (!target) return;
-
-    const { updatedAgent, txRecord } = evolveAgentWithStylus(target, 45);
+    // UI-only simulation remains available as a visualization; it does not create a fake on-chain receipt.
+    const { updatedAgent } = evolveAgentWithStylus(target, 45);
     setAgents((prev) => prev.map((a) => (a.id === agentId ? updatedAgent : a)));
-    setTransactions((prev) => [txRecord, ...prev]);
   };
 
   const handleUpdateAgents = (updatedAgents: Agent[], txRecord: TransactionRecord) => {
     setAgents(updatedAgents);
-    setTransactions((prev) => [txRecord, ...prev]);
+    if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]);
   };
 
   const handleAddTask = (newTask: TaskItem, txRecord: TransactionRecord) => {
     setTasks((prev) => [newTask, ...prev]);
-    setTransactions((prev) => [txRecord, ...prev]);
+    if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]);
   };
 
   const handleUpdateTask = (updatedTask: TaskItem, txRecord: TransactionRecord) => {
-    setTasks((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
-    setTransactions((prev) => [txRecord, ...prev]);
-
-    // If task was completed, increment executor's completedTasks and give reputation
-    if (updatedTask.status === "COMPLETED" && updatedTask.assigneeAgentId) {
-      setAgents((prev) =>
-        prev.map((a) => {
-          if (a.id === updatedTask.assigneeAgentId) {
-            return {
-              ...a,
-              completedTasks: a.completedTasks + 1,
-              reputation: Math.min(1000, a.reputation + 25),
-            };
-          }
-          return a;
-        })
-      );
-    }
+    setTasks((prev) => prev.map((item) => (item.id === updatedTask.id ? updatedTask : item)));
+    if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]);
   };
 
   const handleToggleKillSwitch = (txRecord: TransactionRecord) => {
     setIsEmergencyLocked((prev) => !prev);
-    setTransactions((prev) => [txRecord, ...prev]);
+    if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]);
   };
 
-  const handleAddSecurityLog = (log: SecurityEvent) => {
-    setSecurityLogs((prev) => [log, ...prev]);
+  const handleAddSecurityLog = (log: SecurityEvent) => setSecurityLogs((prev) => [log, ...prev]);
+  const handleClaimFaucet = (_qarbiAmount: number, _ethAmount: number, txRecord: TransactionRecord) => {
+    if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]);
+    if (wallet.address) void fetchLiveBalances(wallet.address).then((b) => { setUserBalanceQarbi(b.qarbiBalance); setUserBalanceEth(b.ethBalance); });
   };
-
-  const handleClaimFaucet = (qarbiAmount: number, ethAmount: number, txRecord: TransactionRecord) => {
-    setUserBalanceQarbi((prev) => prev + qarbiAmount);
-    setUserBalanceEth((prev) => prev + ethAmount);
-    setTransactions((prev) => [txRecord, ...prev]);
-  };
-
-  const handleNavigateToTerminal = (agentName: string) => {
-    setTerminalActiveAgent(agentName);
-    setActiveTab("terminal");
-  };
+  const handleNavigateToTerminal = (agentName: string) => { setTerminalActiveAgent(agentName); setActiveTab("terminal"); };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-cyan-500 selection:text-white flex flex-col">
-      {/* Global Header */}
-      <Header
-        t={t}
-        currentLanguage={currentLanguage}
-        onLanguageChange={setCurrentLanguage}
-        userBalanceQarbi={userBalanceQarbi}
-        userBalanceEth={userBalanceEth}
-        onOpenFaucet={() => setIsFaucetOpen(true)}
-        onOpenDeployer={() => setIsDeployerOpen(true)}
-        isEmergencyLocked={isEmergencyLocked}
-        walletAddress={wallet.address}
-        isWalletConnected={wallet.isConnected}
-        isCorrectNetwork={wallet.isCorrectNetwork}
-        onConnectWallet={handleConnectWallet}
-      />
-
-      {/* Navigation Sub-header */}
-      <Navigation
-        activeTab={activeTab}
-        onSelectTab={setActiveTab}
-        t={t}
-        agentCount={agents.length}
-        openTaskCount={tasks.filter((task) => task.status === "OPEN").length}
-        isEmergencyLocked={isEmergencyLocked}
-      />
-
-      {/* Main Content Area */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col">
+      <Header t={t} currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} userBalanceQarbi={userBalanceQarbi} userBalanceEth={userBalanceEth} onOpenFaucet={() => setIsFaucetOpen(true)} onOpenDeployer={() => setIsDeployerOpen(true)} isEmergencyLocked={isEmergencyLocked} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} isCorrectNetwork={wallet.isCorrectNetwork} onConnectWallet={handleConnectWallet} />
+      <Navigation activeTab={activeTab} onSelectTab={setActiveTab} t={t} agentCount={agents.length} openTaskCount={tasks.filter((task) => task.status === "OPEN").length} isEmergencyLocked={isEmergencyLocked} />
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === "spawner" && (
-          <AgentSpawner
-            agents={agents}
-            onAddAgent={handleAddAgent}
-            onEvolveAgent={handleEvolveAgent}
-            t={t}
-            onNavigateToTerminal={handleNavigateToTerminal}
-          />
-        )}
-
-        {activeTab === "conway" && (
-          <ConwayVisualizer
-            agents={agents}
-            onUpdateAgents={handleUpdateAgents}
-            t={t}
-          />
-        )}
-
-        {activeTab === "terminal" && (
-          <AgentTerminal
-            agents={agents}
-            t={t}
-            defaultAgentName={terminalActiveAgent}
-            currentLanguage={currentLanguage}
-          />
-        )}
-
-        {activeTab === "tasks" && (
-          <TaskMarketplace
-            tasks={tasks}
-            agents={agents}
-            onAddTask={handleAddTask}
-            onUpdateTask={handleUpdateTask}
-            t={t}
-          />
-        )}
-
-        {activeTab === "security" && (
-          <SecurityEnclave
-            isEmergencyLocked={isEmergencyLocked}
-            onToggleKillSwitch={handleToggleKillSwitch}
-            securityLogs={securityLogs}
-            onAddLog={handleAddSecurityLog}
-            t={t}
-          />
-        )}
-
-        {activeTab === "explorer" && (
-          <ArbitrumExplorer
-            transactions={transactions}
-            t={t}
-            onOpenDeployer={() => setIsDeployerOpen(true)}
-          />
-        )}
-
-        {activeTab === "whitepaper" && (
-          <WhitepaperViewer
-            t={t}
-          />
-        )}
+        {activeTab === "spawner" && <AgentSpawner agents={agents} onAddAgent={handleAddAgent} onEvolveAgent={handleEvolveAgent} t={t} onNavigateToTerminal={handleNavigateToTerminal} signer={wallet.signer} walletAddress={wallet.address} />}
+        {activeTab === "conway" && <ConwayVisualizer agents={agents} onUpdateAgents={handleUpdateAgents} t={t} />}
+        {activeTab === "terminal" && <AgentTerminal agents={agents} t={t} defaultAgentName={terminalActiveAgent} currentLanguage={currentLanguage} />}
+        {activeTab === "tasks" && <TaskMarketplace tasks={tasks} agents={agents} onAddTask={handleAddTask} onUpdateTask={handleUpdateTask} t={t} />}
+        {activeTab === "security" && <SecurityEnclave isEmergencyLocked={isEmergencyLocked} onToggleKillSwitch={handleToggleKillSwitch} securityLogs={securityLogs} onAddLog={handleAddSecurityLog} t={t} />}
+        {activeTab === "explorer" && <ArbitrumExplorer transactions={transactions} t={t} onOpenDeployer={() => setIsDeployerOpen(true)} />}
+        {activeTab === "whitepaper" && <WhitepaperViewer t={t} />}
       </main>
-
-      {/* 1-Click Onchain Deployer Modal */}
-      <OnchainDeployerModal
-        isOpen={isDeployerOpen}
-        onClose={() => setIsDeployerOpen(false)}
-        signer={wallet.signer}
-        walletAddress={wallet.address}
-        isWalletConnected={wallet.isConnected}
-        ethBalance={wallet.ethBalance}
-        onDeploymentSuccess={handleDeploymentSuccess}
-        t={t}
-      />
-
-      {/* Testnet Token Faucet Modal */}
-      <FaucetModal
-        isOpen={isFaucetOpen}
-        onClose={() => setIsFaucetOpen(false)}
-        onClaim={handleClaimFaucet}
-        t={t}
-        signer={wallet.signer}
-        walletAddress={wallet.address}
-        isWalletConnected={wallet.isConnected}
-      />
-
-      {/* Protocol Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 py-6 text-center text-xs text-slate-400">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p>© 2026 QARBI Protocol · Arbitrum Stylus (Rust Wasm) · NIST ML-DSA-65 PQC · Gemini 2.0 Flash</p>
-          <div className="flex items-center space-x-4">
-            <a
-              href="https://sepolia.arbiscan.io"
-              target="_blank"
-              rel="noreferrer"
-              className="text-slate-400 hover:text-cyan-400 transition"
-            >
-              Arbiscan Sepolia
-            </a>
-            <a
-              href="https://github.com/elon00/QARBI"
-              target="_blank"
-              rel="noreferrer"
-              className="text-slate-400 hover:text-cyan-400 transition"
-            >
-              GitHub Repository
-            </a>
-            <span className="text-slate-700">|</span>
-            <span className="text-emerald-400">All Systems Operational</span>
-          </div>
-        </div>
-      </footer>
+      <OnchainDeployerModal isOpen={isDeployerOpen} onClose={() => setIsDeployerOpen(false)} signer={wallet.signer} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} ethBalance={wallet.ethBalance} onDeploymentSuccess={handleDeploymentSuccess} t={t} />
+      <FaucetModal isOpen={isFaucetOpen} onClose={() => setIsFaucetOpen(false)} onClaim={handleClaimFaucet} t={t} signer={wallet.signer} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} />
+      <footer className="border-t border-slate-900 bg-slate-950/80 py-6 text-center text-xs text-slate-400">© 2026 QARBI Protocol · Arbitrum Sepolia</footer>
     </div>
   );
 }

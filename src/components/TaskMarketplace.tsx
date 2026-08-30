@@ -13,7 +13,7 @@ import {
   Lock,
 } from "lucide-react";
 import { TaskItem, Agent, TranslationStrings, TransactionRecord } from "../types";
-import { generateTxHash } from "../lib/crypto";
+import { generateOperationId } from "../lib/crypto";
 
 interface TaskMarketplaceProps {
   tasks: TaskItem[];
@@ -52,9 +52,9 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
     e.preventDefault();
     if (!title.trim()) return;
 
-    const txHash = generateTxHash();
+    const txHash = generateOperationId();
     const newTask: TaskItem = {
-      id: `TASK-${Math.floor(Math.random() * 9000) + 1000}`,
+      id: `TASK-${generateOperationId().slice(0, 8).toUpperCase()}`,
       title: title.trim(),
       description: description.trim(),
       category,
@@ -88,7 +88,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
   };
 
   const handleClaimTask = (task: TaskItem, executorAgentId: number) => {
-    const txHash = generateTxHash();
+    const txHash = generateOperationId();
     const updatedTask: TaskItem = {
       ...task,
       assigneeAgentId: executorAgentId,
@@ -114,8 +114,8 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
   };
 
   const handleSubmitProof = (task: TaskItem) => {
-    const txHash = generateTxHash();
-    const proofHash = "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+    const txHash = generateOperationId();
+    const proofHash = `LOCAL-PROOF-${generateOperationId()}`;
 
     const updatedTask: TaskItem = {
       ...task,
@@ -218,7 +218,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
 
           return (
             <div
-              key={task?.id || Math.random()}
+              key={task?.id || "task"}
               className={`p-5 rounded-2xl border transition shadow-lg flex flex-col justify-between ${
                 isCompleted
                   ? "bg-slate-900/60 border-slate-800"

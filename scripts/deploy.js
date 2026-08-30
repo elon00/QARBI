@@ -20,75 +20,25 @@ async function main() {
   console.log(`Connecting to Arbitrum Sepolia (Chain ID: ${CHAIN_ID}) at ${RPC_URL}...`);
   const provider = new ethers.JsonRpcProvider(RPC_URL);
 
-  let privateKey = process.env.DEPLOYER_PRIVATE_KEY || process.env.PRIVATE_KEY;
-  let wallet;
-
-  if (privateKey && privateKey.startsWith('0x') && privateKey.length === 66) {
-    wallet = new ethers.Wallet(privateKey, provider);
-    console.log(`Deployer address loaded from .env: ${wallet.address}`);
-  } else {
-    // Generate a dedicated deployment wallet
-    wallet = ethers.Wallet.createRandom().connect(provider);
-    console.log(`\n⚠️ No valid PRIVATE_KEY found in .env. Generated temporary deployer wallet:`);
-    console.log(`Address: ${wallet.address}`);
-    console.log(`Private Key: ${wallet.privateKey}`);
-    console.log(`To deploy with testnet ETH, fund this address with Arbitrum Sepolia ETH or set PRIVATE_KEY in .env\n`);
+  const privateKey = process.env.DEPLOYER_PRIVATE_KEY || process.env.PRIVATE_KEY;
+  if (!privateKey || !privateKey.startsWith('0x') || privateKey.length !== 66) {
+    throw new Error('Missing valid DEPLOYER_PRIVATE_KEY/PRIVATE_KEY. Refusing to generate an ephemeral deployer wallet.');
   }
+  const wallet = new ethers.Wallet(privateKey, provider);
+  const network = await provider.getNetwork();
+  if (Number(network.chainId) !== CHAIN_ID) {
+    throw new Error(`Wrong network: expected chain ${CHAIN_ID}, got ${network.chainId}`);
+  }
+  console.log(`Deployer address loaded from .env: ${wallet.address}`);
 
   const balance = await provider.getBalance(wallet.address);
   const balanceEth = ethers.formatEther(balance);
   console.log(`Deployer balance on Arbitrum Sepolia: ${balanceEth} ETH`);
 
   if (balance === 0n) {
-    console.log(`\nℹ️ Balance is 0 ETH. Generating verified deterministic testnet deployment configuration...`);
-    
-    // Deterministic deployment address computation or active testnet registry
-    const deployedAddresses = {
-      network: "Arbitrum Sepolia",
-      chainId: CHAIN_ID,
-      rpcUrl: RPC_URL,
-      explorerUrl: "https://sepolia.arbiscan.io",
-      deployer: wallet.address,
-      deployedAt: new Date().toISOString(),
-      contracts: {
-        QARBIToken: {
-          address: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
-          name: "QARBIToken.sol",
-          symbol: "QARBI",
-          decimals: 18,
-          verified: true,
-          explorer: `https://sepolia.arbiscan.io/address/0xa513E6E4b8f2a923D98304ec87F64353C4D5C853`
-        },
-        AgentRegistry: {
-          address: "0x89D227316719b407137fFEe47a50C83602525150",
-          name: "AgentRegistry.sol",
-          verified: true,
-          explorer: `https://sepolia.arbiscan.io/address/0x89D227316719b407137fFEe47a50C83602525150`
-        },
-        TaskMarket: {
-          address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-          name: "TaskMarket.sol",
-          verified: true,
-          explorer: `https://sepolia.arbiscan.io/address/0x5FbDB2315678afecb367f032d93F642f64180aa3`
-        },
-        ConwayEngine: {
-          address: "0x3648BfD0d046A9f8ff4579F2188aE15D48074dC8",
-          name: "ConwayEngine.sol",
-          verified: true,
-          explorer: `https://sepolia.arbiscan.io/address/0x3648BfD0d046A9f8ff4579F2188aE15D48074dC8`
-        },
-        AgentWallet: {
-          address: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
-          name: "AgentWallet.sol",
-          verified: true,
-          explorer: `https://sepolia.arbiscan.io/address/0x0165878A594ca255338adfa4d48449f69242Eb8F`
-        }
-      }
-    };
-
-    fs.writeFileSync(addressesFile, JSON.stringify(deployedAddresses, null, 2));
-    console.log(`Saved deployment manifest to: ${addressesFile}`);
-    return;
+    throw new Error(
+      `Deployer ${wallet.address} has 0 Arbitrum Sepolia ETH. Fund this wallet and rerun deployment. No addresses or verification claims were written.`
+    );
   }
 
   console.log(`Deploying smart contracts to Arbitrum Sepolia with wallet ${wallet.address}...`);
@@ -110,6 +60,7 @@ async function main() {
   const tokenContract = await TokenFactory.deploy(10000000n);
   await tokenContract.waitForDeployment();
   const tokenAddress = await tokenContract.getAddress();
+  const tokenDeploymentTxHash = tokenContract.deploymentTransaction()?.hash ?? null;
   console.log(`✓ QARBIToken deployed at: ${tokenAddress}`);
 
   // 2. Deploy AgentRegistry
@@ -118,6 +69,7 @@ async function main() {
   const registryContract = await RegistryFactory.deploy();
   await registryContract.waitForDeployment();
   const registryAddress = await registryContract.getAddress();
+  const registryDeploymentTxHash = registryContract.deploymentTransaction()?.hash ?? null;
   console.log(`✓ AgentRegistry deployed at: ${registryAddress}`);
 
   // 3. Deploy TaskMarket
@@ -126,6 +78,7 @@ async function main() {
   const marketContract = await MarketFactory.deploy(tokenAddress, registryAddress);
   await marketContract.waitForDeployment();
   const marketAddress = await marketContract.getAddress();
+  const marketDeploymentTxHash = marketContract.deploymentTransaction()?.hash ?? null;
   console.log(`✓ TaskMarket deployed at: ${marketAddress}`);
 
   // Set TaskMarket address in AgentRegistry
@@ -139,6 +92,7 @@ async function main() {
   const conwayContract = await ConwayFactory.deploy();
   await conwayContract.waitForDeployment();
   const conwayAddress = await conwayContract.getAddress();
+  const conwayDeploymentTxHash = conwayContract.deploymentTransaction()?.hash ?? null;
   console.log(`✓ ConwayEngine deployed at: ${conwayAddress}`);
 
   // 5. Deploy AgentWallet
@@ -152,6 +106,7 @@ async function main() {
   );
   await walletContract.waitForDeployment();
   const walletAddress = await walletContract.getAddress();
+  const walletDeploymentTxHash = walletContract.deploymentTransaction()?.hash ?? null;
   console.log(`✓ AgentWallet deployed at: ${walletAddress}`);
 
   const deployedAddresses = {
@@ -161,37 +116,43 @@ async function main() {
     explorerUrl: "https://sepolia.arbiscan.io",
     deployer: wallet.address,
     deployedAt: new Date().toISOString(),
+    deploymentEvidence: "Contract addresses require explorer verification before verified=true",
     contracts: {
       QARBIToken: {
         address: tokenAddress,
         name: "QARBIToken.sol",
         symbol: "QARBI",
         decimals: 18,
-        verified: true,
+        verified: false,
+        deploymentTxHash: tokenDeploymentTxHash,
         explorer: `https://sepolia.arbiscan.io/address/${tokenAddress}`
       },
       AgentRegistry: {
         address: registryAddress,
         name: "AgentRegistry.sol",
-        verified: true,
+        verified: false,
+        deploymentTxHash: registryDeploymentTxHash,
         explorer: `https://sepolia.arbiscan.io/address/${registryAddress}`
       },
       TaskMarket: {
         address: marketAddress,
         name: "TaskMarket.sol",
-        verified: true,
+        verified: false,
+        deploymentTxHash: marketDeploymentTxHash,
         explorer: `https://sepolia.arbiscan.io/address/${marketAddress}`
       },
       ConwayEngine: {
         address: conwayAddress,
         name: "ConwayEngine.sol",
-        verified: true,
+        verified: false,
+        deploymentTxHash: conwayDeploymentTxHash,
         explorer: `https://sepolia.arbiscan.io/address/${conwayAddress}`
       },
       AgentWallet: {
         address: walletAddress,
         name: "AgentWallet.sol",
-        verified: true,
+        verified: false,
+        deploymentTxHash: walletDeploymentTxHash,
         explorer: `https://sepolia.arbiscan.io/address/${walletAddress}`
       }
     }

@@ -1,52 +1,56 @@
-/**
- * Hybrid Post-Quantum Cryptography (PQC) & EVM Commitment Helper
- * Simulates NIST FIPS 204 ML-DSA-65 (CRYSTALS-Dilithium3) keypair generation
- * and derives on-chain compatible bytes32 Keccak-256 commitment hash.
- */
+import { createMlDsa65Provider } from './mlDsa65Provider';
 
 export interface PQCIdentityResult {
-  algorithm: string;
+  algorithm: 'ML-DSA-65';
   publicKeyHex: string;
   publicKeyPreview: string;
-  pqcCommitmentHash: string; // 0x... bytes32
-  delegatedWalletAddress: string;
+  pqcCommitmentHash: string;
+  signatureHex: string;
   signaturePreview: string;
   createdAt: number;
 }
 
-// Deterministic / Secure pseudo-random hex generator for client
-function generateRandomHex(length: number): string {
-  const chars = "0123456789abcdef";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return result;
+const encoder = new TextEncoder();
+
+function bytesToHex(bytes: Uint8Array): string {
+  return `0x${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}`;
 }
 
-export function generatePQCIdentity(agentName?: string): PQCIdentityResult {
-  // ML-DSA-65 public keys are 1952 bytes (3904 hex chars)
-  const simulatedPubKeyHex = "0x" + generateRandomHex(3904);
-  const pqcCommitmentHash = "0x" + generateRandomHex(64); // 32-byte Keccak-256 hash
-  const delegatedWalletAddress = "0x" + generateRandomHex(40);
-  const signaturePreview = "0x" + generateRandomHex(130);
+async function sha256Hex(bytes: Uint8Array): Promise<string> {
+  const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+  return bytesToHex(new Uint8Array(digest));
+}
+
+export async function generatePQCIdentity(agentName = 'QARBI-Agent'): Promise<PQCIdentityResult> {
+  const provider = await createMlDsa65Provider();
+  const { publicKey, secretKey } = await provider.keygen();
+  const message = encoder.encode(`QARBI:PQC-IDENTITY:${agentName}`);
+  const signature = await provider.sign(message, secretKey);
+  const valid = await provider.verify(message, signature, publicKey);
+  if (!valid) throw new Error('ML-DSA-65 self-verification failed');
+
+  const publicKeyHex = bytesToHex(publicKey);
+  const signatureHex = bytesToHex(signature);
+  const pqcCommitmentHash = await sha256Hex(publicKey);
 
   return {
-    algorithm: "ML-DSA-65 (NIST FIPS 204 / Dilithium3)",
-    publicKeyHex: simulatedPubKeyHex,
-    publicKeyPreview: `${simulatedPubKeyHex.slice(0, 10)}...${simulatedPubKeyHex.slice(-8)} (1952 Bytes)`,
+    algorithm: 'ML-DSA-65',
+    publicKeyHex,
+    publicKeyPreview: `${publicKeyHex.slice(0, 10)}...${publicKeyHex.slice(-8)}`,
     pqcCommitmentHash,
-    delegatedWalletAddress,
-    signaturePreview,
+    signatureHex,
+    signaturePreview: `${signatureHex.slice(0, 10)}...${signatureHex.slice(-8)}`,
     createdAt: Date.now(),
   };
-}
-
-export function generateTxHash(): string {
-  return "0x" + generateRandomHex(64);
 }
 
 export function formatAddress(address: string): string {
   if (!address || address.length < 10) return address;
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
+export function generateOperationId(): string {
+  const bytes = new Uint8Array(16);
+  globalThis.crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
 }

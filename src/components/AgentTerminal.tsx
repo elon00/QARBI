@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Agent, TranslationStrings, TaskItem, TransactionRecord } from "../types";
 import { validateAgentIntent } from "../lib/policyEngine";
-import { generateTxHash } from "../lib/crypto";
+import { generateOperationId } from "../lib/crypto";
 
 interface AgentTerminalProps {
   agents: Agent[];
@@ -168,7 +168,7 @@ export const AgentTerminal: React.FC<AgentTerminalProps> = ({
       // Step 4: Arbitrum Sepolia Onchain Settlement
       await new Promise((r) => setTimeout(r, 700));
 
-      const txHash = generateTxHash();
+      const txHash = generateOperationId();
       const newTask: TaskItem = {
         id: `TASK-${Math.floor(Math.random() * 9000) + 1000}`,
         title: plan.taskTitle || "Autonomous On-Chain Mission",

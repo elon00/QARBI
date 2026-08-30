@@ -2,7 +2,7 @@ name: CI - Build & Quality Assurance
 
 on:
   push:
-    branches: [main]
+    branches: [main, production-hardening]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -12,35 +12,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-test:
-    name: Build & Typecheck (Node ${{ matrix.node-version }})
+  build-test-guard:
+    name: Build, Contract Compile & Production Guard (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20.x, 22.x]
-
+        node-version: [22.x, 24.x]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
-
+          cache: npm
       - name: Install Dependencies
         run: npm ci
-
-      - name: Typecheck & Static Analysis
+      - name: Typecheck
         run: npm run typecheck
-
+      - name: Compile Smart Contracts
+        run: npm run contracts:compile
+      - name: Production Guard
+        run: npm run production:guard
       - name: Production Build
         run: npm run build
-
       - name: Verify Build Artifacts
         run: |
-          test -d dist || { echo "dist directory missing"; exit 1; }
-          test -f dist/server.cjs || { echo "server.cjs bundle missing"; exit 1; }
-          test -f dist/index.html || { echo "index.html bundle missing"; exit 1; }
-          echo "All build artifacts successfully verified!"
+          test -d dist
+          test -f dist/server.cjs
+          test -f dist/index.html
+          echo "Build artifacts verified."

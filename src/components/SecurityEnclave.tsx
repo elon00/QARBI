@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { SecurityEvent, TranslationStrings, Agent, TransactionRecord } from "../types";
 import { validateAgentIntent } from "../lib/policyEngine";
-import { generateTxHash } from "../lib/crypto";
+import { generateOperationId } from "../lib/crypto";
 
 interface SecurityEnclaveProps {
   securityLogs: SecurityEvent[];
@@ -143,7 +143,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
   };
 
   const handleToggleKill = () => {
-    const txHash = generateTxHash();
+    const txHash = generateOperationId();
     const newStatus = !isEmergencyLocked;
     const txRecord: TransactionRecord = {
       hash: txHash,
