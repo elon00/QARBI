@@ -3,7 +3,10 @@ const { spawnSync } = require('child_process');
 
 const mode = process.argv[2] || 'dev';
 const phases = [
+  ['Dependency reproducibility', ['ci']],
   ['Typecheck', ['run', 'typecheck']],
+  ['PQC reality gate', ['run', 'pqc:real']],
+  ['Security gate', ['run', 'security:taskmarket']],
   ['Contract compile', ['run', 'contracts:compile']],
   ['Production guard', ['run', 'production:guard']],
   ...(mode === 'release' ? [['Release evidence gate', ['run', 'release:gate']]] : []),
@@ -20,5 +23,5 @@ for (const [name, args] of phases) {
     process.exit(1);
   }
 }
-console.log('\nONE-CLICK: PASS — ' + (mode === 'release' ? 'release prerequisites passed' : 'local production baseline passed'));
-console.log('Truthfulness rule: this command never fabricates keys, funds, deployments, PQC proofs, or blockchain receipts.');
+console.log('\nONE-CLICK: PASS — all applicable local evidence gates passed');
+console.log('Truthfulness rule: this command never fabricates keys, funds, deployments, PQC proofs, blockchain receipts, or production claims.');
