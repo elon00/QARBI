@@ -36,7 +36,10 @@
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist server.js",
     "typecheck": "tsc --noEmit",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "check:env": "node scripts/check-env.mjs",
+    "check:truth": "node scripts/check-truth.mjs",
+    "test": "npm run check:env && npm run check:truth && npm run typecheck && npm run build"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
