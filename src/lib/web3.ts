@@ -21,82 +21,69 @@ export interface WalletState {
   signer: ethers.JsonRpcSigner | null;
 }
 
-// Fallback safety for BroadcastChannel in restricted/sandboxed browser environments
-if (typeof window !== "undefined") {
-  if (typeof (window as any).BroadcastChannel === "undefined") {
-    try {
-      (window as any).BroadcastChannel = class {
-        name: string;
-        onmessage: any = null;
-        constructor(name: string) {
-          this.name = name;
-        }
-        postMessage() {}
-        close() {}
-      };
-    } catch {
-      // Ignore
-    }
-  }
-}
-
 export type WalletType = "metamask" | "trust";
 
-function isTrustProvider(provider: any): boolean {
+type Eip1193Provider = {
+  request: (args: { method: string; params?: unknown[] }) => Promise<any>;
+  on?: (event: string, handler: (...args: any[]) => void) => void;
+  removeListener?: (event: string, handler: (...args: any[]) => void) => void;
+  isMetaMask?: boolean;
+  isTrust?: boolean;
+  isTrustWallet?: boolean;
+  providerInfo?: { rdns?: string; name?: string };
+};
+
+function isTrustProvider(provider: Eip1193Provider | null | undefined): boolean {
   return Boolean(provider?.isTrust || provider?.isTrustWallet || provider?.providerInfo?.rdns === "com.trustwallet.app");
 }
 
-function isMetaMaskProvider(provider: any): boolean {
+function isMetaMaskProvider(provider: Eip1193Provider | null | undefined): boolean {
   return Boolean(provider?.isMetaMask) && !isTrustProvider(provider);
 }
 
-function addUniqueProvider(list: any[], provider: any) {
+function addUniqueProvider(list: Eip1193Provider[], provider: Eip1193Provider | null | undefined) {
   if (provider && !list.includes(provider)) list.push(provider);
 }
 
-async function getWalletProviders(): Promise<any[]> {
+async function getWalletProviders(): Promise<Eip1193Provider[]> {
   if (typeof window === "undefined") return [];
-  const win = window as any;
-  const providers: any[] = [];
+  const win = window as Window & typeof globalThis & {
+    ethereum?: Eip1193Provider & { providers?: Eip1193Provider[] };
+    trustwallet?: { ethereum?: Eip1193Provider };
+  };
+  const providers: Eip1193Provider[] = [];
 
   if (Array.isArray(win.ethereum?.providers)) {
-    for (const provider of win.ethereum.providers) addUniqueProvider(providers, provider);
+    win.ethereum.providers.forEach((provider) => addUniqueProvider(providers, provider));
   } else {
     addUniqueProvider(providers, win.ethereum);
   }
   addUniqueProvider(providers, win.trustwallet?.ethereum);
 
-  const discovered: any[] = [];
-  const handler = (event: any) => {
-    const detail = event?.detail;
+  const discovered: Eip1193Provider[] = [];
+  const handler = (event: Event) => {
+    const detail = (event as CustomEvent<{ provider?: Eip1193Provider; info?: { rdns?: string; name?: string } }>).detail;
     if (detail?.provider) {
       detail.provider.providerInfo = detail.info;
       addUniqueProvider(discovered, detail.provider);
     }
   };
 
-  window.addEventListener("eip6963:announceProvider", handler as EventListener);
+  window.addEventListener("eip6963:announceProvider", handler);
   window.dispatchEvent(new Event("eip6963:requestProvider"));
   await new Promise((resolve) => window.setTimeout(resolve, 300));
-  window.removeEventListener("eip6963:announceProvider", handler as EventListener);
+  window.removeEventListener("eip6963:announceProvider", handler);
 
-  for (const provider of discovered) addUniqueProvider(providers, provider);
+  discovered.forEach((provider) => addUniqueProvider(providers, provider));
   return providers;
 }
 
-async function getInjectedProvider(walletType: WalletType): Promise<any> {
+async function getInjectedProvider(walletType: WalletType): Promise<Eip1193Provider | null> {
   const providers = await getWalletProviders();
-
   if (walletType === "trust") {
-    return providers.find((p: any) => isTrustProvider(p))
-      || (window as any).trustwallet?.ethereum
-      || null;
+    return providers.find((provider) => isTrustProvider(provider)) || null;
   }
-
-  return providers.find((p: any) => isMetaMaskProvider(p))
-    || ((window as any).ethereum && !isTrustProvider((window as any).ethereum)
-      ? (window as any).ethereum
-      : null);
+  return providers.find((provider) => isMetaMaskProvider(provider)) || null;
 }
 
 export function getPublicRpcProvider(): ethers.JsonRpcProvider {
@@ -109,27 +96,18 @@ export async function checkWalletConnection(): Promise<{
   isCorrectNetwork: boolean;
 }> {
   const ethereum = await getInjectedProvider("metamask");
-  if (!ethereum) {
-    return { address: null, chainId: null, isCorrectNetwork: false };
-  }
-
+  if (!ethereum) return { address: null, chainId: null, isCorrectNetwork: false };
   try {
     const accounts = await ethereum.request({ method: "eth_accounts" });
     const chainIdHex = await ethereum.request({ method: "eth_chainId" });
-    const chainId = parseInt(chainIdHex, 16);
-
-    if (accounts && accounts.length > 0) {
-      return {
-        address: accounts[0],
-        chainId,
-        isCorrectNetwork: chainId === ARBITRUM_SEPOLIA_CHAIN_ID,
-      };
-    }
+    const chainId = parseInt(String(chainIdHex), 16);
+    return accounts?.length
+      ? { address: accounts[0], chainId, isCorrectNetwork: chainId === ARBITRUM_SEPOLIA_CHAIN_ID }
+      : { address: null, chainId: null, isCorrectNetwork: false };
   } catch (error) {
     console.warn("Silent check of wallet connection:", error);
+    return { address: null, chainId: null, isCorrectNetwork: false };
   }
-
-  return { address: null, chainId: null, isCorrectNetwork: false };
 }
 
 export async function connectWallet(walletType: WalletType = "metamask"): Promise<{
@@ -142,120 +120,69 @@ export async function connectWallet(walletType: WalletType = "metamask"): Promis
   const ethereum = await getInjectedProvider(walletType);
   if (!ethereum) {
     const label = walletType === "metamask" ? "MetaMask" : "Trust Wallet";
-    throw new Error(`${label} was not detected. Open/activate ${label} and try again.`);
+    throw new Error(`${label} was not detected. Install/enable the ${label} browser extension, unlock it, then retry.`);
   }
 
-  try {
-    const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-    if (!accounts || accounts.length === 0) {
-      throw new Error("No accounts selected in wallet");
-    }
+  const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+  if (!accounts?.length) throw new Error("No accounts selected in wallet");
 
-    const provider = new ethers.BrowserProvider(ethereum, "any");
-    let network = await provider.getNetwork();
-    let chainId = Number(network.chainId);
+  const provider = new ethers.BrowserProvider(ethereum, "any");
+  let chainId = Number((await provider.getNetwork()).chainId);
 
-    if (chainId !== ARBITRUM_SEPOLIA_CHAIN_ID) {
-      try {
+  if (chainId !== ARBITRUM_SEPOLIA_CHAIN_ID) {
+    try {
+      await ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: ARBITRUM_SEPOLIA_HEX_CHAIN_ID }] });
+    } catch (switchError: any) {
+      if (switchError?.code === 4902 || /unrecognized chain|chain not added/i.test(String(switchError?.message || ""))) {
         await ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: ARBITRUM_SEPOLIA_HEX_CHAIN_ID }],
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: ARBITRUM_SEPOLIA_HEX_CHAIN_ID,
+            chainName: "Arbitrum Sepolia",
+            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+            rpcUrls: [ARBITRUM_SEPOLIA_RPC],
+            blockExplorerUrls: ["https://sepolia.arbiscan.io"],
+          }],
         });
-        chainId = ARBITRUM_SEPOLIA_CHAIN_ID;
-      } catch (switchError: any) {
-        if (switchError.code === 4902 || switchError.message?.includes("Unrecognized chain")) {
-          await ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [
-              {
-                chainId: ARBITRUM_SEPOLIA_HEX_CHAIN_ID,
-                chainName: "Arbitrum Sepolia Testnet",
-                nativeCurrency: {
-                  name: "Ethereum",
-                  symbol: "ETH",
-                  decimals: 18,
-                },
-                rpcUrls: [ARBITRUM_SEPOLIA_RPC, "https://arbitrum-sepolia-rpc.publicnode.com"],
-                blockExplorerUrls: ["https://sepolia.arbiscan.io"],
-              },
-            ],
-          });
-          chainId = ARBITRUM_SEPOLIA_CHAIN_ID;
-        } else {
-          console.warn("Chain switch error ignored:", switchError);
-        }
+      } else {
+        throw switchError;
       }
     }
-
-    const signer = await provider.getSigner();
-    return {
-      address: accounts[0],
-      chainId,
-      isCorrectNetwork: chainId === ARBITRUM_SEPOLIA_CHAIN_ID,
-      provider,
-      signer,
-    };
-  } catch (error: any) {
-    console.error("Connect wallet error:", error);
-    throw new Error(error.message || "Failed to connect wallet");
+    chainId = Number((await provider.getNetwork()).chainId);
   }
+
+  const signer = await provider.getSigner();
+  return {
+    address: accounts[0],
+    chainId,
+    isCorrectNetwork: chainId === ARBITRUM_SEPOLIA_CHAIN_ID,
+    provider,
+    signer,
+  };
 }
 
 export function getContractInstances(signerOrProvider?: ethers.Signer | ethers.Provider) {
   const runner = signerOrProvider || getPublicRpcProvider();
-
-  const token = new ethers.Contract(
-    deployedAddresses.contracts.QARBIToken.address,
-    QARBITokenAbi,
-    runner
-  );
-
-  const registry = new ethers.Contract(
-    deployedAddresses.contracts.AgentRegistry.address,
-    AgentRegistryAbi,
-    runner
-  );
-
-  const market = new ethers.Contract(
-    deployedAddresses.contracts.TaskMarket.address,
-    TaskMarketAbi,
-    runner
-  );
-
-  const wallet = new ethers.Contract(
-    deployedAddresses.contracts.AgentWallet.address,
-    AgentWalletAbi,
-    runner
-  );
-
-  const conway = new ethers.Contract(
-    deployedAddresses.contracts.ConwayEngine.address,
-    ConwayEngineAbi,
-    runner
-  );
-
-  return { token, registry, market, wallet, conway };
+  return {
+    token: new ethers.Contract(deployedAddresses.contracts.QARBIToken.address, QARBITokenAbi, runner),
+    registry: new ethers.Contract(deployedAddresses.contracts.AgentRegistry.address, AgentRegistryAbi, runner),
+    market: new ethers.Contract(deployedAddresses.contracts.TaskMarket.address, TaskMarketAbi, runner),
+    wallet: new ethers.Contract(deployedAddresses.contracts.AgentWallet.address, AgentWalletAbi, runner),
+    conway: new ethers.Contract(deployedAddresses.contracts.ConwayEngine.address, ConwayEngineAbi, runner),
+  };
 }
 
-export async function fetchLiveBalances(address: string): Promise<{
-  ethBalance: number;
-  qarbiBalance: number;
-}> {
+export async function fetchLiveBalances(address: string): Promise<{ ethBalance: number; qarbiBalance: number }> {
   try {
     const provider = getPublicRpcProvider();
-    const ethWei = await provider.getBalance(address);
-    const ethBalance = parseFloat(ethers.formatEther(ethWei));
-
+    const ethBalance = parseFloat(ethers.formatEther(await provider.getBalance(address)));
     const { token } = getContractInstances(provider);
-    let qarbiBalance = 250;
     try {
-      const qarbiWei = await token.balanceOf(address);
-      qarbiBalance = parseFloat(ethers.formatEther(qarbiWei));
+      const qarbiBalance = parseFloat(ethers.formatEther(await token.balanceOf(address)));
+      return { ethBalance, qarbiBalance };
     } catch {
-      // Fallback
+      return { ethBalance, qarbiBalance: 0 };
     }
-
-    return { ethBalance, qarbiBalance };
   } catch (error) {
     console.error("Error fetching live balances:", error);
     return { ethBalance: 0, qarbiBalance: 0 };
