@@ -34,7 +34,11 @@ type Eip1193Provider = {
 };
 
 function isTrustProvider(provider: Eip1193Provider | null | undefined): boolean {
-  return Boolean(provider?.isTrust || provider?.isTrustWallet || provider?.providerInfo?.rdns === "com.trustwallet.app");
+  return Boolean(
+    provider?.isTrust ||
+      provider?.isTrustWallet ||
+      provider?.providerInfo?.rdns === "com.trustwallet.app"
+  );
 }
 
 function isMetaMaskProvider(provider: Eip1193Provider | null | undefined): boolean {
@@ -47,10 +51,12 @@ function addUniqueProvider(list: Eip1193Provider[], provider: Eip1193Provider | 
 
 async function getWalletProviders(): Promise<Eip1193Provider[]> {
   if (typeof window === "undefined") return [];
+
   const win = window as Window & typeof globalThis & {
     ethereum?: Eip1193Provider & { providers?: Eip1193Provider[] };
     trustwallet?: { ethereum?: Eip1193Provider };
   };
+
   const providers: Eip1193Provider[] = [];
 
   if (Array.isArray(win.ethereum?.providers)) {
@@ -62,7 +68,10 @@ async function getWalletProviders(): Promise<Eip1193Provider[]> {
 
   const discovered: Eip1193Provider[] = [];
   const handler = (event: Event) => {
-    const detail = (event as CustomEvent<{ provider?: Eip1193Provider; info?: { rdns?: string; name?: string } }>).detail;
+    const detail = (event as CustomEvent<{
+      provider?: Eip1193Provider;
+      info?: { rdns?: string; name?: string };
+    }>).detail;
     if (detail?.provider) {
       detail.provider.providerInfo = detail.info;
       addUniqueProvider(discovered, detail.provider);
@@ -71,7 +80,7 @@ async function getWalletProviders(): Promise<Eip1193Provider[]> {
 
   window.addEventListener("eip6963:announceProvider", handler);
   window.dispatchEvent(new Event("eip6963:requestProvider"));
-  await new Promise((resolve) => window.setTimeout(resolve, 300));
+  await new Promise((resolve) => window.setTimeout(resolve, 400));
   window.removeEventListener("eip6963:announceProvider", handler);
 
   discovered.forEach((provider) => addUniqueProvider(providers, provider));
@@ -80,10 +89,12 @@ async function getWalletProviders(): Promise<Eip1193Provider[]> {
 
 async function getInjectedProvider(walletType: WalletType): Promise<Eip1193Provider | null> {
   const providers = await getWalletProviders();
+
   if (walletType === "trust") {
-    return providers.find((provider) => isTrustProvider(provider)) || null;
+    return providers.find(isTrustProvider) || null;
   }
-  return providers.find((provider) => isMetaMaskProvider(provider)) || null;
+
+  return providers.find(isMetaMaskProvider) || null;
 }
 
 export function getPublicRpcProvider(): ethers.JsonRpcProvider {
@@ -95,8 +106,11 @@ export async function checkWalletConnection(): Promise<{
   chainId: number | null;
   isCorrectNetwork: boolean;
 }> {
+  // Do not probe with eth_requestAccounts during page load. Only inspect a
+  // previously authorized MetaMask account to avoid triggering extension UI.
   const ethereum = await getInjectedProvider("metamask");
   if (!ethereum) return { address: null, chainId: null, isCorrectNetwork: false };
+
   try {
     const accounts = await ethereum.request({ method: "eth_accounts" });
     const chainIdHex = await ethereum.request({ method: "eth_chainId" });
@@ -105,7 +119,7 @@ export async function checkWalletConnection(): Promise<{
       ? { address: accounts[0], chainId, isCorrectNetwork: chainId === ARBITRUM_SEPOLIA_CHAIN_ID }
       : { address: null, chainId: null, isCorrectNetwork: false };
   } catch (error) {
-    console.warn("Silent check of wallet connection:", error);
+    console.warn("Silent wallet check failed:", error);
     return { address: null, chainId: null, isCorrectNetwork: false };
   }
 }
@@ -118,47 +132,67 @@ export async function connectWallet(walletType: WalletType = "metamask"): Promis
   signer: ethers.JsonRpcSigner;
 }> {
   const ethereum = await getInjectedProvider(walletType);
+  const label = walletType === "metamask" ? "MetaMask" : "Trust Wallet";
+
   if (!ethereum) {
-    const label = walletType === "metamask" ? "MetaMask" : "Trust Wallet";
-    throw new Error(`${label} was not detected. Install/enable the ${label} browser extension, unlock it, then retry.`);
+    throw new Error(
+      `${label} was not detected. Install, unlock, and enable the ${label} extension, then reload this page.`
+    );
   }
 
-  const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-  if (!accounts?.length) throw new Error("No accounts selected in wallet");
+  try {
+    const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+    if (!accounts?.length) throw new Error(`No account was selected in ${label}`);
 
-  const provider = new ethers.BrowserProvider(ethereum, "any");
-  let chainId = Number((await provider.getNetwork()).chainId);
+    const provider = new ethers.BrowserProvider(ethereum, "any");
+    let chainId = Number((await provider.getNetwork()).chainId);
 
-  if (chainId !== ARBITRUM_SEPOLIA_CHAIN_ID) {
-    try {
-      await ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: ARBITRUM_SEPOLIA_HEX_CHAIN_ID }] });
-    } catch (switchError: any) {
-      if (switchError?.code === 4902 || /unrecognized chain|chain not added/i.test(String(switchError?.message || ""))) {
+    if (chainId !== ARBITRUM_SEPOLIA_CHAIN_ID) {
+      try {
         await ethereum.request({
-          method: "wallet_addEthereumChain",
-          params: [{
-            chainId: ARBITRUM_SEPOLIA_HEX_CHAIN_ID,
-            chainName: "Arbitrum Sepolia",
-            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-            rpcUrls: [ARBITRUM_SEPOLIA_RPC],
-            blockExplorerUrls: ["https://sepolia.arbiscan.io"],
-          }],
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: ARBITRUM_SEPOLIA_HEX_CHAIN_ID }],
         });
-      } else {
-        throw switchError;
+      } catch (switchError: any) {
+        if (
+          switchError?.code === 4902 ||
+          /unrecognized chain|chain not added/i.test(String(switchError?.message || ""))
+        ) {
+          await ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainId: ARBITRUM_SEPOLIA_HEX_CHAIN_ID,
+                chainName: "Arbitrum Sepolia",
+                nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+                rpcUrls: [ARBITRUM_SEPOLIA_RPC],
+                blockExplorerUrls: ["https://sepolia.arbiscan.io"],
+              },
+            ],
+          });
+        } else {
+          throw switchError;
+        }
       }
+      chainId = Number((await provider.getNetwork()).chainId);
     }
-    chainId = Number((await provider.getNetwork()).chainId);
-  }
 
-  const signer = await provider.getSigner();
-  return {
-    address: accounts[0],
-    chainId,
-    isCorrectNetwork: chainId === ARBITRUM_SEPOLIA_CHAIN_ID,
-    provider,
-    signer,
-  };
+    if (chainId !== ARBITRUM_SEPOLIA_CHAIN_ID) {
+      throw new Error(`Please switch ${label} to Arbitrum Sepolia (Chain ID ${ARBITRUM_SEPOLIA_CHAIN_ID}).`);
+    }
+
+    const signer = await provider.getSigner();
+    return {
+      address: accounts[0],
+      chainId,
+      isCorrectNetwork: true,
+      provider,
+      signer,
+    };
+  } catch (error: any) {
+    console.error(`${label} connection error:`, error);
+    throw new Error(error?.message || `Failed to connect ${label}`);
+  }
 }
 
 export function getContractInstances(signerOrProvider?: ethers.Signer | ethers.Provider) {
@@ -177,12 +211,13 @@ export async function fetchLiveBalances(address: string): Promise<{ ethBalance: 
     const provider = getPublicRpcProvider();
     const ethBalance = parseFloat(ethers.formatEther(await provider.getBalance(address)));
     const { token } = getContractInstances(provider);
+    let qarbiBalance = 0;
     try {
-      const qarbiBalance = parseFloat(ethers.formatEther(await token.balanceOf(address)));
-      return { ethBalance, qarbiBalance };
+      qarbiBalance = parseFloat(ethers.formatEther(await token.balanceOf(address)));
     } catch {
-      return { ethBalance, qarbiBalance: 0 };
+      // Leave balance at 0 when the token contract is unavailable.
     }
+    return { ethBalance, qarbiBalance };
   } catch (error) {
     console.error("Error fetching live balances:", error);
     return { ethBalance: 0, qarbiBalance: 0 };
