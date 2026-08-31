@@ -7,13 +7,6 @@
   "deployedAt": "2026-08-31T06:27:29.033Z",
   "deploymentEvidence": "Contract addresses require explorer verification before verified=true",
   "contracts": {
-<<<<<<< Updated upstream
-    "QARBIToken": {"address": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853","name": "QARBIToken.sol","symbol": "QARBI","decimals": 18,"verified": false,"explorer": "https://sepolia.arbiscan.io/address/0xa513E6E4b8f2a923D98304ec87F64353C4D5C853"},
-    "AgentRegistry": {"address": "0x89D227316719b407137fFEe47a50C83602525150","name": "AgentRegistry.sol","verified": false,"explorer": "https://sepolia.arbiscan.io/address/0x89D227316719b407137fFEe47a50C83602525150"},
-    "TaskMarket": {"address": "0x5FbDB2315678afecb367f032d93F642f64180aa3","name": "TaskMarket.sol","verified": false,"explorer": "https://sepolia.arbiscan.io/address/0x5FbDB2315678afecb367f032d93F642f64180aa3"},
-    "ConwayEngine": {"address": "0x3648BfD0d046A9f8ff4579F2188aE15D48074dC8","name": "ConwayEngine.sol","verified": false,"explorer": "https://sepolia.arbiscan.io/address/0x3648BfD0d046A9f8ff4579F2188aE15D48074dC8"},
-    "AgentWallet": {"address": "0x0165878A594ca255338adfa4d48449f69242Eb8F","name": "AgentWallet.sol","verified": false,"explorer": "https://sepolia.arbiscan.io/address/0x0165878A594ca255338adfa4d48449f69242Eb8F"}
-=======
     "QARBIToken": {
       "address": "0x801146d478D5C3e6C8302c4De064706Da4E44E25",
       "name": "QARBIToken.sol",
@@ -51,6 +44,5 @@
       "deploymentTxHash": "0xc1d4720d0f790862a684c2de581fda25db12b4ff359075954f00c258e46199c4",
       "explorer": "https://sepolia.arbiscan.io/address/0xf934f7315CbDE2436C44c0AdD456f7BE5b27c413"
     }
->>>>>>> Stashed changes
   }
 }
