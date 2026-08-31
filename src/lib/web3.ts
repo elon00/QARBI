@@ -98,9 +98,10 @@ export async function connectWallet(walletType: WalletType = "metamask"): Promis
   provider: ethers.BrowserProvider;
   signer: ethers.JsonRpcSigner;
 }> {
-  const ethereum = getInjectedProvider();
+  const ethereum = getInjectedProvider(walletType);
   if (!ethereum) {
-    throw new Error("No Web3 wallet (Trust Wallet / MetaMask) detected. Please ensure your wallet is active.");
+    const label = walletType === "metamask" ? "MetaMask" : "Trust Wallet";
+    throw new Error(`${label} was not detected. Open/activate ${label} and try again.`);
   }
 
   try {
@@ -216,7 +217,7 @@ export async function fetchLiveBalances(address: string): Promise<{
     return { ethBalance, qarbiBalance };
   } catch (error) {
     console.error("Error fetching live balances:", error);
-    return { ethBalance: 0.245, qarbiBalance: 250 };
+    return { ethBalance: 0, qarbiBalance: 0 };
   }
 }
 
