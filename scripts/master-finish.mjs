@@ -7,11 +7,8 @@ function run(label, args) {
   console.log('\n' + '='.repeat(72));
   console.log('MASTER FINISH: ' + label);
   console.log('='.repeat(72));
-  const command = process.platform === 'win32' ? 'cmd.exe' : 'npm';
-  const commandArgs = process.platform === 'win32'
-    ? ['/d', '/s', '/c', ['npm.cmd', ...args].map((a) => `"${String(a).replaceAll('"', '\\"')}"`).join(' ')]
-    : args;
-  const r = spawnSync(command, commandArgs, { stdio: 'inherit', shell: false });
+  const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+  const r = spawnSync(npmCommand, args, { stdio: 'inherit', shell: false, windowsVerbatimArguments: true });
   if (r.error) {
     console.error('MASTER FINISH: FAIL — unable to start npm:', r.error.message);
     process.exit(1);
