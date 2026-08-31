@@ -3,20 +3,21 @@ import { spawnSync } from 'node:child_process';
 import dotenv from 'dotenv';
 import { JsonRpcProvider, Wallet, formatEther } from 'ethers';
 
+dotenv.config({ quiet: true });
+
 function run(label, args) {
   console.log('\n' + '='.repeat(72));
   console.log('MASTER FINISH: ' + label);
   console.log('='.repeat(72));
-  const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-  const r = spawnSync(npmCommand, args, { stdio: 'inherit', shell: false, windowsVerbatimArguments: true });
+  const r = process.platform === 'win32'
+    ? spawnSync(process.env.ComSpec || 'cmd.exe', ['/d', '/c', 'npm.cmd', ...args], { stdio: 'inherit', shell: false })
+    : spawnSync('npm', args, { stdio: 'inherit', shell: false });
   if (r.error) {
     console.error('MASTER FINISH: FAIL — unable to start npm:', r.error.message);
     process.exit(1);
   }
   if (r.status !== 0) process.exit(r.status || 1);
 }
-
-dotenv.config({ quiet: true });
 
 const rpc = process.env.ARBITRUM_SEPOLIA_RPC || process.env.ARBITRUM_SEPOLIA_RPC_URL;
 const key = process.env.DEPLOYER_PRIVATE_KEY || process.env.PRIVATE_KEY;
