@@ -84,6 +84,21 @@ export function App() {
     }
   };
 
+  const handleDisconnectWallet = () => {
+    setWallet({
+      isConnected: false,
+      address: null,
+      chainId: null,
+      isCorrectNetwork: false,
+      qarbiBalance: 0,
+      ethBalance: 0,
+      provider: null,
+      signer: null,
+    });
+    setUserBalanceQarbi(0);
+    setUserBalanceEth(0);
+  };
+
   const handleDeploymentSuccess = (_newContracts: Record<string, string>, createdTxRecords: TransactionRecord[]) => {
     setTransactions((prev) => [...createdTxRecords, ...prev]);
   };
