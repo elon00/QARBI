@@ -42,20 +42,61 @@ if (typeof window !== "undefined") {
 
 export type WalletType = "metamask" | "trust";
 
-function getWalletProviders(): any[] {
+function isTrustProvider(provider: any): boolean {
+  return Boolean(provider?.isTrust || provider?.isTrustWallet || provider?.providerInfo?.rdns === "com.trustwallet.app");
+}
+
+function isMetaMaskProvider(provider: any): boolean {
+  return Boolean(provider?.isMetaMask) && !isTrustProvider(provider);
+}
+
+function addUniqueProvider(list: any[], provider: any) {
+  if (provider && !list.includes(provider)) list.push(provider);
+}
+
+async function getWalletProviders(): Promise<any[]> {
   if (typeof window === "undefined") return [];
   const win = window as any;
-  const providers = win.ethereum?.providers?.length ? [...win.ethereum.providers] : win.ethereum ? [win.ethereum] : [];
-  if (win.trustwallet?.ethereum && !providers.includes(win.trustwallet.ethereum)) providers.push(win.trustwallet.ethereum);
+  const providers: any[] = [];
+
+  if (Array.isArray(win.ethereum?.providers)) {
+    for (const provider of win.ethereum.providers) addUniqueProvider(providers, provider);
+  } else {
+    addUniqueProvider(providers, win.ethereum);
+  }
+  addUniqueProvider(providers, win.trustwallet?.ethereum);
+
+  const discovered: any[] = [];
+  const handler = (event: any) => {
+    const detail = event?.detail;
+    if (detail?.provider) {
+      detail.provider.providerInfo = detail.info;
+      addUniqueProvider(discovered, detail.provider);
+    }
+  };
+
+  window.addEventListener("eip6963:announceProvider", handler as EventListener);
+  window.dispatchEvent(new Event("eip6963:requestProvider"));
+  await new Promise((resolve) => window.setTimeout(resolve, 300));
+  window.removeEventListener("eip6963:announceProvider", handler as EventListener);
+
+  for (const provider of discovered) addUniqueProvider(providers, provider);
   return providers;
 }
 
-export function getInjectedProvider(walletType: WalletType = "metamask"): any {
-  const providers = getWalletProviders();
-  const selected = walletType === "metamask"
-    ? providers.find((p: any) => p.isMetaMask && !p.isTrust && !p.isTrustWallet)
-    : providers.find((p: any) => p.isTrust || p.isTrustWallet);
-  return selected || null;
+async function getInjectedProvider(walletType: WalletType): Promise<any> {
+  const providers = await getWalletProviders();
+
+  if (walletType === "trust") {
+    return providers.find((p: any) => isTrustProvider(p))
+      || (window as any).trustwallet?.ethereum
+      || null;
+  }
+
+  return providers.find((p: any) => isMetaMaskProvider(p))
+    || ((window as any).ethereum && !isTrustProvider((window as any).ethereum)
+      ? (window as any).ethereum
+      : null);
 }
 
 export function getPublicRpcProvider(): ethers.JsonRpcProvider {
@@ -67,7 +108,7 @@ export async function checkWalletConnection(): Promise<{
   chainId: number | null;
   isCorrectNetwork: boolean;
 }> {
-  const ethereum = getInjectedProvider();
+  const ethereum = await getInjectedProvider("metamask");
   if (!ethereum) {
     return { address: null, chainId: null, isCorrectNetwork: false };
   }
@@ -98,7 +139,7 @@ export async function connectWallet(walletType: WalletType = "metamask"): Promis
   provider: ethers.BrowserProvider;
   signer: ethers.JsonRpcSigner;
 }> {
-  const ethereum = getInjectedProvider(walletType);
+  const ethereum = await getInjectedProvider(walletType);
   if (!ethereum) {
     const label = walletType === "metamask" ? "MetaMask" : "Trust Wallet";
     throw new Error(`${label} was not detected. Open/activate ${label} and try again.`);
