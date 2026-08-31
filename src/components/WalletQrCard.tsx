@@ -32,7 +32,14 @@ export const WalletQrCard: React.FC<WalletQrCardProps> = ({ address, label = "Co
         <span className="rounded-full border border-emerald-700/60 bg-emerald-950/50 px-2 py-1 text-[10px] text-emerald-300">CONNECTED</span>
       </div>
       <div className="flex justify-center rounded-xl bg-white p-3">
-        <img src={qrUrl(address)} alt="QR code for connected wallet address" width={220} height={220} className="h-44 w-44 sm:h-48 sm:w-48" />
+        <img
+          src={qrUrl(address)}
+          alt="QR code for connected wallet address"
+          width={220}
+          height={220}
+          className="h-44 w-44 sm:h-48 sm:w-48"
+          referrerPolicy="no-referrer"
+        />
       </div>
       <button type="button" onClick={copyAddress} className="mt-3 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-left font-mono text-[11px] text-slate-200 hover:bg-slate-800">
         <span className="block truncate">{address}</span>
