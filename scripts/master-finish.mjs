@@ -3,11 +3,17 @@ import { spawnSync } from 'node:child_process';
 import dotenv from 'dotenv';
 import { JsonRpcProvider, Wallet, formatEther } from 'ethers';
 
+const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+
 function run(label, args) {
   console.log('\n' + '='.repeat(72));
   console.log('MASTER FINISH: ' + label);
   console.log('='.repeat(72));
-  const r = spawnSync('npm', args, { stdio: 'inherit', shell: process.platform === 'win32' });
+  const r = spawnSync(npmCommand, args, { stdio: 'inherit', shell: false });
+  if (r.error) {
+    console.error('MASTER FINISH: FAIL — unable to start npm:', r.error.message);
+    process.exit(1);
+  }
   if (r.status !== 0) process.exit(r.status || 1);
 }
 
@@ -43,7 +49,6 @@ console.log('Arbitrum Sepolia balance:', formatEther(balance), 'ETH');
 
 if (balance === 0n) {
   console.error('\nMASTER FINISH: BLOCKED — all local quality gates passed, but deployment cannot be paid for because this deployer has 0 Arbitrum Sepolia ETH.');
-  console.error('Fund the SAME deployer on Arbitrum Sepolia, then rerun this one command. No fake deployment claim was made.');
   process.exit(2);
 }
 
