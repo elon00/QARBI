@@ -10,6 +10,7 @@ import { ArbitrumExplorer } from "./components/ArbitrumExplorer";
 import { WhitepaperViewer } from "./components/WhitepaperViewer";
 import { FaucetModal } from "./components/FaucetModal";
 import { OnchainDeployerModal } from "./components/OnchainDeployerModal";
+import { WalletQrCard } from "./components/WalletQrCard";
 import { INITIAL_AGENTS, INITIAL_TASKS, INITIAL_TRANSACTIONS, INITIAL_SECURITY_LOGS } from "./data/initialState";
 import { TRANSLATIONS } from "./data/translations";
 import { LanguageCode, Agent, TaskItem, TransactionRecord, SecurityEvent } from "./types";
@@ -85,62 +86,20 @@ export function App() {
   };
 
   const handleDisconnectWallet = () => {
-    setWallet({
-      isConnected: false,
-      address: null,
-      chainId: null,
-      isCorrectNetwork: false,
-      qarbiBalance: 0,
-      ethBalance: 0,
-      provider: null,
-      signer: null,
-    });
+    setWallet({ isConnected: false, address: null, chainId: null, isCorrectNetwork: false, qarbiBalance: 0, ethBalance: 0, provider: null, signer: null });
     setUserBalanceQarbi(0);
     setUserBalanceEth(0);
   };
 
-  const handleDeploymentSuccess = (_newContracts: Record<string, string>, createdTxRecords: TransactionRecord[]) => {
-    setTransactions((prev) => [...createdTxRecords, ...prev]);
-  };
-
-  const handleAddAgent = (newAgent: Agent, tx: TransactionRecord) => {
-    setAgents((prev) => [newAgent, ...prev]);
-    setTransactions((prev) => [tx, ...prev]);
-  };
-
-  const handleEvolveAgent = (agentId: number) => {
-    const target = agents.find((a) => a.id === agentId);
-    if (!target) return;
-    // UI-only simulation remains available as a visualization; it does not create a fake on-chain receipt.
-    const { updatedAgent } = evolveAgentWithStylus(target, 45);
-    setAgents((prev) => prev.map((a) => (a.id === agentId ? updatedAgent : a)));
-  };
-
-  const handleUpdateAgents = (updatedAgents: Agent[], txRecord: TransactionRecord) => {
-    setAgents(updatedAgents);
-    if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]);
-  };
-
-  const handleAddTask = (newTask: TaskItem, txRecord: TransactionRecord) => {
-    setTasks((prev) => [newTask, ...prev]);
-    if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]);
-  };
-
-  const handleUpdateTask = (updatedTask: TaskItem, txRecord: TransactionRecord) => {
-    setTasks((prev) => prev.map((item) => (item.id === updatedTask.id ? updatedTask : item)));
-    if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]);
-  };
-
-  const handleToggleKillSwitch = (txRecord: TransactionRecord) => {
-    setIsEmergencyLocked((prev) => !prev);
-    if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]);
-  };
-
+  const handleDeploymentSuccess = (_newContracts: Record<string, string>, createdTxRecords: TransactionRecord[]) => setTransactions((prev) => [...createdTxRecords, ...prev]);
+  const handleAddAgent = (newAgent: Agent, tx: TransactionRecord) => { setAgents((prev) => [newAgent, ...prev]); setTransactions((prev) => [tx, ...prev]); };
+  const handleEvolveAgent = (agentId: number) => { const target = agents.find((a) => a.id === agentId); if (!target) return; const { updatedAgent } = evolveAgentWithStylus(target, 45); setAgents((prev) => prev.map((a) => (a.id === agentId ? updatedAgent : a))); };
+  const handleUpdateAgents = (updatedAgents: Agent[], txRecord: TransactionRecord) => { setAgents(updatedAgents); if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]); };
+  const handleAddTask = (newTask: TaskItem, txRecord: TransactionRecord) => { setTasks((prev) => [newTask, ...prev]); if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]); };
+  const handleUpdateTask = (updatedTask: TaskItem, txRecord: TransactionRecord) => { setTasks((prev) => prev.map((item) => (item.id === updatedTask.id ? updatedTask : item))); if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]); };
+  const handleToggleKillSwitch = (txRecord: TransactionRecord) => { setIsEmergencyLocked((prev) => !prev); if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]); };
   const handleAddSecurityLog = (log: SecurityEvent) => setSecurityLogs((prev) => [log, ...prev]);
-  const handleClaimFaucet = (_qarbiAmount: number, _ethAmount: number, txRecord: TransactionRecord) => {
-    if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]);
-    if (wallet.address) void fetchLiveBalances(wallet.address).then((b) => { setUserBalanceQarbi(b.qarbiBalance); setUserBalanceEth(b.ethBalance); });
-  };
+  const handleClaimFaucet = (_qarbiAmount: number, _ethAmount: number, txRecord: TransactionRecord) => { if (txRecord?.hash) setTransactions((prev) => [txRecord, ...prev]); if (wallet.address) void fetchLiveBalances(wallet.address).then((b) => { setUserBalanceQarbi(b.qarbiBalance); setUserBalanceEth(b.ethBalance); }); };
   const handleNavigateToTerminal = (agentName: string) => { setTerminalActiveAgent(agentName); setActiveTab("terminal"); };
 
   return (
@@ -158,6 +117,7 @@ export function App() {
       </main>
       <OnchainDeployerModal isOpen={isDeployerOpen} onClose={() => setIsDeployerOpen(false)} signer={wallet.signer} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} ethBalance={wallet.ethBalance} onDeploymentSuccess={handleDeploymentSuccess} t={t} />
       <FaucetModal isOpen={isFaucetOpen} onClose={() => setIsFaucetOpen(false)} onClaim={handleClaimFaucet} t={t} signer={wallet.signer} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} />
+      {wallet.isConnected && wallet.address && <WalletQrCard address={wallet.address} label="Connected MetaMask / EVM wallet" />}
       <footer className="border-t border-slate-900 bg-slate-950/80 py-6 text-center text-xs text-slate-400">© 2026 QARBI Protocol · Arbitrum Sepolia</footer>
     </div>
   );
