@@ -3,13 +3,15 @@ import { spawnSync } from 'node:child_process';
 import dotenv from 'dotenv';
 import { JsonRpcProvider, Wallet, formatEther } from 'ethers';
 
-const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-
 function run(label, args) {
   console.log('\n' + '='.repeat(72));
   console.log('MASTER FINISH: ' + label);
   console.log('='.repeat(72));
-  const r = spawnSync(npmCommand, args, { stdio: 'inherit', shell: false });
+  const command = process.platform === 'win32' ? 'cmd.exe' : 'npm';
+  const commandArgs = process.platform === 'win32'
+    ? ['/d', '/s', '/c', ['npm.cmd', ...args].map((a) => `"${String(a).replaceAll('"', '\\"')}"`).join(' ')]
+    : args;
+  const r = spawnSync(command, commandArgs, { stdio: 'inherit', shell: false });
   if (r.error) {
     console.error('MASTER FINISH: FAIL — unable to start npm:', r.error.message);
     process.exit(1);
