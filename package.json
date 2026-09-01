@@ -53,7 +53,9 @@
     "pqc:smoke": "tsx scripts/ml-dsa65-smoke.mjs",
     "pqc:real": "npm run pqc:provider-gate && npm run pqc:boundary && npm run pqc:gate && npm run pqc:smoke",
     "magic:fix": "node scripts/magic-fix.mjs",
-    "finish:all": "node scripts/master-finish.mjs"
+    "finish:all": "node scripts/master-finish.mjs",
+    "preflight": "node scripts/preflight.mjs",
+    "finish:all:check": "npm run preflight && npm run finish:all"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
