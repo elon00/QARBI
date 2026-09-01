@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import { Header } from "./components/Header";
 import { Navigation, TabKey } from "./components/Navigation";
-import { AgentSpawner } from "./components/AgentSpawner";
-import { ConwayVisualizer } from "./components/ConwayVisualizer";
-import { AgentTerminal } from "./components/AgentTerminal";
-import { TaskMarketplace } from "./components/TaskMarketplace";
-import { SecurityEnclave } from "./components/SecurityEnclave";
-import { ArbitrumExplorer } from "./components/ArbitrumExplorer";
-import { WhitepaperViewer } from "./components/WhitepaperViewer";
-import { FaucetModal } from "./components/FaucetModal";
-import { OnchainDeployerModal } from "./components/OnchainDeployerModal";
-import { WalletQrCard } from "./components/WalletQrCard";
 import { INITIAL_AGENTS, INITIAL_TASKS, INITIAL_TRANSACTIONS, INITIAL_SECURITY_LOGS } from "./data/initialState";
 import { TRANSLATIONS } from "./data/translations";
 import { LanguageCode, Agent, TaskItem, TransactionRecord, SecurityEvent } from "./types";
 import { evolveAgentWithStylus } from "./lib/conwayEngine";
 import { checkWalletConnection, connectWallet, fetchLiveBalances, WalletState } from "./lib/web3";
+
+const AgentSpawner = lazy(() => import("./components/AgentSpawner").then((m) => ({ default: m.AgentSpawner })));
+const ConwayVisualizer = lazy(() => import("./components/ConwayVisualizer").then((m) => ({ default: m.ConwayVisualizer })));
+const AgentTerminal = lazy(() => import("./components/AgentTerminal").then((m) => ({ default: m.AgentTerminal })));
+const TaskMarketplace = lazy(() => import("./components/TaskMarketplace").then((m) => ({ default: m.TaskMarketplace })));
+const SecurityEnclave = lazy(() => import("./components/SecurityEnclave").then((m) => ({ default: m.SecurityEnclave })));
+const ArbitrumExplorer = lazy(() => import("./components/ArbitrumExplorer").then((m) => ({ default: m.ArbitrumExplorer })));
+const WhitepaperViewer = lazy(() => import("./components/WhitepaperViewer").then((m) => ({ default: m.WhitepaperViewer })));
+const FaucetModal = lazy(() => import("./components/FaucetModal").then((m) => ({ default: m.FaucetModal })));
+const OnchainDeployerModal = lazy(() => import("./components/OnchainDeployerModal").then((m) => ({ default: m.OnchainDeployerModal })));
+const WalletQrCard = lazy(() => import("./components/WalletQrCard").then((m) => ({ default: m.WalletQrCard })));
 
 export function App() {
   const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>("en");
@@ -107,6 +108,7 @@ export function App() {
       <Header t={t} currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} userBalanceQarbi={userBalanceQarbi} userBalanceEth={userBalanceEth} onOpenFaucet={() => setIsFaucetOpen(true)} onOpenDeployer={() => setIsDeployerOpen(true)} isEmergencyLocked={isEmergencyLocked} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} isCorrectNetwork={wallet.isCorrectNetwork} onConnectWallet={handleConnectWallet} onDisconnectWallet={handleDisconnectWallet} />
       <Navigation activeTab={activeTab} onSelectTab={setActiveTab} t={t} agentCount={agents.length} openTaskCount={tasks.filter((task) => task.status === "OPEN").length} isEmergencyLocked={isEmergencyLocked} />
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Suspense fallback={<div className="py-16 text-center text-sm text-slate-400">Loading module…</div>}>
         {activeTab === "spawner" && <AgentSpawner agents={agents} onAddAgent={handleAddAgent} onEvolveAgent={handleEvolveAgent} t={t} onNavigateToTerminal={handleNavigateToTerminal} signer={wallet.signer} walletAddress={wallet.address} />}
         {activeTab === "conway" && <ConwayVisualizer agents={agents} onUpdateAgents={handleUpdateAgents} t={t} />}
         {activeTab === "terminal" && <AgentTerminal agents={agents} t={t} defaultAgentName={terminalActiveAgent} currentLanguage={currentLanguage} />}
@@ -114,10 +116,11 @@ export function App() {
         {activeTab === "security" && <SecurityEnclave isEmergencyLocked={isEmergencyLocked} onToggleKillSwitch={handleToggleKillSwitch} securityLogs={securityLogs} onAddSecurityLog={handleAddSecurityLog} t={t} />}
         {activeTab === "explorer" && <ArbitrumExplorer transactions={transactions} t={t} onOpenDeployer={() => setIsDeployerOpen(true)} />}
         {activeTab === "whitepaper" && <WhitepaperViewer t={t} />}
+        </Suspense>
       </main>
-      <OnchainDeployerModal isOpen={isDeployerOpen} onClose={() => setIsDeployerOpen(false)} signer={wallet.signer} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} ethBalance={wallet.ethBalance} onDeploymentSuccess={handleDeploymentSuccess} t={t} />
-      <FaucetModal isOpen={isFaucetOpen} onClose={() => setIsFaucetOpen(false)} onClaim={handleClaimFaucet} t={t} signer={wallet.signer} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} />
-      {wallet.isConnected && wallet.address && <WalletQrCard address={wallet.address} label="Connected MetaMask / EVM wallet" />}
+      <Suspense fallback={null}><OnchainDeployerModal isOpen={isDeployerOpen} onClose={() => setIsDeployerOpen(false)} signer={wallet.signer} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} ethBalance={wallet.ethBalance} onDeploymentSuccess={handleDeploymentSuccess} t={t} /></Suspense>
+      <Suspense fallback={null}><FaucetModal isOpen={isFaucetOpen} onClose={() => setIsFaucetOpen(false)} onClaim={handleClaimFaucet} t={t} signer={wallet.signer} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} /></Suspense>
+      <Suspense fallback={null}>{wallet.isConnected && wallet.address && <WalletQrCard address={wallet.address} label="Connected MetaMask / EVM wallet" />}</Suspense>
       <footer className="border-t border-slate-900 bg-slate-950/80 py-6 text-center text-xs text-slate-400">© 2026 QARBI Protocol · Arbitrum Sepolia</footer>
     </div>
   );
