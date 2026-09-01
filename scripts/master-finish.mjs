@@ -9,9 +9,9 @@ function run(label, args) {
   console.log('\n' + '='.repeat(72));
   console.log('MASTER FINISH: ' + label);
   console.log('='.repeat(72));
-  const r = process.platform === 'win32'
-    ? spawnSync(process.env.ComSpec || 'cmd.exe', ['/d', '/c', 'npm.cmd', ...args], { stdio: 'inherit', shell: false })
-    : spawnSync('npm', args, { stdio: 'inherit', shell: false });
+  const command = process.env.npm_execpath ? process.execPath : (process.platform === 'win32' ? 'npm.cmd' : 'npm');
+  const commandArgs = process.env.npm_execpath ? [process.env.npm_execpath, ...args] : args;
+  const r = spawnSync(command, commandArgs, { stdio: 'inherit', shell: false });
   if (r.error) {
     console.error('MASTER FINISH: FAIL — unable to start npm:', r.error.message);
     process.exit(1);
