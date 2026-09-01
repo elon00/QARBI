@@ -2,8 +2,6 @@
 const { spawnSync } = require('child_process');
 
 const mode = process.argv[2] || 'dev';
-const isWindows = process.platform === 'win32';
-const npmCommand = isWindows ? 'npm.cmd' : 'npm';
 const phases = [
   ['Dependency reproducibility', ['ci']],
   ['Typecheck', ['run', 'typecheck']],
@@ -15,19 +13,20 @@ const phases = [
   ['Production build', ['run', 'build']],
 ];
 
+function npmInvocation(args) {
+  // npm_execpath is provided by npm itself and avoids npm.cmd spawning issues
+  // under Git Bash / Windows when shell:false is used.
+  if (process.env.npm_execpath) return [process.execPath, [process.env.npm_execpath, ...args]];
+  return [process.platform === 'win32' ? 'npm.cmd' : 'npm', args];
+}
+
 function run(label, args) {
   console.log('\n' + '='.repeat(72));
   console.log('ONE-CLICK PHASE: ' + label);
   console.log('='.repeat(72));
 
-  let result;
-  if (isWindows) {
-    // Git Bash launches this Node process directly; spawning npm.cmd directly
-    // avoids the npm.cmd/command-shell EINVAL issue seen with nested shell calls.
-    result = spawnSync(npmCommand, args, { stdio: 'inherit', shell: false });
-  } else {
-    result = spawnSync(npmCommand, args, { stdio: 'inherit', shell: false });
-  }
+  const [command, commandArgs] = npmInvocation(args);
+  const result = spawnSync(command, commandArgs, { stdio: 'inherit', shell: false });
 
   if (result.error) {
     console.error('ONE-CLICK: FAIL — unable to start npm:', result.error.message);
