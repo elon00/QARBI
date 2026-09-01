@@ -165,15 +165,15 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-rose-950/40 to-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-slate-900 via-rose-950/40 to-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col xl:flex-row xl:items-center justify-between gap-4 min-w-0">
         <div>
           <div className="flex items-center space-x-2.5">
             <div className="p-2 rounded-lg bg-rose-500/20 text-rose-400">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-bold text-white tracking-wide">
+            <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide break-words">
               {t?.security?.title || "Policy Engine & Security Enclave"}
             </h2>
           </div>
@@ -186,7 +186,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
         <button
           type="button"
           onClick={handleToggleKill}
-          className={`flex items-center space-x-2 px-5 py-3 rounded-xl font-bold text-xs shadow-xl transition cursor-pointer active:scale-95 ${
+          className={`w-full xl:w-auto justify-center flex items-center space-x-2 px-4 sm:px-5 py-3 rounded-xl font-bold text-xs shadow-xl transition cursor-pointer active:scale-95 ${
             isEmergencyLocked
               ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/40"
               : "bg-rose-600 hover:bg-rose-500 text-white shadow-rose-950/40 animate-pulse"
@@ -206,9 +206,9 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-w-0">
         {/* 4-Layer Defense Breakdown (5 cols) */}
-        <div className="lg:col-span-5 bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+        <div className="lg:col-span-5 min-w-0 bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
           <div className="border-b border-slate-800 pb-3">
             <h3 className="text-sm font-bold text-white flex items-center space-x-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
@@ -218,7 +218,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
 
           <div className="space-y-3 text-xs">
             <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-              <div className="flex items-center justify-between text-cyan-300 font-bold">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-cyan-300 font-bold">
                 <span>Layer 1: AI Intent & Anti-Injection</span>
                 <span className="text-[10px] bg-cyan-950 px-2 py-0.5 rounded-full border border-cyan-800">Off-Chain</span>
               </div>
@@ -228,7 +228,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-              <div className="flex items-center justify-between text-indigo-300 font-bold">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-indigo-300 font-bold">
                 <span>Layer 2: Policy & Velocity Engine</span>
                 <span className="text-[10px] bg-indigo-950 px-2 py-0.5 rounded-full border border-indigo-800">Deterministic</span>
               </div>
@@ -238,7 +238,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-              <div className="flex items-center justify-between text-purple-300 font-bold">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-purple-300 font-bold">
                 <span>Layer 3: Hybrid PQC Key Enclave</span>
                 <span className="text-[10px] bg-purple-950 px-2 py-0.5 rounded-full border border-purple-800">NIST FIPS 204</span>
               </div>
@@ -248,7 +248,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-              <div className="flex items-center justify-between text-emerald-300 font-bold">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-emerald-300 font-bold">
                 <span>Layer 4: AgentWallet.sol Contract</span>
                 <span className="text-[10px] bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-800">Arbitrum Sepolia</span>
               </div>
@@ -260,9 +260,9 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
         </div>
 
         {/* Interactive Attack Simulator (7 cols) */}
-        <div className="lg:col-span-7 bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-5 flex flex-col justify-between">
+        <div className="lg:col-span-7 min-w-0 bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 shadow-xl space-y-5 flex flex-col justify-between">
           <div>
-            <div className="border-b border-slate-800 pb-3 flex items-center justify-between">
+            <div className="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <h3 className="text-sm font-bold text-white flex items-center space-x-2">
                 <ShieldAlert className="w-4 h-4 text-rose-400" />
                 <span>{t?.security?.attackSimulatorTitle || "Interactive Attack & Vulnerability Simulator"}</span>
@@ -365,7 +365,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
             </h4>
             <div className="max-h-40 overflow-y-auto rounded-xl bg-slate-950 border border-slate-800 text-[11px] divide-y divide-slate-800">
               {securityLogs.slice(0, 8).map((log) => (
-                <div key={log.id} className="p-2.5 flex items-center justify-between">
+                <div key={log.id} className="p-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 min-w-0">
                   <div className="flex items-center space-x-2">
                     <span
                       className={`w-2 h-2 rounded-full ${
