@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import dotenv from 'dotenv';
-import { JsonRpcProvider, Wallet, formatEther } from 'ethers';
+import { JsonRpcProvider, Wallet, formatEther, isAddress } from 'ethers';
 
 dotenv.config({ quiet: true });
 
@@ -34,8 +34,12 @@ function loadManifest() {
 
 async function deploymentIsVerifiable(provider, manifest) {
   if (!manifest?.contracts) return false;
-  for (const item of Object.values(manifest.contracts)) {
-    if (!item?.address || !Wallet.isAddress(item.address)) return false;
+  const required = ['QARBIToken', 'AgentRegistry', 'TaskMarket', 'ConwayEngine', 'AgentWallet'];
+  if (!required.every((name) => manifest.contracts[name])) return false;
+
+  for (const name of required) {
+    const item = manifest.contracts[name];
+    if (!item?.address || !isAddress(item.address)) return false;
     if (!item?.deploymentTxHash || !/^0x[0-9a-fA-F]{64}$/.test(item.deploymentTxHash)) return false;
     const code = await provider.getCode(item.address);
     if (code === '0x') return false;
