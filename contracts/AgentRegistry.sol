@@ -12,15 +12,15 @@ contract AgentRegistry {
     struct Agent {
         uint256 id;
         string name;
-        string archetype; // RESEARCHER, SECURITY_AUDITOR, QUANT_TRADER, DEFI_OPTIMIZER, DATA_VALIDATOR, CREATIVE_SYNTH
+        string archetype;
         address owner;
         address delegatedSessionWallet;
-        bytes32 pqcCommitmentHash; // Keccak-256 hash of NIST ML-DSA-65 1952-byte public key
+        bytes32 pqcCommitmentHash;
         string metadataURI;
         uint256 singleTxLimit;
         uint256 dailyBudget;
-        uint256 reputation; // 0 to 1000 scale
-        uint256 energy; // 0 to 100 scale
+        uint256 reputation;
+        uint256 energy;
         uint256 completedTasks;
         uint256 failedTasks;
         uint256 registeredAt;
@@ -36,15 +36,7 @@ contract AgentRegistry {
     mapping(bytes32 => bool) public usedCommitments;
     mapping(address => uint256) public sessionWalletToAgentId;
 
-    event AgentRegistered(
-        uint256 indexed agentId,
-        string name,
-        string archetype,
-        address indexed owner,
-        address delegatedSessionWallet,
-        bytes32 pqcCommitmentHash,
-        uint256 registeredAt
-    );
+    event AgentRegistered(uint256 indexed agentId, string name, string archetype, address indexed owner, address delegatedSessionWallet, bytes32 pqcCommitmentHash, uint256 registeredAt);
     event ReputationUpdated(uint256 indexed agentId, uint256 oldRep, uint256 newRep, string reason);
     event EnergyUpdated(uint256 indexed agentId, uint256 newEnergy);
     event StatusChanged(uint256 indexed agentId, AgentStatus newStatus);
@@ -65,13 +57,12 @@ contract AgentRegistry {
     }
 
     function setTaskMarketAddress(address _marketAddress) external onlyAdmin {
+        require(_marketAddress != address(0), "Invalid market address");
+        require(_marketAddress.code.length > 0, "Market must be a contract");
         taskMarketAddress = _marketAddress;
         emit TaskMarketAddressSet(_marketAddress);
     }
 
-    /**
-     * @notice Registers a new autonomous agent with NIST ML-DSA-65 PQC commitment
-     */
     function registerAgent(
         string memory name,
         string memory archetype,
@@ -87,10 +78,7 @@ contract AgentRegistry {
 
         uint256 agentId = nextAgentId++;
         usedCommitments[pqcCommitmentHash] = true;
-
-        if (delegatedSessionWallet != address(0)) {
-            sessionWalletToAgentId[delegatedSessionWallet] = agentId;
-        }
+        if (delegatedSessionWallet != address(0)) sessionWalletToAgentId[delegatedSessionWallet] = agentId;
 
         agents[agentId] = Agent({
             id: agentId,
@@ -102,33 +90,22 @@ contract AgentRegistry {
             metadataURI: metadataURI,
             singleTxLimit: singleTxLimit > 0 ? singleTxLimit : 50,
             dailyBudget: dailyBudget > 0 ? dailyBudget : 250,
-            reputation: 800, // Initial reputation baseline
-            energy: 100,     // Initial energy max
+            reputation: 800,
+            energy: 100,
             completedTasks: 0,
             failedTasks: 0,
             registeredAt: block.timestamp,
             status: AgentStatus.ACTIVE
         });
-
         ownerAgents[msg.sender].push(agentId);
 
-        emit AgentRegistered(
-            agentId,
-            name,
-            archetype,
-            msg.sender,
-            delegatedSessionWallet,
-            pqcCommitmentHash,
-            block.timestamp
-        );
-
+        emit AgentRegistered(agentId, name, archetype, msg.sender, delegatedSessionWallet, pqcCommitmentHash, block.timestamp);
         return agentId;
     }
 
     function updateReputation(uint256 agentId, int256 delta, string memory reason) external onlyAuthorized {
         Agent storage agent = agents[agentId];
         require(agent.id != 0, "Agent does not exist");
-
         uint256 oldRep = agent.reputation;
         if (delta > 0) {
             uint256 newRep = oldRep + uint256(delta);
@@ -137,14 +114,12 @@ contract AgentRegistry {
             uint256 sub = uint256(-delta);
             agent.reputation = oldRep > sub ? oldRep - sub : 0;
         }
-
         emit ReputationUpdated(agentId, oldRep, agent.reputation, reason);
     }
 
     function recordTaskCompletion(uint256 agentId, bool success) external onlyAuthorized {
         Agent storage agent = agents[agentId];
         require(agent.id != 0, "Agent does not exist");
-
         if (success) {
             agent.completedTasks += 1;
             if (agent.reputation < 1000) {
@@ -153,11 +128,7 @@ contract AgentRegistry {
             }
         } else {
             agent.failedTasks += 1;
-            if (agent.reputation >= 25) {
-                agent.reputation -= 25;
-            } else {
-                agent.reputation = 0;
-            }
+            agent.reputation = agent.reputation >= 25 ? agent.reputation - 25 : 0;
         }
     }
 
@@ -172,7 +143,6 @@ contract AgentRegistry {
         Agent storage agent = agents[agentId];
         require(agent.id != 0, "Agent does not exist");
         require(msg.sender == agent.owner || msg.sender == protocolAdmin, "Not authorized to change status");
-
         agent.status = newStatus;
         emit StatusChanged(agentId, newStatus);
     }
