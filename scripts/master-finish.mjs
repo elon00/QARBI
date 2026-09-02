@@ -7,9 +7,20 @@ import { JsonRpcProvider, Wallet, formatEther, isAddress } from 'ethers';
 
 dotenv.config({ quiet: true });
 
+// Windows/Git-Bash bootstrap: make Node's own installation directory visible
+// to child install scripts (esbuild/tsx use "node install.js").
+if (process.platform === 'win32') {
+  const nodeDir = path.dirname(process.execPath);
+  const parts = (process.env.PATH || '').split(path.delimiter);
+  if (!parts.some((p) => p.replace(/\\/g, '/').toLowerCase() === nodeDir.replace(/\\/g, '/').toLowerCase())) {
+    process.env.PATH = nodeDir + path.delimiter + (process.env.PATH || '');
+  }
+}
+
 function npmInvocation(args) {
+  // Run npm through the current Node executable whenever possible.
   if (process.env.npm_execpath) return [process.execPath, [process.env.npm_execpath, ...args]];
-  if (process.platform === 'win32') return [process.env.ComSpec || 'cmd.exe', ['/d', '/c', 'npm.cmd', ...args]];
+  if (process.platform === 'win32') return [process.env.ComSpec || 'cmd.exe', ['/d', '/s', '/c', 'npm.cmd', ...args]];
   return ['npm', args];
 }
 
@@ -18,12 +29,20 @@ function run(label, args) {
   console.log('MASTER FINISH: ' + label);
   console.log('='.repeat(72));
   const [command, commandArgs] = npmInvocation(args);
-  const r = spawnSync(command, commandArgs, { stdio: 'inherit', shell: false, windowsHide: false });
+  const r = spawnSync(command, commandArgs, {
+    stdio: 'inherit',
+    shell: false,
+    windowsHide: false,
+    env: process.env,
+  });
   if (r.error) {
-    console.error('MASTER FINISH: FAIL — unable to start npm:', r.error.message);
+    console.error('MASTER FINISH: FAIL at ' + label + ' — ' + r.error.message);
     process.exit(1);
   }
-  if (r.status !== 0) process.exit(r.status || 1);
+  if (r.status !== 0) {
+    console.error('MASTER FINISH: STOPPED at ' + label + '. Later phases were not run.');
+    process.exit(r.status || 1);
+  }
 }
 
 function loadManifest() {
@@ -78,8 +97,7 @@ if (balance === 0n) {
 }
 
 const manifest = loadManifest();
-const reusable = await deploymentIsVerifiable(provider, manifest);
-if (reusable) {
+if (await deploymentIsVerifiable(provider, manifest)) {
   console.log('\nMASTER FINISH: existing verified deployment found — skipping redeployment.');
   run('Deployment verification', ['run', 'verify:testnet']);
 } else {
