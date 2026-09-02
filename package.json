@@ -37,6 +37,7 @@
     "requirement:check":"node scripts/requirement-check.mjs",
     "reality:report":"node scripts/reality-report.mjs",
     "qmoosa:finish":"node scripts/qmoosa-master-finish.mjs",
+    "deploy:state":"node scripts/deploy-state.mjs",
     "finish:all":"npm run qmoosa:finish",
     "finish:all:check":"npm run preflight && npm run finish:all"
   },
