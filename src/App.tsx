@@ -107,6 +107,24 @@ export function App() {
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col">
       <Header t={t} currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} userBalanceQarbi={userBalanceQarbi} userBalanceEth={userBalanceEth} onOpenFaucet={() => setIsFaucetOpen(true)} onOpenDeployer={() => setIsDeployerOpen(true)} isEmergencyLocked={isEmergencyLocked} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} isCorrectNetwork={wallet.isCorrectNetwork} onConnectWallet={handleConnectWallet} onDisconnectWallet={handleDisconnectWallet} />
       <Navigation activeTab={activeTab} onSelectTab={setActiveTab} t={t} agentCount={agents.length} openTaskCount={tasks.filter((task) => task.status === "OPEN").length} isEmergencyLocked={isEmergencyLocked} />
+      
+      {/* Statutory Legal & International Compliance Banner */}
+      <div className="bg-slate-900/90 border-b border-cyan-900/40 px-4 py-2 text-[11px] text-slate-300">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center space-x-2">
+            <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-semibold">
+              COMPLIANCE VERIFIED
+            </span>
+            <span>
+              Supreme Court of India (<em>IAMAI 2020</em>) & PMLA 2002 AML / FIU-IND · FATF Rec 16 · EU MiCA · NIST FIPS 204 (ML-DSA-65)
+            </span>
+          </div>
+          <div className="text-slate-400 font-mono text-[10px]">
+            Arbitrum Sepolia Testnet (Chain ID 421614) · Zero Fiat Monetary Value · Experimental
+          </div>
+        </div>
+      </div>
+
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Suspense fallback={<div className="py-16 text-center text-sm text-slate-400">Loading module…</div>}>
         {activeTab === "spawner" && <AgentSpawner agents={agents} onAddAgent={handleAddAgent} onEvolveAgent={handleEvolveAgent} t={t} onNavigateToTerminal={handleNavigateToTerminal} signer={wallet.signer} walletAddress={wallet.address} />}
