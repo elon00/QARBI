@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { ethers } from "ethers";
 import { Agent, AgentArchetype, TranslationStrings, TransactionRecord } from "../types";
-import { generatePQCIdentity } from "../lib/crypto";
+import { generatePQCIdentity, type PQCIdentityResult } from "../lib/crypto";
 import { registerAgentOnchain, explorerTxUrl, getProductionContracts } from "../lib/productionChain";
 
 interface AgentSpawnerProps {
@@ -46,15 +46,24 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
   const [description, setDescription] = useState("");
   const [singleTxLimit, setSingleTxLimit] = useState(25);
   const [dailyBudget, setDailyBudget] = useState(100);
-  const [pqcIdentity, setPqcIdentity] = useState<ReturnType<typeof generatePQCIdentity> | null>(null);
+  const [pqcIdentity, setPqcIdentity] = useState<PQCIdentityResult | null>(null);
+  const [isGeneratingPQC, setIsGeneratingPQC] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployedTxHash, setDeployedTxHash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const handleGeneratePQC = () => {
+  const handleGeneratePQC = async () => {
     setError(null);
-    setPqcIdentity(generatePQCIdentity(name || "Qarbi-Agent"));
+    setIsGeneratingPQC(true);
+    try {
+      const id = await generatePQCIdentity(name.trim() || "Qarbi-Agent");
+      setPqcIdentity(id);
+    } catch (err: any) {
+      setError("PQC generation failed: " + (err?.message || String(err)));
+    } finally {
+      setIsGeneratingPQC(false);
+    }
   };
 
   const handleDeployAgent = async (e: React.FormEvent) => {
@@ -67,11 +76,11 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
       return;
     }
 
-    const activePqc = pqcIdentity || generatePQCIdentity(name);
-    setPqcIdentity(activePqc);
     setIsDeploying(true);
 
     try {
+      const activePqc = pqcIdentity || await generatePQCIdentity(name.trim());
+      setPqcIdentity(activePqc);
       const metadata = {
         name: name.trim(),
         archetype,
@@ -184,7 +193,7 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
             <div><div className="flex justify-between text-xs text-slate-400"><span>Daily Budget</span><span className="font-mono text-cyan-300">{dailyBudget} QARBI</span></div><input type="range" min="20" max="100" step="5" value={dailyBudget} onChange={(e) => setDailyBudget(Number(e.target.value))} className="w-full" /></div>
           </div>
           <div className="p-4 rounded-xl bg-indigo-950/30 border border-indigo-800/40">
-            <div className="flex items-center justify-between text-xs font-semibold text-indigo-300"><span className="flex items-center gap-2"><Key className="w-3.5 h-3.5" />PQC Commitment</span><button type="button" onClick={handleGeneratePQC} className="underline">Generate</button></div>
+            <div className="flex items-center justify-between text-xs font-semibold text-indigo-300"><span className="flex items-center gap-2"><Key className="w-3.5 h-3.5" />PQC Commitment</span><button type="button" disabled={isGeneratingPQC} onClick={handleGeneratePQC} className="underline disabled:opacity-50">{isGeneratingPQC ? "Generating ML-DSA-65..." : "Generate"}</button></div>
             <p className="mt-2 text-[11px] text-amber-300">Cryptographic implementation must be independently verified before calling this a production ML-DSA identity.</p>
             {pqcIdentity && <div className="mt-2 font-mono text-[11px] text-cyan-300 flex items-center gap-2"><span className="truncate">{pqcIdentity.pqcCommitmentHash}</span><button type="button" onClick={copyHash}><Copy className="w-3 h-3" /></button>{copied && <span className="text-emerald-300">copied</span>}</div>}
           </div>
