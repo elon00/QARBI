@@ -59,6 +59,11 @@ const evidence = {
     strictProviderIsolation: 'PASS',
     liveBrowserMetaMaskE2E: 'REQUIRES INTERACTIVE BROWSER SESSION',
   },
+  legalRegulatoryBoundary: {
+    automatedControls: 'REPOSITORY_EVIDENCE_CHECKS_ONLY',
+    legalAdviceOrApproval: 'NOT_CLAIMED',
+    humanReviewTriggers: ['custody','virtual-asset services','token offering/investment claims','new jurisdiction','mainnet material value'],
+  },
   independentAudit: {
     status: 'EXTERNAL_AUDIT_REQUIRED_FOR_MAINNET',
     internalSecurityGates: 'PASS (TaskMarket reentrancy + spending limit invariants)',
@@ -84,6 +89,7 @@ console.log('Post-Quantum ML-DSA-65 cryptographic gate:', 'PASS');
 console.log('Wallet EIP-1193 & EIP-6963 isolation gate:', 'PASS');
 console.log('Browser MetaMask/Trust Wallet live session:', 'REQUIRES REAL BROWSER EVIDENCE');
 console.log('Independent security audit:', 'REQUIRES EXTERNAL AUDIT EVIDENCE');
+console.log('Legal/regulatory status:', 'AUTOMATED CONTROLS ONLY — NOT LEGAL ADVICE OR REGULATORY APPROVAL');
 console.log(`Machine-readable evidence written to: artifacts/reality-evidence.json`);
 console.log('Truthfulness rule: No claim of 100% unless all mandatory evidence is present.');
 console.log('========================================================================\n');
