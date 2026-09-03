@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "1.0",
+  "policy": "Evidence-first. A claim may not be promoted above its evidence level.",
+  "claims": [
+    {
+      "id": "blockchain.testnet",
+      "claim": "Arbitrum Sepolia deployment",
+      "requiredEvidence": [
+        "deployment receipt",
+        "live RPC bytecode"
+      ],
+      "maxStatus": "LIVE_TESTNET_VERIFIED"
+    },
+    {
+      "id": "wallet.browser",
+      "claim": "Browser wallet compatibility",
+      "requiredEvidence": [
+        "real browser E2E evidence"
+      ],
+      "maxStatus": "TESTED"
+    },
+    {
+      "id": "stylus.live",
+      "claim": "Live Stylus deployment",
+      "requiredEvidence": [
+        "Stylus deployment transaction",
+        "live RPC evidence"
+      ],
+      "maxStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "legal.compliance",
+      "claim": "Legal/regulatory compliance",
+      "requiredEvidence": [
+        "jurisdiction-specific qualified legal review"
+      ],
+      "maxStatus": "EXTERNAL_REVIEW_REQUIRED"
+    }
+  ]
+}
