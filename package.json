@@ -63,7 +63,9 @@
     "deploy:state": "node scripts/deploy-state.mjs",
     "finish:all": "npm run qmoosa:finish",
     "finish:all:check": "npm run preflight && npm run finish:all",
-    "compliance:check": "node scripts/compliance-gate.mjs"
+    "compliance:check": "node scripts/compliance-gate.mjs",
+    "qmoosa:magic": "npm run finish:all",
+    "master:finish": "npm run finish:all"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
