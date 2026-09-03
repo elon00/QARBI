@@ -13,6 +13,7 @@ if (process.platform === 'win32') {
 const stages = [
   ['DISCOVER', ['run', 'preflight']],
   ['CLASSIFY', ['run', 'requirement:check']],
+  ['COMPLIANCE', ['run', 'compliance:check']],
   ['AUDIT', ['run', 'oneclick:release']],
   ['FIX', ['run', 'magic:fix']],
   ['TEST', ['run', 'test']],
@@ -64,4 +65,4 @@ for (const [label, args] of stages) {
   run(label, args);
 }
 
-console.log('\nQMOOSA MASTER: PASS — orchestration completed with evidence-gated stages.');
+console.log('\nQMOOSA MASTER: PASS — orchestration completed with evidence-gated stages. Legal/regulatory approval is never implied by this result.');
