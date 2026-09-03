@@ -1,0 +1,21 @@
+﻿[package]
+name = "conway-stylus"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Arbitrum Stylus WASM Conway Game of Life Cellular Automata Consensus & Execution Engine"
+
+[dependencies]
+alloy-primitives = { version = "=0.7.6", default-features = false, features = ["tiny-keccak"] }
+alloy-sol-types = { version = "=0.7.6", default-features = false }
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = true

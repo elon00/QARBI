@@ -4,45 +4,45 @@
   "rpcUrl": "https://sepolia-rollup.arbitrum.io/rpc",
   "explorerUrl": "https://sepolia.arbiscan.io",
   "deployer": "0xbbaaD9B836f9bd61cD0d616a016Cc911A2E1f60D",
-  "deployedAt": "2026-09-01T11:47:23.689Z",
+  "deployedAt": "2026-09-01T14:45:23.511Z",
   "deploymentEvidence": "Contract addresses require explorer verification before verified=true",
   "contracts": {
     "QARBIToken": {
-      "address": "0xee4310A2F5FB4007A7d755eBB9617A74301F0a4e",
+      "address": "0x1787F3d2F1BfF32C05EC1E0a6043669D7224d387",
       "name": "QARBIToken.sol",
       "symbol": "QARBI",
       "decimals": 18,
       "verified": false,
-      "deploymentTxHash": "0x0f5739dca4dfd5d8180c64dc704eff401f785d51f191d482d1f11fa35a2cf328",
-      "explorer": "https://sepolia.arbiscan.io/address/0xee4310A2F5FB4007A7d755eBB9617A74301F0a4e"
+      "deploymentTxHash": "0xaeb6b990e0a0be1dc65a79043256d20de477f15ebb193f7b1c194f17a996b6e4",
+      "explorer": "https://sepolia.arbiscan.io/address/0x1787F3d2F1BfF32C05EC1E0a6043669D7224d387"
     },
     "AgentRegistry": {
-      "address": "0x489a7E0b34bE8911869b62d419afcE9f4F4b756F",
+      "address": "0xcF782d7409B9911F295855506164100AAc1b3Dc1",
       "name": "AgentRegistry.sol",
       "verified": false,
-      "deploymentTxHash": "0x1691aea468f4e5ebc6973fd9ba2bd68089836dddec209bc7bbbc7ad92c37e645",
-      "explorer": "https://sepolia.arbiscan.io/address/0x489a7E0b34bE8911869b62d419afcE9f4F4b756F"
+      "deploymentTxHash": "0x30e101c6579054b58eca81150f3c0e0d2135e44a7a049298ab12f2c979c4abad",
+      "explorer": "https://sepolia.arbiscan.io/address/0xcF782d7409B9911F295855506164100AAc1b3Dc1"
     },
     "TaskMarket": {
-      "address": "0x6400B2aaeb91a8CB7B9340dC530D445762f788Eb",
+      "address": "0x45DEFB4710162830476a8EA2c6467E87FD7FacA1",
       "name": "TaskMarket.sol",
       "verified": false,
-      "deploymentTxHash": "0xf732e0e2a7b434da669a779933fdd743c43ec6b595d3340a776756ffbf311328",
-      "explorer": "https://sepolia.arbiscan.io/address/0x6400B2aaeb91a8CB7B9340dC530D445762f788Eb"
+      "deploymentTxHash": "0xc46cd26c46a6828795b37a23c2f036f665193a6f5e0f22f767b3f66bd5e6af0a",
+      "explorer": "https://sepolia.arbiscan.io/address/0x45DEFB4710162830476a8EA2c6467E87FD7FacA1"
     },
     "ConwayEngine": {
-      "address": "0x0745aAf39bC729EA7E8a694D1D2c5e5f767075f7",
+      "address": "0xF8C60603BA7436FB74d67699af9CfD7A76C20543",
       "name": "ConwayEngine.sol",
       "verified": false,
-      "deploymentTxHash": "0x29340daec62ad4dc77edb8c0e22ecdf5daebd38f7e97c1ec3d22f0c58346b9aa",
-      "explorer": "https://sepolia.arbiscan.io/address/0x0745aAf39bC729EA7E8a694D1D2c5e5f767075f7"
+      "deploymentTxHash": "0x37e876fe72674c69dce50bd96161a69c07f4e60af2876fc6d4fa0515b049439b",
+      "explorer": "https://sepolia.arbiscan.io/address/0xF8C60603BA7436FB74d67699af9CfD7A76C20543"
     },
     "AgentWallet": {
-      "address": "0x4A51C05404695c911c31405cE5340a6b83447510",
+      "address": "0x61Ac7a4b292381266d06e1CfD84b4769c287DcD7",
       "name": "AgentWallet.sol",
       "verified": false,
-      "deploymentTxHash": "0xb4c5a402f8915c018131fbcdae6724ec93a08bf9ef39cb2aa8de3833d758c9e2",
-      "explorer": "https://sepolia.arbiscan.io/address/0x4A51C05404695c911c31405cE5340a6b83447510"
+      "deploymentTxHash": "0x0a5c82a0c43dd217f7a02c90a1765c755fa469d54841df2479972086e339ff1d",
+      "explorer": "https://sepolia.arbiscan.io/address/0x61Ac7a4b292381266d06e1CfD84b4769c287DcD7"
     }
   }
 }

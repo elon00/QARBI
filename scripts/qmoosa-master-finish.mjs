@@ -17,8 +17,6 @@ const stages = [
   ['FIX', ['run', 'magic:fix']],
   ['TEST', ['run', 'test']],
   ['VERIFY', ['run', 'verify:testnet']],
-  // Deployment is handled by the deploy-state master directly. Never call
-  // `finish:all` here: that would recursively invoke this file forever.
   ['DEPLOY', ['run', 'deploy:state']],
   ['REPORT', ['run', 'reality:report']],
 ];

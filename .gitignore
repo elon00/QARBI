@@ -42,3 +42,8 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# Rust & Cargo
+target/
+**/target/
+
