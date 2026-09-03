@@ -11,6 +11,7 @@ const checks = [
   ['Security gate', ['scripts/taskmarket-security-gate.js']],
   ['Production build pipeline', ['vite.config.ts','scripts/one-click.cjs','scripts/master-finish.mjs']],
   ['Netlify configuration', ['netlify.toml']],
+  ['Compliance & truth baseline', ['compliance/LEGAL-TRUTH-BASELINE.md','compliance/CLAIMS-REGISTRY.json','compliance/JURISDICTION-MATRIX.md','scripts/compliance-gate.mjs']],
 ];
 let failures=0;
 for(const [label, files] of checks){
