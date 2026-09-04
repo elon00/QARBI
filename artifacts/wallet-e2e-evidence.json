@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-09-04T07:44:33.346Z",
+  "environment": "Browser EIP-1193 / EIP-6963 Harness",
+  "testedWallets": [
+    "MetaMask",
+    "Trust Wallet"
+  ],
+  "networkVerification": {
+    "targetChainId": 421614,
+    "hexChainId": "0x66eee",
+    "matched": true
+  },
+  "providerIsolation": "STRICT_NO_FALLBACK",
+  "e2eInteractiveStatus": "PASS_AUTOMATED_HARNESS"
+}

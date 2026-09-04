@@ -64,7 +64,8 @@
     "deploy:state": "node scripts/deploy-state.mjs",
     "finish:all": "npm run qmoosa:finish",
     "finish:all:check": "npm run preflight && npm run finish:all",
-    "compliance:check": "node scripts/legal-compliance-gate.js"
+    "compliance:check": "node scripts/legal-compliance-gate.js",
+    "wallet:e2e": "node scripts/browser-wallet-e2e.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

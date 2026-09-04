@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-03T17:04:52.461Z",
-  "gitCommit": "f1d66ce5e837ec893e81bbb365146ead4149c3fe",
+  "timestamp": "2026-09-04T07:10:29.607Z",
+  "gitCommit": "ad57cc26d7fd6b7932a60673b2b21ddc2df9d50c",
   "protocol": "QARBI Protocol (Reality Hardening)",
   "network": {
     "name": "Arbitrum Sepolia Testnet",
@@ -76,6 +76,17 @@
     "eip6963Support": "PASS",
     "strictProviderIsolation": "PASS",
     "liveBrowserMetaMaskE2E": "REQUIRES INTERACTIVE BROWSER SESSION"
+  },
+  "legalRegulatoryBoundary": {
+    "automatedControls": "REPOSITORY_EVIDENCE_CHECKS_ONLY",
+    "legalAdviceOrApproval": "NOT_CLAIMED",
+    "humanReviewTriggers": [
+      "custody",
+      "virtual-asset services",
+      "token offering/investment claims",
+      "new jurisdiction",
+      "mainnet material value"
+    ]
   },
   "independentAudit": {
     "status": "EXTERNAL_AUDIT_REQUIRED_FOR_MAINNET",
