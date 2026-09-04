@@ -51,12 +51,7 @@ export const ConwayVisualizer: React.FC<ConwayVisualizerProps> = ({
     let count = 0;
     let totalSynergy = 0;
     for (let r = 0; r < grid.length; r++) {
-      for (let c = 0; c < grid[0].length; c++) {
-        if (grid[r][c].alive) {
-          count++;
-          totalSynergy += grid[r][c].synergy;
-        }
-      }
+      const row = grid[r]; if (!row) continue; for (let c = 0; c < row.length; c++) { const cell = row[c]; if (cell && cell.alive) { count++; totalSynergy += (cell.synergy || 0); } }
     }
     setLivingCount(count);
     setSynergyScore(count > 0 ? Math.round(totalSynergy / count) : 0);
