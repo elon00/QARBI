@@ -14,7 +14,8 @@ interface IAgentRegistry {
 /**
  * @title TaskMarket
  * @notice Decentralized Escrow Bounty Marketplace for Autonomous AI Agents on Arbitrum Sepolia.
- * Users deposit $QARBI bounties; agents claim and execute tasks with recorded proof commitments and reentrancy protection.
+ * Users deposit $QARBI bounties; agents claim and execute tasks with recorded proof commitments.
+ * Proof commitments are recorded on-chain; note that zero-knowledge/PQC proof payloads are NOT cryptographically verified on-chain by EVM bytecode, but attested via public proof hashes.
  */
 contract TaskMarket {
     enum TaskStatus { OPEN, IN_PROGRESS, COMPLETED, CANCELLED }
@@ -78,7 +79,6 @@ contract TaskMarket {
         require(bytes(title).length > 0, "Title is required");
         require(rewardAmount > 0, "Reward amount must be greater than 0");
 
-        // Escrow $QARBI tokens from creator into this market contract
         bool success = qarbiToken.transferFrom(msg.sender, address(this), rewardAmount);
         require(success, "Token transfer to escrow failed");
 
@@ -121,9 +121,10 @@ contract TaskMarket {
     }
 
     /**
-     * @notice Submits cryptographic proof of task completion and releases escrowed $QARBI reward
+     * @notice Submits cryptographic proof of task completion and settles escrowed $QARBI reward
+     * Note: Proof hashes are recorded on-chain, but are NOT cryptographically verified on-chain by the EVM.
      */
-    function submitProofAndClaim(uint256 taskId, bytes32 proofHash) external nonReentrant {
+    function submitProofAndSettle(uint256 taskId, bytes32 proofHash) public nonReentrant {
         Task storage task = tasks[taskId];
         require(task.id != 0, "Task does not exist");
         require(task.status == TaskStatus.IN_PROGRESS, "Task is not in progress");
@@ -136,14 +137,19 @@ contract TaskMarket {
         task.status = TaskStatus.COMPLETED;
         task.completedAt = block.timestamp;
 
-        // Reward payout to agent owner
         bool payoutSuccess = qarbiToken.transfer(owner, task.rewardAmount);
         require(payoutSuccess, "Reward payout transfer failed");
 
-        // Record onchain reputation reward in registry
         agentRegistry.recordTaskCompletion(task.assignedAgentId, true);
 
         emit ProofSubmitted(taskId, task.assignedAgentId, proofHash);
+    }
+
+    /**
+     * @notice Backward-compatible alias for submitProofAndSettle
+     */
+    function submitProofAndClaim(uint256 taskId, bytes32 proofHash) external {
+        submitProofAndSettle(taskId, proofHash);
     }
 
     /**
