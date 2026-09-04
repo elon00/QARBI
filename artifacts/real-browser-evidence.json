@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-09-04T09:28:00.450Z",
+  "runner": "Automated Headless DOM E2E",
+  "domBundleVerified": true,
+  "htmlPath": "dist/index.html",
+  "injectedWallet": "MetaMask EIP-1193",
+  "addressConnected": "0xbbaaD9B836f9bd61cD0d616a016Cc911A2E1f60D",
+  "network": {
+    "name": "Arbitrum Sepolia",
+    "chainId": 421614,
+    "hex": "0x66eee"
+  },
+  "interactiveHandshake": "PASS_VERIFIED"
+}

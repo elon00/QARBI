@@ -3,12 +3,12 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_tokenAddress",
+        "name": "_qarbiToken",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_registryAddress",
+        "name": "_agentRegistry",
         "type": "address"
       }
     ],
@@ -51,18 +51,18 @@
       },
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "creator",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "agentId",
+        "type": "uint256"
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "refundAmount",
-        "type": "uint256"
+        "indexed": true,
+        "internalType": "address",
+        "name": "worker",
+        "type": "address"
       }
     ],
-    "name": "TaskCancelled",
+    "name": "TaskAssigned",
     "type": "event"
   },
   {
@@ -76,18 +76,18 @@
       },
       {
         "indexed": true,
-        "internalType": "uint256",
-        "name": "agentId",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "claimant",
-        "type": "address"
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "refundedAmount",
+        "type": "uint256"
       }
     ],
-    "name": "TaskClaimed",
+    "name": "TaskCancelled",
     "type": "event"
   },
   {
@@ -134,35 +134,28 @@
     "type": "event"
   },
   {
-    "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
         "internalType": "uint256",
-        "name": "taskId",
+        "name": "",
         "type": "uint256"
       },
       {
-        "indexed": true,
         "internalType": "uint256",
-        "name": "agentId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "recipient",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "rewardPaid",
+        "name": "",
         "type": "uint256"
       }
     ],
-    "name": "TaskSettled",
-    "type": "event"
+    "name": "agentAssignedTasks",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -320,19 +313,6 @@
   },
   {
     "inputs": [],
-    "name": "getTotalTasks",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "nextTaskId",
     "outputs": [
       {
@@ -373,24 +353,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_tokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_registryAddress",
-        "type": "address"
-      }
-    ],
-    "name": "setContracts",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "taskId",
         "type": "uint256"
@@ -401,7 +363,7 @@
         "type": "bytes32"
       }
     ],
-    "name": "submitProofAndSettle",
+    "name": "submitProofAndClaim",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

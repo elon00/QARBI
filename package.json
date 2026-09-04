@@ -49,7 +49,7 @@
     "stylus:wasm-check": "cargo check --target wasm32-unknown-unknown --manifest-path crates/conway-stylus/Cargo.toml",
     "wallet:test": "node scripts/wallet-provider-test.mjs",
     "legal:gate": "tsx scripts/legal-compliance-gate.js",
-    "test": "npm run pqc:real && npm run security:taskmarket && npm run wallet:test && npm run legal:gate && npm run contracts:compile && npm run stylus:test && npm run stylus:wasm-check && npm run typecheck && npm run build && node scripts/test-noop.mjs",
+    "test": "npm run pqc:real && npm run security:taskmarket && npm run security:ast && npm run wallet:test && npm run browser:e2e && npm run legal:gate && npm run contracts:compile && npm run stylus:test && npm run stylus:wasm-check && npm run typecheck && npm run build && node scripts/test-noop.mjs",
     "pqc:gate": "node scripts/pqc-truthfulness-gate.js",
     "security:taskmarket": "node scripts/taskmarket-security-gate.js",
     "pqc:provider-gate": "node scripts/pqc-provider-gate.js",
@@ -65,7 +65,9 @@
     "finish:all": "npm run qmoosa:finish",
     "finish:all:check": "npm run preflight && npm run finish:all",
     "compliance:check": "node scripts/legal-compliance-gate.js",
-    "wallet:e2e": "node scripts/browser-wallet-e2e.mjs"
+    "wallet:e2e": "node scripts/browser-wallet-e2e.mjs",
+    "security:ast": "node scripts/security-ast-scanner.js",
+    "browser:e2e": "node scripts/real-browser-e2e.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

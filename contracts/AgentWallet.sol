@@ -4,12 +4,13 @@ pragma solidity ^0.8.24;
 /**
  * @title AgentWallet
  * @notice Policy-guarded Smart Contract Enclave & Session Wallet on Arbitrum Sepolia.
- * Enforces per-transaction caps, daily spending velocity budgets, whitelist verifications, and guardian killswitches.
+ * Enforces per-transaction caps, daily spending velocity budgets, whitelist verifications, guardian killswitches, and reentrancy protection.
  */
 contract AgentWallet {
     address public owner;
     address public guardian;
     bool public isEmergencyLocked;
+    uint256 private _reentrancyStatus; // 1 = NOT_ENTERED, 2 = ENTERED
 
     uint256 public singleTxLimit;
     uint256 public dailyLimit;
@@ -33,6 +34,13 @@ contract AgentWallet {
         _;
     }
 
+    modifier nonReentrant() {
+        require(_reentrancyStatus != 2, "ReentrancyGuard: reentrant call");
+        _reentrancyStatus = 2;
+        _;
+        _reentrancyStatus = 1;
+    }
+
     constructor(
         address _owner,
         address _guardian,
@@ -44,18 +52,19 @@ contract AgentWallet {
         singleTxLimit = _singleTxLimit;
         dailyLimit = _dailyLimit;
         lastResetDay = block.timestamp / 1 days;
+        _reentrancyStatus = 1;
     }
 
     receive() external payable {}
 
-    function setWhitelistedTarget(address target, bool allowed) external onlyOwnerOrGuardian {
-        whitelistedTargets[target] = allowed;
-        emit TargetWhitelisted(target, allowed);
-    }
-
     function toggleEmergencyLock(bool locked) external onlyOwnerOrGuardian {
         isEmergencyLocked = locked;
         emit EmergencyLockToggled(locked, msg.sender);
+    }
+
+    function whitelistTarget(address target, bool allowed) external onlyOwnerOrGuardian {
+        whitelistedTargets[target] = allowed;
+        emit TargetWhitelisted(target, allowed);
     }
 
     function updateLimits(uint256 _singleTxLimit, uint256 _dailyLimit) external onlyOwnerOrGuardian {
@@ -68,9 +77,9 @@ contract AgentWallet {
         address target,
         uint256 value,
         bytes calldata data
-    ) external onlyOwnerOrGuardian whenNotLocked returns (bytes memory) {
-        require(whitelistedTargets[target], "Target contract not on verified whitelist");
-        require(value <= singleTxLimit, "Value exceeds single tx velocity cap");
+    ) external onlyOwnerOrGuardian whenNotLocked nonReentrant returns (bytes memory) {
+        require(whitelistedTargets[target], "Target address is not whitelisted");
+        require(value <= singleTxLimit, "Single transaction limit exceeded");
 
         uint256 currentDay = block.timestamp / 1 days;
         if (currentDay > lastResetDay) {

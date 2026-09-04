@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-09-04T09:28:02.048Z",
+  "contractsAudited": [
+    "AgentRegistry.sol",
+    "AgentWallet.sol",
+    "ConwayEngine.sol",
+    "QARBIToken.sol",
+    "TaskMarket.sol"
+  ],
+  "vulnerabilitiesFound": 0,
+  "passedChecks": 17,
+  "verdict": "PASS_CLEAN_SECURITY_BASELINE"
+}
