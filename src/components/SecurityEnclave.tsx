@@ -40,7 +40,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
     severity: string;
   } | null>(null);
 
-  const testAgent = agents[0] || {
+  const testAgent = (agents && agents[0]) || {
     id: 1,
     name: "Researcher-01",
     singleTxLimit: 25,

@@ -131,7 +131,7 @@ export function App() {
         {activeTab === "conway" && <ConwayVisualizer agents={agents} onUpdateAgents={handleUpdateAgents} t={t} />}
         {activeTab === "terminal" && <AgentTerminal agents={agents} t={t} defaultAgentName={terminalActiveAgent} currentLanguage={currentLanguage} />}
         {activeTab === "tasks" && <TaskMarketplace tasks={tasks} agents={agents} onAddTask={handleAddTask} onUpdateTask={handleUpdateTask} t={t} />}
-        {activeTab === "security" && <SecurityEnclave isEmergencyLocked={isEmergencyLocked} onToggleKillSwitch={handleToggleKillSwitch} securityLogs={securityLogs} onAddSecurityLog={handleAddSecurityLog} t={t} />}
+        {activeTab === "security" && <SecurityEnclave agents={agents} isEmergencyLocked={isEmergencyLocked} onToggleKillSwitch={handleToggleKillSwitch} securityLogs={securityLogs} onAddSecurityLog={handleAddSecurityLog} t={t} />}
         {activeTab === "explorer" && <ArbitrumExplorer transactions={transactions} t={t} onOpenDeployer={() => setIsDeployerOpen(true)} />}
         {activeTab === "whitepaper" && <WhitepaperViewer t={t} />}
         </Suspense>
