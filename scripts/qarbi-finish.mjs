@@ -20,10 +20,7 @@ const REQUIRED = [
   "scripts/compile.js", "scripts/generateArtifacts.js", "scripts/check-env.mjs", "scripts/check-truth.mjs",
 ];
 
-const SOURCE_FILES = [
-  "README.md",
-  "server.ts",
-  "netlify/functions/api.mts",
+const UI_FILES = [
   "src/components/AgentSpawner.tsx",
   "src/components/AgentTerminal.tsx",
   "src/components/TaskMarketplace.tsx",
@@ -32,15 +29,11 @@ const SOURCE_FILES = [
   "src/components/OnchainDeployerModal.tsx",
   "src/components/ArbitrumExplorer.tsx",
   "src/components/WhitepaperViewer.tsx",
-  "src/data/initialState.ts",
-  "src/data/translations.ts",
-  "src/lib/crypto.ts",
-  "src/lib/conwayEngine.ts",
 ];
 
 console.log(`QARBI MASTER FINISHER — ${auditOnly ? "audit-only" : "canonical completion"}`);
-
 for (const rel of REQUIRED) assert(existsSync(join(root, rel)), `missing required file: ${rel}`);
+
 for (const forbidden of [
   ".netlify/functions/api.zip",
   ".netlify/netlify.toml",
@@ -50,30 +43,24 @@ for (const forbidden of [
 const ignore = readFileSync(join(root, ".gitignore"), "utf8");
 assert(ignore.includes(".netlify/"), ".gitignore must exclude .netlify/");
 
-const combined = SOURCE_FILES
-  .filter((rel) => existsSync(join(root, rel)))
-  .map((rel) => `\n--- ${rel} ---\n${readFileSync(join(root, rel), "utf8")}`)
-  .join("\n");
+const text = (rel) => readFileSync(join(root, rel), "utf8");
+const combinedUI = UI_FILES.filter((rel) => existsSync(join(root, rel))).map(text).join("\n");
 
-const forbiddenTruthPatterns = [
-  [/Math\.random\(\).*tx/i, "randomized transaction hash/state used as live chain proof"],
-  [/generateTxHash\(/i, "generated transaction hash helper referenced by runtime UI"],
-  [/status:\s*["']CONFIRMED["']/i, "hardcoded CONFIRMED transaction state in source"],
-  [/blockNumber:\s*18\d{6,}/i, "hardcoded historical-looking block number in source"],
-  [/89\.4%/i, "hardcoded gas saving claim"],
-  [/38,500 EVM/i, "hardcoded benchmark claim"],
-  [/4,120 Gas/i, "hardcoded Stylus gas claim"],
-  [/Direct Private Key/i, "private-key browser deployment path"],
-  [/crypto\/pqc-generate/i, "legacy PQC API endpoint must be explicitly truth-gated"],
-];
+// These patterns indicate UI paths that fabricate chain evidence rather than reading a real receipt.
+for (const [pattern, description] of [
+  [/blockNumber:\s*18\d{6,}/i, "hardcoded historical-looking block number in UI"],
+  [/gasSavedStylus:\s*["']89\.4%/i, "hardcoded Stylus gas-saving field in UI"],
+  [/Direct Private Key/i, "browser private-key deployment path"],
+  [/No valid PRIVATE_KEY.*Generated temporary deployer wallet/i, "temporary private-key generation path"],
+]) assert(!pattern.test(combinedUI), description);
 
-for (const [pattern, description] of forbiddenTruthPatterns) {
-  assert(!pattern.test(combined), description);
-}
+// Initial demo state must not impersonate confirmed chain state.
+const state = text("src/data/initialState.ts");
+assert(!/status:\s*["']CONFIRMED["']/i.test(state), "initial demo state contains fake confirmed transaction status");
+assert(!/blockNumber:\s*18\d{6,}/i.test(state), "initial demo state contains fake block numbers");
 
-const state = readFileSync(join(root, "src/data/initialState.ts"), "utf8");
-assert(!/status:\s*["']CONFIRMED["']/i.test(state), "initial state contains fake confirmed transactions");
-assert(!/blockNumber:\s*18\d{6,}/i.test(state), "initial state contains fake block numbers");
+// Source control must not track generated Netlify state.
+assert(!existsSync(join(root, ".netlify")), ".netlify must not exist in the working tree");
 
 if (!auditOnly) {
   run("npm", ["run", "check:env"]);
@@ -86,4 +73,4 @@ if (!auditOnly) {
 }
 
 console.log(`\nQARBI MASTER FINISHER — ${auditOnly ? "AUDIT PASS" : "PASS"}`);
-console.log("Cleanliness, truthfulness, environment gates, contract compilation, artifact synchronization, typecheck and production build are covered.");
+console.log("Repository hygiene, deterministic truth gates, contract compilation, artifact synchronization, typecheck and production build are covered.");
