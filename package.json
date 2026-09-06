@@ -1,7 +1,7 @@
 {
   "name": "qarbi-protocol",
   "version": "1.0.0",
-  "description": "Autonomous AI Agent Civilization & Conway State Engine on Arbitrum Sepolia with Stylus Rust VM, Hybrid PQC Identity, and Verifiable Onchain Economy",
+  "description": "QARBI Protocol — autonomous AI-agent coordination prototype on Arbitrum Sepolia with policy guardrails, task escrow, Conway state simulation, and PQC research interfaces.",
   "type": "module",
   "author": {
     "name": "Martin Luther",
@@ -19,12 +19,12 @@
   "license": "MIT",
   "keywords": [
     "arbitrum",
-    "arbitrum-stylus",
+    "arbitrum-sepolia",
     "ai-agents",
     "autonomous-agents",
     "conway-game-of-life",
     "post-quantum-cryptography",
-    "dilithium3",
+    "ml-dsa",
     "web4",
     "gemini-ai",
     "blockchain",
@@ -34,12 +34,16 @@
     "dev": "tsx server.ts",
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
     "start": "node dist/server.cjs",
-    "clean": "rm -rf dist server.js",
+    "clean": "rm -rf dist server.js build",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
+    "compile:contracts": "node scripts/compile.js",
+    "generate:artifacts": "node scripts/generateArtifacts.js",
     "check:env": "node scripts/check-env.mjs",
     "check:truth": "node scripts/check-truth.mjs",
-    "test": "npm run check:env && npm run check:truth && npm run typecheck && npm run build"
+    "check:repo": "node scripts/qarbi-finish.mjs --audit-only",
+    "finish": "node scripts/qarbi-finish.mjs",
+    "test": "npm run finish"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
