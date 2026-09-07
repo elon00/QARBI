@@ -1,11 +1,11 @@
 {
   "standard": "UNIVERSAL REALITY SYSTEM (URS v1.0)",
   "title": "QARBI PROTOCOL URS EVIDENCE CERTIFICATE",
-  "issuedAt": "2026-09-07T09:26:05.766Z",
-  "executionDurationMs": 41955,
+  "issuedAt": "2026-09-07T09:28:11.361Z",
+  "executionDurationMs": 39703,
   "target": {
     "repository": "https://github.com/elon00/QARBI.git",
-    "commitSha": "9cdb7560762241be088fdcb1b7ab0a14babab18b",
+    "commitSha": "07a0844a780141b1527b6afe3195adf1dfbfdf17",
     "packageLockSha": "bfcbee9af3b1e7a8f350337149ab2767820747a8dce0801809aba467bacaf21f"
   },
   "environment": {
@@ -13,7 +13,7 @@
     "arch": "x64",
     "nodeVersion": "v24.18.0",
     "npmVersion": "11.16.0",
-    "timestamp": "2026-09-07T09:25:25.121Z"
+    "timestamp": "2026-09-07T09:27:33.372Z"
   },
   "evidenceVerification": {
     "typecheckStatus": "PASS (0 Errors)",
@@ -58,6 +58,6 @@
   },
   "realityHash": {
     "formula": "H = SHA256(CommitSHA || PackageLockSHA || Environment || TestLogs || BuildLogs || AuditResults)",
-    "digest": "72ccbcf35f656a2935e3d0075cbe2735cf8349ca652a41123f52429dd88a4149"
+    "digest": "8c2c646978b609d1e4127b82c8e5c1fba77b4b17f5c6b8e99b3c53382ee8adb6"
   }
 }
