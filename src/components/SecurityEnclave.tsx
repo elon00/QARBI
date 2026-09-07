@@ -59,7 +59,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
     });
 
     const newLog: SecurityEvent = {
-      id: `SEC-${Math.floor(Math.random() * 900) + 100}`,
+      id: `SEC-${Date.now().toString().slice(-6)}`,
       timestamp: Date.now(),
       agentId: testAgent.id,
       targetAddress: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
@@ -90,7 +90,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
     });
 
     const newLog: SecurityEvent = {
-      id: `SEC-${Math.floor(Math.random() * 900) + 100}`,
+      id: `SEC-${Date.now().toString().slice(-6)}`,
       timestamp: Date.now(),
       agentId: testAgent.id,
       targetAddress: maliciousTarget,
@@ -122,7 +122,7 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
     });
 
     const newLog: SecurityEvent = {
-      id: `SEC-${Math.floor(Math.random() * 900) + 100}`,
+      id: `SEC-${Date.now().toString().slice(-6)}`,
       timestamp: Date.now(),
       agentId: testAgent.id,
       targetAddress: "0x5FbDB2315678afecb367f032d93F642f64180aa3",

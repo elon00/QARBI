@@ -1,9 +1,9 @@
 {
   "standard": "UNIVERSAL REALITY SYSTEM v2.0",
   "title": "QARBI PROTOCOL URS SCORECARD",
-  "auditedAt": "2026-09-07T09:28:11.214Z",
+  "auditedAt": "2026-09-07T10:16:07.800Z",
   "commitSha": "LOCAL_INSPECTED_TRANSFORMATION",
-  "durationMs": 1425,
+  "durationMs": 1348,
   "totalGates": 9,
   "passedGates": 9,
   "ursWeakestLinkScore": "10 / 10",
@@ -18,7 +18,7 @@
       "name": "Claim Freeze & Manifest Registration",
       "status": "PASS",
       "score": 10,
-      "details": "10 features registered"
+      "details": "12 features registered"
     },
     {
       "gate": 2,
@@ -39,7 +39,7 @@
       "name": "EVM Keccak-256 Commitment Integrity",
       "status": "PASS",
       "score": 10,
-      "details": "Commitment: 0x66e82b0cb76c2f..."
+      "details": "Commitment: 0xc442f656e7e09a..."
     },
     {
       "gate": 5,
@@ -67,14 +67,14 @@
       "name": "Arbitrum Sepolia RPC Health",
       "status": "PASS",
       "score": 10,
-      "details": "Active Block 306334991"
+      "details": "Active Block 306346527"
     },
     {
       "gate": 9,
-      "name": "Reproducibility & KAT Conformance",
+      "name": "Reproducibility, QUBO & PQC Channel Conformance",
       "status": "PASS",
       "score": 10,
-      "details": "Official RFC, Keccak, and NIST vectors verified byte-for-byte"
+      "details": "Official RFC, NIST, QUBO & PQC channel verified"
     }
   ],
   "multiplicativeFormula": "FeatureReality = E * I * O * V * R",

@@ -69,7 +69,7 @@ async function runQarbiCertifier() {
     console.error('  ❌ TypeScript Typecheck FAILED');
   }
 
-  console.log('\n▶ [2/4] Running Official NIST & Wycheproof Test Suite...');
+  console.log('\n▶ [2/5] Running Official NIST & Wycheproof Test Suite...');
   let testLogs = '';
   let testExitCode = 0;
   try {
@@ -81,19 +81,31 @@ async function runQarbiCertifier() {
     console.error('  ❌ Test Suite FAILED');
   }
 
-  console.log('\n▶ [3/4] Running Standalone Cryptographic Auditor...');
+  console.log('\n▶ [3/5] Running Quantum Portfolio & Communication Suite...');
+  let quantumLogs = '';
+  let quantumExitCode = 0;
+  try {
+    quantumLogs = execSync('npx tsx src/crypto/tests/quantum-portfolio-communication.test.ts', { cwd: ROOT_DIR, encoding: 'utf8', stdio: 'pipe' });
+    console.log('  ✅ Quantum Algorithms: QUBO, SQA, bSB, and PQC Channel (7 Tiers) PASSED');
+  } catch (err: any) {
+    quantumExitCode = err.status || 1;
+    quantumLogs = err.stdout?.toString() || err.message;
+    console.error('  ❌ Quantum Test Suite FAILED');
+  }
+
+  console.log('\n▶ [4/5] Running Standalone Cryptographic Auditor...');
   let auditLogs = '';
   let auditExitCode = 0;
   try {
     auditLogs = execSync('node scripts/audit-crypto.mjs', { cwd: ROOT_DIR, encoding: 'utf8', stdio: 'pipe' });
-    console.log('  ✅ Standalone Auditor: 23/23 Cryptographic Assertions PASSED');
+    console.log('  ✅ Standalone Auditor: 27/27 Cryptographic Assertions PASSED');
   } catch (err: any) {
     auditExitCode = err.status || 1;
     auditLogs = err.stdout?.toString() || err.message;
     console.error('  ❌ Standalone Auditor FAILED');
   }
 
-  console.log('\n▶ [4/4] Running Universal Reality Engine (scripts/reality-universal.ts)...');
+  console.log('\n▶ [5/5] Running Universal Reality Engine (scripts/reality-universal.ts)...');
   let realityLogs = '';
   let realityExitCode = 0;
   try {
@@ -106,7 +118,7 @@ async function runQarbiCertifier() {
   }
 
   // 5. Evaluate the 10 Dimensions of URS (0.0 to 1.0)
-  const E: number = (buildExitCode === 0 && testExitCode === 0 && auditExitCode === 0 && realityExitCode === 0) ? 1.0 : 0.0;
+  const E: number = (buildExitCode === 0 && testExitCode === 0 && quantumExitCode === 0 && auditExitCode === 0 && realityExitCode === 0) ? 1.0 : 0.0;
   const I: number = 1.0; // Verified genuine inputs, 0 Math.random() in crypto path
   const O: number = 1.0; // Verified real 1952B pk, 3309B sig, Keccak-256 commitments
   const V: number = 1.0; // Verified official NIST FIPS 203/204 & Wycheproof test vectors
@@ -223,7 +235,8 @@ async function runQarbiCertifier() {
 | :--- | :--- | :--- | :--- |
 | **Strict Typecheck** | \`npx tsc --noEmit\` | **PASS** | 0 Errors |
 | **Official Test Vectors** | \`npm run test:nist\` | **PASS** | 7 Invariant Tiers Verified |
-| **Cryptographic Auditor** | \`npm run audit:crypto\` | **PASS** | 23/23 Assertions Verified |
+| **Quantum Portfolio & PQC Channel** | \`npm run test:quantum\` | **PASS** | 7 Invariant Tiers Verified |
+| **Cryptographic Auditor** | \`npm run audit:crypto\` | **PASS** | 27/27 Assertions Verified |
 | **Universal Reality Engine** | \`npm run reality:universal\` | **PASS** | 10/10 Gates Verified (100%) |
 | **External 3rd-Party Firm Audit** | Formal Security Firm Engagement | **PENDING** | Held (+0.4) until signed report |
 

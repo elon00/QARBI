@@ -1,15 +1,15 @@
 # 📜 QARBI PROTOCOL — URS EVIDENCE CERTIFICATE
 
 **Standard:** UNIVERSAL REALITY SYSTEM v2.0  
-**Issued At:** 2026-09-07T09:28:11.361Z  
-**Reality Hash (SHA-256):** `8c2c646978b609d1e4127b82c8e5c1fba77b4b17f5c6b8e99b3c53382ee8adb6`  
+**Issued At:** 2026-09-07T10:16:07.914Z  
+**Reality Hash (SHA-256):** `63c21d3b27fc8d622ab7ab6c7998e2cfb09f3a41869c358bcad720a170e8fdd3`  
 
 ---
 
 ## 📌 Target & Integrity Hashes
 * **Repository:** [elon00/QARBI](https://github.com/elon00/QARBI)
-* **Commit SHA:** `07a0844a780141b1527b6afe3195adf1dfbfdf17`
-* **Package-Lock SHA-256:** `bfcbee9af3b1e7a8f350337149ab2767820747a8dce0801809aba467bacaf21f`
+* **Commit SHA:** `b1e71b71f82078caaf1fe439063d6e8229324318`
+* **Package-Lock SHA-256:** `ccb7bbb4d45fd6aac2245264b30b017a59828737b3a02f430ff74c78737a398c`
 * **Runtime Environment:** `win32-x64` | Node `v24.18.0` | npm `11.16.0`
 
 ---
@@ -20,7 +20,8 @@
 | :--- | :--- | :--- | :--- |
 | **Strict Typecheck** | `npx tsc --noEmit` | **PASS** | 0 Errors |
 | **Official Test Vectors** | `npm run test:nist` | **PASS** | 7 Invariant Tiers Verified |
-| **Cryptographic Auditor** | `npm run audit:crypto` | **PASS** | 23/23 Assertions Verified |
+| **Quantum Portfolio & PQC Channel** | `npm run test:quantum` | **PASS** | 7 Invariant Tiers Verified |
+| **Cryptographic Auditor** | `npm run audit:crypto` | **PASS** | 27/27 Assertions Verified |
 | **Universal Reality Engine** | `npm run reality:universal` | **PASS** | 10/10 Gates Verified (100%) |
 | **External 3rd-Party Firm Audit** | Formal Security Firm Engagement | **PENDING** | Held (+0.4) until signed report |
 
@@ -68,4 +69,4 @@ $$\boxed{\text{Any Critical Failure} = 0 \implies \text{That Feature Cannot Be C
 ## 🔐 Master Reality Hash
 $$\boxed{H = \text{SHA256}(CommitSHA \parallel PackageLockSHA \parallel Environment \parallel TestLogs \parallel BuildLogs \parallel AuditResults)}$$
 
-$$\mathbf{8c2c646978b609d1e4127b82c8e5c1fba77b4b17f5c6b8e99b3c53382ee8adb6}$$
+$$\mathbf{63c21d3b27fc8d622ab7ab6c7998e2cfb09f3a41869c358bcad720a170e8fdd3}$$

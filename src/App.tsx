@@ -8,6 +8,7 @@ import { TaskMarketplace } from "./components/TaskMarketplace";
 import { SecurityEnclave } from "./components/SecurityEnclave";
 import { ArbitrumExplorer } from "./components/ArbitrumExplorer";
 import { WhitepaperViewer } from "./components/WhitepaperViewer";
+import { QuantumOperations } from "./components/QuantumOperations";
 import { FaucetModal } from "./components/FaucetModal";
 import { OnchainDeployerModal } from "./components/OnchainDeployerModal";
 import {
@@ -201,6 +202,10 @@ export function App() {
     setSecurityLogs((prev) => [log, ...prev]);
   };
 
+  const handleAddTransaction = (txRecord: TransactionRecord) => {
+    setTransactions((prev) => [txRecord, ...prev]);
+  };
+
   const handleClaimFaucet = (qarbiAmount: number, ethAmount: number, txRecord: TransactionRecord) => {
     setUserBalanceQarbi((prev) => prev + qarbiAmount);
     setUserBalanceEth((prev) => prev + ethAmount);
@@ -285,6 +290,14 @@ export function App() {
             onToggleKillSwitch={handleToggleKillSwitch}
             securityLogs={securityLogs}
             onAddLog={handleAddSecurityLog}
+            t={t}
+          />
+        )}
+
+        {activeTab === "quantum" && (
+          <QuantumOperations
+            agents={agents}
+            onAddTransaction={handleAddTransaction}
             t={t}
           />
         )}

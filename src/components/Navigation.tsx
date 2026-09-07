@@ -1,8 +1,8 @@
 import React from "react";
-import { Users, Grid, Terminal, Layers, ShieldCheck, Activity, FileText } from "lucide-react";
+import { Users, Grid, Terminal, Layers, ShieldCheck, Activity, FileText, Cpu } from "lucide-react";
 import { TranslationStrings } from "../types";
 
-export type TabKey = "spawner" | "conway" | "terminal" | "tasks" | "security" | "explorer" | "whitepaper";
+export type TabKey = "spawner" | "conway" | "terminal" | "tasks" | "security" | "quantum" | "explorer" | "whitepaper";
 
 interface NavigationProps {
   activeTab: TabKey;
@@ -56,6 +56,13 @@ export const Navigation: React.FC<NavigationProps> = ({
       icon: ShieldCheck,
       badge: isEmergencyLocked ? "HALTED" : "4-Layer",
       badgeColor: isEmergencyLocked ? "bg-rose-900 text-rose-300 border-rose-600" : "bg-emerald-900 text-emerald-300 border-emerald-700",
+    },
+    {
+      key: "quantum",
+      label: "Quantum Enclave (QUBO & PQC)",
+      icon: Cpu,
+      badge: "NIST PQC",
+      badgeColor: "bg-purple-950 text-purple-300 border-purple-700",
     },
     {
       key: "explorer",

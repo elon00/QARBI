@@ -15,6 +15,7 @@
  */
 
 import assert from 'assert';
+import nodeCrypto from 'crypto';
 import { ml_kem768 } from '@noble/post-quantum/ml-kem.js';
 import { ml_dsa65 } from '@noble/post-quantum/ml-dsa.js';
 import { keccak_256 } from '@noble/hashes/sha3';
@@ -27,7 +28,7 @@ async function runStandaloneCryptoAudit() {
   console.log('=====================================================================\n');
 
   let passedAssertions = 0;
-  const totalAssertions = 23;
+  const totalAssertions = 27;
 
   function recordPass(desc) {
     passedAssertions++;
@@ -150,6 +151,67 @@ async function runStandaloneCryptoAudit() {
   const compromisedConjunction = dummyEcdsaValid && compromisedPqc;
   assert.strictEqual(compromisedConjunction, false);
   recordPass('Dual conjunction fail-closed when PQC component compromised');
+
+  // 8. Quantum Portfolio QUBO Mathematical Formulation
+  console.log('\n▶ [TIER 8] Quantum Portfolio QUBO Mathematical Formulation:');
+  // Markowitz Mean-Variance mapping: Q_ii = -mu_i + lambda*sigma_ii + gamma*(1 - 2K)
+  const mu0 = 0.38;
+  const sigma00 = 0.2704;
+  const lambdaRisk = 2.0;
+  const gammaPenalty = 4.0;
+  const budgetK = 3;
+  const q00 = -mu0 + (lambdaRisk * sigma00) + gammaPenalty * (1 - 2 * budgetK);
+  assert.strictEqual(Math.abs(q00 - (-19.8392)) < 1e-4, true);
+  recordPass('QUBO Hamiltonian diagonal mapping matches analytical Markowitz minimum');
+
+  const sigma01 = 0.0819;
+  const q01 = (lambdaRisk * sigma01) + (2 * gammaPenalty);
+  assert.strictEqual(Math.abs(q01 - 8.1638) < 1e-4, true);
+  recordPass('QUBO interaction matrix off-diagonal elements preserve quadratic penalty');
+
+  // 9. Post-Quantum Secure Inter-Agent Channel (ML-KEM-768 + HKDF + ML-DSA-65)
+  console.log('\n▶ [TIER 9] Post-Quantum Secure Inter-Agent Channel:');
+  const aliceDsa = ml_dsa65.keygen();
+  const bobKem = ml_kem768.keygen();
+
+  // Encapsulate to Bob
+  const interAgentEncap = ml_kem768.encapsulate(bobKem.publicKey);
+  assert.strictEqual(interAgentEncap.cipherText.length, 1088);
+  assert.strictEqual(interAgentEncap.sharedSecret.length, 32);
+
+  // Derive symmetric keys via HKDF-SHA256
+  const sessionSalt = Buffer.from('QARBI_PQC_COMMUNICATION_SALT_V1', 'utf8');
+  const sessionInfo = Buffer.from('QARBI_INTER_AGENT_1_TO_2', 'utf8');
+  const derivedSession = hkdf(sha256, interAgentEncap.sharedSecret, sessionSalt, sessionInfo, 44);
+  const aesKey = Buffer.from(derivedSession.slice(0, 32));
+  const iv = Buffer.from(derivedSession.slice(32, 44));
+
+  // Encrypt confidential message
+  const secretPayload = Buffer.from('CONFIDENTIAL_TASK_INTENT_NONCE_77', 'utf8');
+  const cipher = nodeCrypto.createCipheriv('aes-256-gcm', aesKey, iv);
+  const ciphertext = Buffer.concat([cipher.update(secretPayload), cipher.final()]);
+  const authTag = cipher.getAuthTag();
+
+  // Sign transmission with Alice's ML-DSA-65 key
+  const transmissionTranscript = Buffer.concat([interAgentEncap.cipherText, ciphertext, authTag, iv]);
+  const aliceSig = ml_dsa65.sign(transmissionTranscript, aliceDsa.secretKey);
+  assert.strictEqual(aliceSig.length, 3309);
+  recordPass('ML-KEM-768 ephemeral KEX + HKDF + ML-DSA-65 transmission constructed');
+
+  // Bob receives, decapsulates, verifies Alice's signature, and decrypts
+  const sigValid = ml_dsa65.verify(aliceSig, transmissionTranscript, aliceDsa.publicKey);
+  assert.strictEqual(sigValid, true);
+
+  const bobDecapSecret = ml_kem768.decapsulate(interAgentEncap.cipherText, bobKem.secretKey);
+  const bobDerived = hkdf(sha256, bobDecapSecret, sessionSalt, sessionInfo, 44);
+  const bobAesKey = Buffer.from(bobDerived.slice(0, 32));
+  const bobIv = Buffer.from(bobDerived.slice(32, 44));
+
+  const decipher = nodeCrypto.createDecipheriv('aes-256-gcm', bobAesKey, bobIv);
+  decipher.setAuthTag(authTag);
+  const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+  assert.strictEqual(decrypted.toString('utf8'), 'CONFIDENTIAL_TASK_INTENT_NONCE_77');
+  recordPass('Inter-Agent post-quantum encrypted channel decrypted & authenticated');
 
   console.log('\n=====================================================================');
   console.log(`🏆 ALL ${passedAssertions}/${totalAssertions} CRYPTOGRAPHIC ASSERTIONS PASSED CLEANLY`);

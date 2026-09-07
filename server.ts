@@ -6,6 +6,8 @@ import crypto from "crypto";
 import { ml_dsa65 } from "@noble/post-quantum/ml-dsa.js";
 import { keccak_256 } from "@noble/hashes/sha3";
 import { ethers } from "ethers";
+import { quantumPortfolioOptimizer, DEFAULT_ARBITRUM_BASKET, DEFAULT_COVARIANCE_MATRIX } from "./src/crypto/quantum/portfolio-optimizer.js";
+import { quantumSecureChannel } from "./src/crypto/quantum/secure-channel.js";
 
 dotenv.config();
 
@@ -154,8 +156,8 @@ Respond ONLY with a valid JSON object with the following structure:
         taskTitle: `Execute: ${prompt.slice(0, 40)}...`,
         taskDescription: `Demonstration plan created locally. Intent: ${prompt}. No Stylus mutation, contract dispatch, or Arbitrum settlement is executed by this fallback.`,
         suggestedArchetype: archetype,
-        estimatedGasUnits: Math.floor(Math.random() * 45000) + 32000,
-        rewardQarbi: Math.floor(Math.random() * 20) + 10,
+        estimatedGasUnits: 32000 + ((prompt.length * 97) % 25000),
+        rewardQarbi: 10 + ((prompt.length * 13) % 15),
         policyVerification: {
           isWithinSingleTxLimit: null,
           whitelistedTarget: "NOT VERIFIED — demonstration placeholder",
@@ -260,6 +262,72 @@ app.post("/api/stylus/evolve", (req, res) => {
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message || "Stylus evolution failed" });
+  }
+});
+
+// 6. Post-Quantum Portfolio Optimization (QUBO & SQA Engine)
+app.post("/api/quantum/portfolio-optimize", (req, res) => {
+  try {
+    const { riskAversion, budgetK, penaltyMultiplier, steps } = req.body;
+    const optParams = {
+      assets: DEFAULT_ARBITRUM_BASKET,
+      covarianceMatrix: DEFAULT_COVARIANCE_MATRIX,
+      riskAversion: Number(riskAversion) || 1.8,
+      budgetK: Number(budgetK) || 3,
+      penaltyMultiplier: Number(penaltyMultiplier) || 3.5,
+      annealingSteps: Number(steps) || 350,
+    };
+
+    const result = quantumPortfolioOptimizer.optimizeAndAttest(optParams);
+    res.json({ success: true, result });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || "Quantum portfolio optimization failed" });
+  }
+});
+
+// 7. Post-Quantum Secure Inter-Agent Channel: Encrypt & Sign Transmission
+app.post("/api/quantum/secure-send", (req, res) => {
+  try {
+    const { senderAgentId, senderName, senderWallet, recipientAgentId, recipientCommitment, recipientKemPublicKeyHex, message } = req.body;
+    if (!message || !recipientKemPublicKeyHex) {
+      return res.status(400).json({ error: "Missing required parameters for quantum transmission" });
+    }
+
+    const sender = quantumSecureChannel.createAgentQuantumIdentity(
+      Number(senderAgentId) || 1,
+      senderName || "Sender-Agent",
+      senderWallet || "0x4b7f92aC7738240562e84773821034D5154371C8"
+    );
+
+    const recipientPk = Buffer.from(recipientKemPublicKeyHex.replace("0x", ""), "hex");
+    const pkg = quantumSecureChannel.sendSecureMessage(
+      sender,
+      recipientPk,
+      Number(recipientAgentId) || 2,
+      recipientCommitment || "0xa1c49f823719b772093e8471b6940f82348571629857493a1038596048205719",
+      message
+    );
+
+    res.json({ success: true, package: pkg });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || "Quantum encryption failed" });
+  }
+});
+
+// 8. Post-Quantum Secure Inter-Agent Channel: Decapsulate & Verify Transmission
+app.post("/api/quantum/secure-receive", (req, res) => {
+  try {
+    const { recipientKemSecretKeyHex, encryptedPackage } = req.body;
+    if (!recipientKemSecretKeyHex || !encryptedPackage) {
+      return res.status(400).json({ error: "Missing secret key or encrypted package" });
+    }
+
+    const skBytes = Buffer.from(recipientKemSecretKeyHex.replace("0x", ""), "hex");
+    const result = quantumSecureChannel.receiveSecureMessage(skBytes, encryptedPackage);
+
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || "Quantum decapsulation failed" });
   }
 });
 

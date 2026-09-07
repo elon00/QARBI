@@ -60,7 +60,7 @@ export interface TransactionRecord {
   blockNumber: number;
   from: string;
   to: string;
-  type: "AGENT_REGISTER" | "CONWAY_EVOLUTION" | "TASK_ESCROW" | "REWARD_PAYOUT" | "KILL_SWITCH" | "FAUCET_CLAIM" | "TOKEN_DEPLOY";
+  type: "AGENT_REGISTER" | "CONWAY_EVOLUTION" | "TASK_ESCROW" | "REWARD_PAYOUT" | "KILL_SWITCH" | "FAUCET_CLAIM" | "TOKEN_DEPLOY" | "QUANTUM_PORTFOLIO_OPTIMIZE" | "QUANTUM_SECURE_TRANSMIT";
   value: string;
   status: "CONFIRMED" | "PENDING" | "REVERTED";
   timestamp: number;
@@ -201,4 +201,28 @@ export interface TranslationStrings {
     subtitle: string;
     claimButton: string;
   };
+  quantum?: {
+    title: string;
+    subtitle: string;
+  };
+}
+
+export interface QuantumPortfolioPayload {
+  selectedAssets: string[];
+  weights: Record<string, number>;
+  expectedReturn: number;
+  portfolioVolatility: number;
+  sharpeRatio: number;
+  quboEnergy: number;
+  pqcAttestationHash: string;
+}
+
+export interface QuantumCommunicationPayload {
+  senderId: number;
+  recipientId: number;
+  kemCiphertextHex: string;
+  encryptedPayloadHex: string;
+  authTagHex: string;
+  mlDsaSignatureHex: string;
+  timestamp: number;
 }

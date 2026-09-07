@@ -67,6 +67,13 @@ For ai developers and defi users
 - **Live Transaction Ledger**: Visualizes block numbers, transaction hashes, gas units consumed, and Stylus gas efficiency savings.
 - **Internationalization (i18n)**: Fully localized across **11 languages** (English, Hindi, Spanish, Japanese, Chinese, Korean, French, German, Portuguese, Russian, Arabic).
 
+### 7. 🌌 Post-Quantum Portfolio Optimizer & Inter-Agent PQC Channel
+- **QUBO (Quadratic Unconstrained Binary Optimization)**: Maps Markowitz Mean-Variance portfolio allocation across Arbitrum Sepolia DeFi tokens into an Ising Hamiltonian.
+- **Simulated Quantum Annealing (SQA)**: Uses transverse-field tunneling to overcome high energetic barriers that trap classical local search.
+- **Ballistic Simulated Bifurcation (bSB)**: Simulates non-linear optical parametric oscillator networks for rapid combinatorial convergence.
+- **NIST FIPS 204 ML-DSA-65 Attestation**: All optimal portfolio allocations are signed with 3,309-byte lattice signatures and anchored on-chain with Keccak-256 state commitments.
+- **Post-Quantum Secure Inter-Agent Channel**: Implements NIST FIPS 203 ML-KEM-768 ephemeral lattice KEX (1,184B pk, 1,088B ct), RFC 5869 HKDF-SHA256 key derivation, AES-256-GCM authenticated encryption, and fail-closed tamper rejection.
+
 ---
 
 ## 🏗️ System Architecture
@@ -311,13 +318,16 @@ Anyone can independently clone, verify, and audit QARBI in a clean environment:
 # 1. Run 19 official NIST ACVP & Wycheproof KAT test vectors (7 tiers)
 npm run test:nist
 
-# 2. Run standalone zero-dependency cryptographic auditor (23 assertions)
+# 2. Run Quantum Portfolio Optimization & PQC Inter-Agent Channel suite (7 tiers)
+npm run test:quantum
+
+# 3. Run standalone zero-dependency cryptographic auditor (27 assertions)
 npm run audit:crypto
 
-# 3. Run the 10-Gate Universal Reality Engine
+# 4. Run the 10-Gate Universal Reality Engine
 npm run reality:universal
 
-# 4. Generate signed URS Evidence Certificate & SHA-256 Reality Hash
+# 5. Generate signed URS Evidence Certificate & SHA-256 Reality Hash
 npm run reality:certify
 ```
 

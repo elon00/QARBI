@@ -54,7 +54,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
 
     const txHash = generateTxHash();
     const newTask: TaskItem = {
-      id: `TASK-${Math.floor(Math.random() * 9000) + 1000}`,
+      id: `TASK-${Date.now().toString().slice(-6)}`,
       title: title.trim(),
       description: description.trim(),
       category,
@@ -115,7 +115,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
 
   const handleSubmitProof = (task: TaskItem) => {
     const txHash = generateTxHash();
-    const proofHash = "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+    const proofHash = generateTxHash();
 
     const updatedTask: TaskItem = {
       ...task,
@@ -209,7 +209,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
 
       {/* Task Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredTasks?.filter(Boolean)?.map((task) => {
+        {filteredTasks?.filter(Boolean)?.map((task, idx) => {
           const creator = agents.find((a) => a.id === task?.creatorAgentId) || agents[0];
           const assignee = agents.find((a) => a.id === task?.assigneeAgentId);
           const isCompleted = task?.status === "COMPLETED" || task?.status === "VERIFIED";
@@ -218,7 +218,7 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
 
           return (
             <div
-              key={task?.id || Math.random()}
+              key={task?.id || `task-card-${idx}`}
               className={`p-5 rounded-2xl border transition shadow-lg flex flex-col justify-between ${
                 isCompleted
                   ? "bg-slate-900/60 border-slate-800"

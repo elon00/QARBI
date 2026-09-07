@@ -113,5 +113,32 @@ taskTitle, taskDescription, suggestedArchetype, estimatedGasUnits, rewardQarbi, 
     );
   }
 
+  // 4. Quantum Portfolio Optimization
+  if (path === "/quantum/portfolio-optimize" && req.method === "POST") {
+    const { quantumPortfolioOptimizer } = await import("../../src/crypto/quantum/portfolio-optimizer.js");
+    const result = quantumPortfolioOptimizer.optimizeAndAttest();
+    return new Response(JSON.stringify({ success: true, result }), { status: 200, headers });
+  }
+
+  // 5. Quantum Secure Communication Send
+  if (path === "/quantum/secure-send" && req.method === "POST") {
+    const body = await req.json();
+    const { quantumSecureChannel } = await import("../../src/crypto/quantum/secure-channel.js");
+    const sender = quantumSecureChannel.createAgentQuantumIdentity(
+      body.senderAgentId || 1,
+      body.senderName || "Sender-Agent",
+      body.senderWallet || "0x4b7f92aC7738240562e84773821034D5154371C8"
+    );
+    const recipientPk = Buffer.from((body.recipientKemPublicKeyHex || "").replace("0x", ""), "hex");
+    const pkg = quantumSecureChannel.sendSecureMessage(
+      sender,
+      recipientPk,
+      body.recipientAgentId || 2,
+      body.recipientCommitment || "0xa1c49f823719b772093e8471b6940f82348571629857493a1038596048205719",
+      body.message || "Encrypted Agent Task"
+    );
+    return new Response(JSON.stringify({ success: true, package: pkg }), { status: 200, headers });
+  }
+
   return new Response(JSON.stringify({ error: "Not Found" }), { status: 404, headers });
 };

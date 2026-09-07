@@ -43,14 +43,16 @@
     "check:truth": "node scripts/check-truth.mjs",
     "check:repo": "node scripts/qarbi-finish.mjs --audit-only",
     "test:nist": "tsx src/crypto/tests/official-nist-vectors.test.ts",
+    "test:quantum": "tsx src/crypto/tests/quantum-portfolio-communication.test.ts",
     "audit:crypto": "node scripts/audit-crypto.mjs",
     "reality:universal": "tsx scripts/reality-universal.ts",
     "reality:certify": "tsx scripts/generate-urs-certificate.ts",
     "finish": "node scripts/qarbi-finish.mjs",
-    "test": "npm run test:nist && npm run audit:crypto && npm run finish"
+    "test": "npm run test:nist && npm run test:quantum && npm run audit:crypto && npm run finish"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
+    "@noble/ciphers": "^2.4.0",
     "@noble/hashes": "^1.8.0",
     "@noble/post-quantum": "^0.7.1",
     "@tailwindcss/vite": "^4.1.14",

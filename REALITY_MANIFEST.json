@@ -140,6 +140,28 @@
       "external_verification": "scripts/generate-urs-certificate.ts",
       "production_allowed": true,
       "notes": "Generates tamper-proof SHA-256 reality certificates."
+    },
+    {
+      "id": "quantum-portfolio-optimizer",
+      "name": "Post-Quantum Portfolio Optimizer (QUBO & SQA)",
+      "category": "REAL",
+      "real_inputs": true,
+      "algorithm": "Markowitz-to-QUBO mapping, Simulated Quantum Annealing with transverse tunneling, and NIST FIPS 204 ML-DSA-65 attestation",
+      "reproducibility": "100% reproducible via npm run test:quantum",
+      "external_verification": "Analytical QUBO symmetry and NIST FIPS 204 signature verification",
+      "production_allowed": true,
+      "notes": "Optimal asset allocation across Arbitrum Sepolia DeFi tokens."
+    },
+    {
+      "id": "post-quantum-secure-communication",
+      "name": "Post-Quantum Secure Agent Communication Channel",
+      "category": "REAL",
+      "real_inputs": true,
+      "algorithm": "NIST FIPS 203 ML-KEM-768 KEX + RFC 5869 HKDF + AES-256-GCM + NIST FIPS 204 ML-DSA-65 Attestation",
+      "reproducibility": "100% reproducible via npm run test:quantum",
+      "external_verification": "NIST FIPS 203 & 204 wire format and Wycheproof negative testing",
+      "production_allowed": true,
+      "notes": "End-to-end authenticated encryption between autonomous agents."
     }
   ]
 }
