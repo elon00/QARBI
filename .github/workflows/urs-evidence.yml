@@ -1,0 +1,86 @@
+name: URS Evidence Matrix
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evidence:
+    name: Clean-clone evidence (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20.x, 22.x]
+
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Record environment
+        run: |
+          node --version | tee ENVIRONMENT.txt
+          npm --version | tee -a ENVIRONMENT.txt
+          git rev-parse HEAD | tee COMMIT_SHA.txt
+          sha256sum package-lock.json | tee PACKAGE_LOCK_SHA256.txt
+
+      - name: Clean dependency install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Compile contracts
+        run: npm run compile:contracts
+
+      - name: NIST vector matrix
+        run: npm run test:nist
+
+      - name: Quantum portfolio and communication matrix
+        run: npm run test:quantum
+
+      - name: Standalone cryptographic audit
+        run: npm run audit:crypto
+
+      - name: Universal Reality Engine
+        run: npm run reality:universal
+
+      - name: Production build
+        run: npm run build
+
+      - name: Generate URS certificate
+        run: npm run reality:certify
+
+      - name: Verify expected evidence artifacts
+        run: |
+          test -f reality/URS_EVIDENCE_CERTIFICATE.json
+          test -f docs/reality/URS_EVIDENCE_CERTIFICATE.md
+          test -d dist
+
+      - name: Upload immutable CI evidence bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: urs-evidence-${{ github.sha }}-node-${{ matrix.node }}
+          if-no-files-found: error
+          path: |
+            ENVIRONMENT.txt
+            COMMIT_SHA.txt
+            PACKAGE_LOCK_SHA256.txt
+            reality/URS_EVIDENCE_CERTIFICATE.json
+            docs/reality/URS_EVIDENCE_CERTIFICATE.md
+            dist/
+          retention-days: 90
