@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "QARBI_REALITY_MANIFEST",
+  "version": "1.0.0",
+  "standard": "Zero-Trust Evidence-Based Truth in Engineering (URS v1.0)",
+  "last_updated": "2026-09-07T14:30:00.000Z",
+  "truth_principle": "Doodh ka doodh, paani ka paani — jo real hai sirf wahi production claim hoga. Jo simulation hai use ya to REAL banaya jayega, ya clearly experimental/simulation rakha jayega.",
+  "categories": {
+    "REAL": {
+      "symbol": "🟢",
+      "meaning": "Actually executes and is independently verifiable",
+      "production_claim_allowed": true
+    },
+    "EXPERIMENTAL": {
+      "symbol": "🧪",
+      "meaning": "Real technology, prototype/sandbox stage",
+      "production_claim_allowed": false,
+      "disclaimer_required": true
+    },
+    "SIMULATION": {
+      "symbol": "🟡",
+      "meaning": "Mathematical or software simulation on classical CPU",
+      "production_claim_allowed": false,
+      "disclaimer_required": true
+    },
+    "ROADMAP": {
+      "symbol": "🔵",
+      "meaning": "Future target, not yet built or ratified",
+      "production_claim_allowed": false,
+      "disclaimer_required": true
+    }
+  },
+  "features": [
+    {
+      "id": "pqc-ml-dsa65",
+      "name": "NIST FIPS 204 ML-DSA-65 Digital Signatures",
+      "category": "REAL",
+      "real_inputs": true,
+      "algorithm": "Pure-TS Module-Lattice Digital Signatures (@noble/post-quantum)",
+      "reproducibility": "100% reproducible via npm run test:nist",
+      "external_verification": "NIST FIPS 204 test vectors",
+      "production_allowed": true,
+      "notes": "Generates 1952B public key and 3309B lattice signature."
+    },
+    {
+      "id": "pqc-evm-commitment",
+      "name": "EVM Keccak-256 Public Key Commitment Hash",
+      "category": "REAL",
+      "real_inputs": true,
+      "algorithm": "Keccak-256 hash of 1952-byte ML-DSA-65 public key",
+      "reproducibility": "100% reproducible via audit:crypto",
+      "external_verification": "AgentRegistry.sol bytes32 pqcCommitmentHash on Arbitrum Sepolia",
+      "production_allowed": true,
+      "notes": "Anchors post-quantum identity into 32-byte EVM state."
+    },
+    {
+      "id": "dual-hybrid-conjunction",
+      "name": "Dual Hybrid Conjunction (EVM ECDSA ∧ ML-DSA-65)",
+      "category": "REAL",
+      "real_inputs": true,
+      "algorithm": "Strict logical AND conjunction of ECDSA and ML-DSA signatures",
+      "reproducibility": "100% reproducible via test:nist",
+      "external_verification": "Dual signature verifier engine",
+      "production_allowed": true,
+      "notes": "Fails closed if either signature is compromised or tampered."
+    },
+    {
+      "id": "pqc-ml-kem768",
+      "name": "NIST FIPS 203 ML-KEM-768 Lattice Key Encapsulation",
+      "category": "REAL",
+      "real_inputs": true,
+      "algorithm": "Pure-TS Module-Lattice Key Exchange (@noble/post-quantum)",
+      "reproducibility": "100% reproducible via test:nist",
+      "external_verification": "NIST FIPS 203 test vectors and Section 7.3 implicit rejection",
+      "production_allowed": true,
+      "notes": "Provides post-quantum confidential agent-to-agent payload transport."
+    },
+    {
+      "id": "agent-registry-contract",
+      "name": "Arbitrum Sepolia AgentRegistry Contract",
+      "category": "REAL",
+      "real_inputs": true,
+      "algorithm": "Solidity 0.8.24 on-chain agent registry",
+      "reproducibility": "100% reproducible via compile:contracts",
+      "external_verification": "Arbitrum Sepolia RPC & Arbiscan",
+      "production_allowed": true,
+      "notes": "Stores agent metadata, budgets, and pqcCommitmentHash."
+    },
+    {
+      "id": "task-marketplace-contract",
+      "name": "Arbitrum Sepolia TaskMarket Contract",
+      "category": "REAL",
+      "real_inputs": true,
+      "algorithm": "Solidity 0.8.24 decentralized escrow marketplace",
+      "reproducibility": "100% reproducible via compile:contracts",
+      "external_verification": "Arbitrum Sepolia RPC & Arbiscan",
+      "production_allowed": true,
+      "notes": "Escrow locking and bounty payout for autonomous tasks."
+    },
+    {
+      "id": "gemini-intent-orchestrator",
+      "name": "Gemini 2.0 Agentic Intent Engine",
+      "category": "REAL",
+      "real_inputs": true,
+      "algorithm": "Google GenAI SDK intent parsing & planning",
+      "reproducibility": "100% reproducible when GEMINI_API_KEY is configured",
+      "external_verification": "Google GenAI API endpoints",
+      "production_allowed": true,
+      "notes": "Decomposes natural language into validated transaction payloads."
+    },
+    {
+      "id": "conway-state-engine",
+      "name": "Conway Cellular Automaton State Model",
+      "category": "SIMULATION",
+      "real_inputs": false,
+      "algorithm": "B3/S23 2D grid cellular simulation on classical client",
+      "reproducibility": "100% reproducible in React UI",
+      "external_verification": "Client visual rendering",
+      "production_allowed": false,
+      "notes": "Visual state machine for agent lifecycles and energy dynamics."
+    },
+    {
+      "id": "arbitrum-stylus-engine",
+      "name": "Arbitrum Stylus Rust/Wasm Contract Engine",
+      "category": "ROADMAP",
+      "real_inputs": false,
+      "algorithm": "Rust stylus-sdk compiled to WebAssembly",
+      "reproducibility": "Requires local cargo-stylus toolchain",
+      "external_verification": "Stylus testnet verification",
+      "production_allowed": false,
+      "notes": "Future optimization target for 10x-100x compute gas compression."
+    },
+    {
+      "id": "universal-reality-engine",
+      "name": "URS v1.0 Universal Reality Verification Engine",
+      "category": "REAL",
+      "real_inputs": true,
+      "algorithm": "Multiplicative Reality Scoring E*I*O*V*R & SHA-256 Hashing",
+      "reproducibility": "100% reproducible via npm run reality:certify",
+      "external_verification": "scripts/generate-urs-certificate.ts",
+      "production_allowed": true,
+      "notes": "Generates tamper-proof SHA-256 reality certificates."
+    }
+  ]
+}

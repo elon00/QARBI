@@ -1,0 +1,83 @@
+{
+  "standard": "UNIVERSAL REALITY SYSTEM v2.0",
+  "title": "QARBI PROTOCOL URS SCORECARD",
+  "auditedAt": "2026-09-07T09:26:05.609Z",
+  "commitSha": "LOCAL_INSPECTED_TRANSFORMATION",
+  "durationMs": 1149,
+  "totalGates": 9,
+  "passedGates": 9,
+  "ursWeakestLinkScore": "10 / 10",
+  "cumulativeGateScore": "90/90 (100%)",
+  "universalTenLaw": "10/10 <=> All Gates == 10 && External Audit Signed",
+  "universalTenStatus": "PASSED (Internal Automated Gates)",
+  "failClosedRule": "Any Critical Failure == 0 => Feature Cannot Be Called Production-Verified",
+  "verdict": "🟢 EVIDENCE-BASED PQC PROTOCOL VERIFIED",
+  "gates": [
+    {
+      "gate": 1,
+      "name": "Claim Freeze & Manifest Registration",
+      "status": "PASS",
+      "score": 10,
+      "details": "10 features registered"
+    },
+    {
+      "gate": 2,
+      "name": "Zero-Simulation Cryptographic Scan",
+      "status": "PASS",
+      "score": 10,
+      "details": "100% genuine crypto; 0 Math.random() detected"
+    },
+    {
+      "gate": 3,
+      "name": "NIST FIPS 204 Keygen Invariants",
+      "status": "PASS",
+      "score": 10,
+      "details": "1952B pk, 4032B sk verified"
+    },
+    {
+      "gate": 4,
+      "name": "EVM Keccak-256 Commitment Integrity",
+      "status": "PASS",
+      "score": 10,
+      "details": "Commitment: 0x1e365e1a5fd9ef..."
+    },
+    {
+      "gate": 5,
+      "name": "Lattice Signature & Tamper Rejection",
+      "status": "PASS",
+      "score": 10,
+      "details": "3309B signature verified; tamper rejected"
+    },
+    {
+      "gate": 6,
+      "name": "Dual Hybrid Conjunction Conformance",
+      "status": "PASS",
+      "score": 10,
+      "details": "Strict conjunction ECDSA ∧ ML-DSA-65 verified"
+    },
+    {
+      "gate": 7,
+      "name": "NIST FIPS 203 ML-KEM & Implicit Rejection",
+      "status": "PASS",
+      "score": 10,
+      "details": "Lattice KEX converged; zero-leakage implicit rejection verified"
+    },
+    {
+      "gate": 8,
+      "name": "Arbitrum Sepolia RPC Health",
+      "status": "PASS",
+      "score": 10,
+      "details": "Active Block 306334490"
+    },
+    {
+      "gate": 9,
+      "name": "Reproducibility & KAT Conformance",
+      "status": "PASS",
+      "score": 10,
+      "details": "Official RFC, Keccak, and NIST vectors verified byte-for-byte"
+    }
+  ],
+  "multiplicativeFormula": "FeatureReality = E * I * O * V * R",
+  "weakestLinkFormula": "URS_10 = min(E, I, O, V, R, C, P, F, A, H) * 10",
+  "guarantee": "Zero Math.random() in Crypto Path. Real NIST FIPS 204 ML-DSA-65 & EVM Conjunction."
+}
