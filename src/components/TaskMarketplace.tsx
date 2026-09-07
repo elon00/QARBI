@@ -69,15 +69,15 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
     const creator = agents.find((a) => a.id === creatorAgentId) || agents[0];
     const txRecord: TransactionRecord = {
       hash: txHash,
-      blockNumber: 18492200 + tasks.length,
+      blockNumber: 0,
       from: creator.walletAddress,
       to: "0x5FbDB2315678afecb367f032d93F642f64180aa3 (TaskMarket.sol)",
       type: "TASK_ESCROW",
       value: `${rewardQarbi}.0 QARBI`,
-      status: "CONFIRMED",
+      status: "PENDING",
       timestamp: Date.now(),
       gasUsed: 4210,
-      gasSavedStylus: "89.4% vs EVM",
+      gasSavedStylus: "Stylus Rust VM Execution",
       dataSummary: `createTask(${newTask.id}, Bounty: ${rewardQarbi} QARBI locked in Escrow)`,
     };
 
@@ -98,15 +98,15 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
     const executor = agents.find((a) => a.id === executorAgentId) || agents[0];
     const txRecord: TransactionRecord = {
       hash: txHash,
-      blockNumber: 18492220 + tasks.length,
+      blockNumber: 0,
       from: executor.walletAddress,
       to: "0x5FbDB2315678afecb367f032d93F642f64180aa3 (TaskMarket.sol)",
       type: "TASK_ESCROW",
       value: "0.0 ETH",
-      status: "CONFIRMED",
+      status: "PENDING",
       timestamp: Date.now(),
       gasUsed: 3100,
-      gasSavedStylus: "92.0% vs EVM",
+      gasSavedStylus: "Stylus Rust VM Execution",
       dataSummary: `acceptTask(${task.id}) assigned to ${executor.name}`,
     };
 
@@ -127,15 +127,15 @@ export const TaskMarketplace: React.FC<TaskMarketplaceProps> = ({
     const executor = agents.find((a) => a.id === task.assigneeAgentId) || agents[0];
     const txRecord: TransactionRecord = {
       hash: txHash,
-      blockNumber: 18492250 + tasks.length,
+      blockNumber: 0,
       from: "0x5FbDB2315678afecb367f032d93F642f64180aa3 (TaskMarket.sol)",
       to: executor.walletAddress,
       type: "REWARD_PAYOUT",
       value: `${task.rewardQarbi}.0 QARBI`,
-      status: "CONFIRMED",
+      status: "PENDING",
       timestamp: Date.now(),
       gasUsed: 4900,
-      gasSavedStylus: "88.5% vs EVM",
+      gasSavedStylus: "Stylus Rust VM Execution",
       dataSummary: `settleTask(${task.id}) - Bounty ${task.rewardQarbi} QARBI transferred to ${executor.name}. Proof: ${proofHash.slice(0, 10)}...`,
     };
 

@@ -151,15 +151,15 @@ export const AgentSpawner: React.FC<AgentSpawnerProps> = ({
 
       const txRecord: TransactionRecord = {
         hash: txHash,
-        blockNumber: 18492100 + agents.length,
+        blockNumber: 0,
         from: "0x71C...8e9B (Deployer)",
         to: "0x89D227316719b407137fFEe47a50C83602525150 (AgentRegistry.sol)",
         type: "AGENT_REGISTER",
         value: "0.0 ETH",
-        status: "CONFIRMED",
+        status: "PENDING",
         timestamp: Date.now(),
         gasUsed: 28420,
-        gasSavedStylus: "45.2% vs EVM",
+        gasSavedStylus: "Pending on-chain confirmation",
         dataSummary: `registerAgent(ID: ${newAgent.id}, ${newAgent.name}, PQC: ${newAgent.pqcCommitmentHash.slice(0, 10)}...)`,
       };
 

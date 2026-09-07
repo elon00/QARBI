@@ -1,4 +1,5 @@
-import { execFileSync, existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -65,8 +66,8 @@ assert(!existsSync(join(root, ".netlify")), ".netlify must not exist in the work
 if (!auditOnly) {
   run("npm", ["run", "check:env"]);
   run("npm", ["run", "check:truth"]);
-  run(process.execPath, [join("scripts", "compile.js")]);
-  run(process.execPath, [join("scripts", "generateArtifacts.js")]);
+  run("node", [join("scripts", "compile.js")]);
+  run("node", [join("scripts", "generateArtifacts.js")]);
   run("npm", ["run", "typecheck"]);
   run("npm", ["run", "build"]);
   run("npm", ["run", "check:truth"]);

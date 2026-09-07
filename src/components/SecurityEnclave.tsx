@@ -147,12 +147,12 @@ export const SecurityEnclave: React.FC<SecurityEnclaveProps> = ({
     const newStatus = !isEmergencyLocked;
     const txRecord: TransactionRecord = {
       hash: txHash,
-      blockNumber: 18492290,
+      blockNumber: 0,
       from: "0x71C...8e9B (Guardian/Owner)",
       to: "0x0165878A594ca255338adfa4d48449f69242Eb8F (AgentWallet.sol)",
       type: "KILL_SWITCH",
       value: "0.0 ETH",
-      status: "CONFIRMED",
+      status: "PENDING",
       timestamp: Date.now(),
       gasUsed: 21400,
       gasSavedStylus: "0% (Guardian EVM)",

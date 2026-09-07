@@ -1,14 +1,14 @@
 # 📜 QARBI PROTOCOL — URS EVIDENCE CERTIFICATE
 
 **Standard:** UNIVERSAL REALITY SYSTEM v2.0  
-**Issued At:** 2026-09-07T10:17:56.460Z  
-**Reality Hash (SHA-256):** `4d645dc6a5cb9dcbb8c327e0b5a19f1a967824da6568cb945122bead08ea5f25`  
+**Issued At:** 2026-09-07T19:03:29.708Z  
+**Reality Hash (SHA-256):** `37cc5fa631eaac572cd8b184f7f21bc2019cb96531fc8d3a72c9d740559522d6`  
 
 ---
 
 ## 📌 Target & Integrity Hashes
 * **Repository:** [elon00/QARBI](https://github.com/elon00/QARBI)
-* **Commit SHA:** `9aba4e761d1a704398c9e29444c93b63c7833f0a`
+* **Commit SHA:** `653be7ce3eb4d2a310b9455aca769f3778b234fe`
 * **Package-Lock SHA-256:** `ccb7bbb4d45fd6aac2245264b30b017a59828737b3a02f430ff74c78737a398c`
 * **Runtime Environment:** `win32-x64` | Node `v24.18.0` | npm `11.16.0`
 
@@ -69,4 +69,4 @@ $$\boxed{\text{Any Critical Failure} = 0 \implies \text{That Feature Cannot Be C
 ## 🔐 Master Reality Hash
 $$\boxed{H = \text{SHA256}(CommitSHA \parallel PackageLockSHA \parallel Environment \parallel TestLogs \parallel BuildLogs \parallel AuditResults)}$$
 
-$$\mathbf{4d645dc6a5cb9dcbb8c327e0b5a19f1a967824da6568cb945122bead08ea5f25}$$
+$$\mathbf{37cc5fa631eaac572cd8b184f7f21bc2019cb96531fc8d3a72c9d740559522d6}$$

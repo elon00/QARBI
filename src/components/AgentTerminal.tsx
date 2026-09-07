@@ -184,15 +184,15 @@ export const AgentTerminal: React.FC<AgentTerminalProps> = ({
 
       const txRecord: TransactionRecord = {
         hash: txHash,
-        blockNumber: 18492160,
+        blockNumber: 0,
         from: activeAgent.walletAddress,
         to: "0x5FbDB2315678afecb367f032d93F642f64180aa3 (TaskMarket.sol)",
         type: "TASK_ESCROW",
         value: `${newTask.rewardQarbi}.0 QARBI`,
-        status: "CONFIRMED",
+        status: "PENDING",
         timestamp: Date.now(),
         gasUsed: newTask.gasUsed || 4200,
-        gasSavedStylus: "89.4% vs EVM",
+        gasSavedStylus: "Pending on-chain confirmation",
         dataSummary: `createTask(${newTask.id}, Bounty: ${newTask.rewardQarbi} QARBI)`,
       };
 

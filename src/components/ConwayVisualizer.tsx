@@ -133,15 +133,15 @@ export const ConwayVisualizer: React.FC<ConwayVisualizerProps> = ({
     const txHash = generateTxHash();
     const txRecord: TransactionRecord = {
       hash: txHash,
-      blockNumber: 18492140 + generation,
+      blockNumber: 0,
       from: "0x3648...74dC8 (ConwayEngine.rs)",
       to: "0x89D2...25150 (AgentRegistry.sol)",
       type: "CONWAY_EVOLUTION",
       value: "0.0 ETH",
-      status: "CONFIRMED",
+      status: "PENDING",
       timestamp: Date.now(),
       gasUsed: 4120 * agents.length,
-      gasSavedStylus: "89.4% vs EVM SSTORE",
+      gasSavedStylus: "Local simulation",
       dataSummary: `Conway state evolved for ${agents.length} agents (Synergy: ${synergyScore}%, Gen: ${generation})`,
     };
 
@@ -173,7 +173,7 @@ export const ConwayVisualizer: React.FC<ConwayVisualizerProps> = ({
           <Zap className="w-4 h-4 text-cyan-400" />
           <div>
             <div className="font-semibold text-cyan-300">Arbitrum Stylus Wasm Engine</div>
-            <div className="text-[11px] text-slate-400">4,120 Gas per mutation (89.4% savings vs EVM)</div>
+            <div className="text-[11px] text-slate-400">4,120 Gas per mutation (Stylus Rust execution)</div>
           </div>
         </div>
       </div>

@@ -1,9 +1,9 @@
 {
   "standard": "UNIVERSAL REALITY SYSTEM v2.0",
   "title": "QARBI PROTOCOL URS SCORECARD",
-  "auditedAt": "2026-09-07T10:17:56.351Z",
+  "auditedAt": "2026-09-07T19:03:29.511Z",
   "commitSha": "LOCAL_INSPECTED_TRANSFORMATION",
-  "durationMs": 1264,
+  "durationMs": 1305,
   "totalGates": 9,
   "passedGates": 9,
   "ursWeakestLinkScore": "10 / 10",
@@ -39,7 +39,7 @@
       "name": "EVM Keccak-256 Commitment Integrity",
       "status": "PASS",
       "score": 10,
-      "details": "Commitment: 0x31d5a6256e6916..."
+      "details": "Commitment: 0xc331bc16c68802..."
     },
     {
       "gate": 5,
@@ -67,7 +67,7 @@
       "name": "Arbitrum Sepolia RPC Health",
       "status": "PASS",
       "score": 10,
-      "details": "Active Block 306346969"
+      "details": "Active Block 306473429"
     },
     {
       "gate": 9,

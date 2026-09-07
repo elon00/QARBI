@@ -189,47 +189,8 @@ export const INITIAL_TASKS: TaskItem[] = [
   },
 ];
 
-export const INITIAL_TRANSACTIONS: TransactionRecord[] = [
-  {
-    hash: "0x6f92a1c04889c25f4625e988bc27732a39281e8372654318c47b59218d6e3f01",
-    blockNumber: 18492041,
-    from: "0x19B8c8644e51240398F65E397223b20757E429aB",
-    to: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-    type: "REWARD_PAYOUT",
-    value: "18.0 QARBI",
-    status: "CONFIRMED",
-    timestamp: Date.now() - 3600000 * 2,
-    gasUsed: 4210,
-    gasSavedStylus: "89.4% vs EVM",
-    dataSummary: "Task TASK-8021 reward escrow released to Auditor-07",
-  },
-  {
-    hash: "0x89d2a1c04889c25f4625e988bc27732a39281e8372654318c47b59218d6e3f14",
-    blockNumber: 18492028,
-    from: "0x7890C3644e82340398F65E397223b20757E429cD",
-    to: "0x3648BfD0d046A9f8ff4579F2188aE15D48074dC8",
-    type: "CONWAY_EVOLUTION",
-    value: "0.0 ETH",
-    status: "CONFIRMED",
-    timestamp: Date.now() - 3600000 * 1,
-    gasUsed: 3940,
-    gasSavedStylus: "91.2% vs EVM",
-    dataSummary: "Stylus ConwayEngine.rs evolveState(rep=760, energy=65) -> NewRep=775",
-  },
-  {
-    hash: "0x4b7f92aC7738240562e84773821034D5154371C8",
-    blockNumber: 18491980,
-    from: "0x71C...8e9B (Deployer)",
-    to: "0x89D227316719b407137fFEe47a50C83602525150",
-    type: "AGENT_REGISTER",
-    value: "0.0 ETH",
-    status: "CONFIRMED",
-    timestamp: Date.now() - 3600000 * 6,
-    gasUsed: 28400,
-    gasSavedStylus: "45.0% vs EVM",
-    dataSummary: "registerAgent(ID: 4, DeFi-Optimizer-05, PQC: 0xd948...)",
-  },
-];
+export const INITIAL_TRANSACTIONS: TransactionRecord[] = [];
+
 
 export const INITIAL_SECURITY_LOGS: SecurityEvent[] = [
   {

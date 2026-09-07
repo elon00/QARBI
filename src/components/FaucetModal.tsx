@@ -43,7 +43,7 @@ export const FaucetModal: React.FC<FaucetModalProps> = ({
         const txHash = await claimFaucetOnchain(signer);
         const txRecord: TransactionRecord = {
           hash: txHash,
-          blockNumber: 18492320,
+          blockNumber: 0,
           from: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853 (QARBIToken Faucet)",
           to: `${walletAddress} (Trust Wallet)`,
           type: "FAUCET_CLAIM",
@@ -68,12 +68,12 @@ export const FaucetModal: React.FC<FaucetModalProps> = ({
       const txHash = generateTxHash();
       const txRecord: TransactionRecord = {
         hash: txHash,
-        blockNumber: 18492310,
+        blockNumber: 0,
         from: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853 (QARBI Faucet)",
         to: walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : "0x71C...8e9B (Active Wallet)",
         type: "FAUCET_CLAIM",
         value: `${qarbiClaim} QARBI + ${ethClaim} ETH`,
-        status: "CONFIRMED",
+        status: "PENDING",
         timestamp: Date.now(),
         gasUsed: 21000,
         gasSavedStylus: "Arbitrum Stylus Optimized",

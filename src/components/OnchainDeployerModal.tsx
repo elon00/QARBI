@@ -11,7 +11,6 @@ import {
   ArrowRight,
   RefreshCw,
   Coins,
-  Key,
   Wallet,
 } from "lucide-react";
 import { ethers } from "ethers";
@@ -55,8 +54,6 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
   onDeploymentSuccess,
   t,
 }) => {
-  const [deployMode, setDeployMode] = useState<"WALLET" | "PRIVATE_KEY">("WALLET");
-  const [customPrivateKey, setCustomPrivateKey] = useState("");
   const [isDeployingAll, setIsDeployingAll] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [steps, setSteps] = useState<DeployStep[]>([
@@ -70,28 +67,12 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
   if (!isOpen) return null;
 
   const handleStartDeployment = async () => {
-    let activeSigner: ethers.Signer | null = null;
-    let activeSenderAddress = walletAddress;
-
-    if (deployMode === "PRIVATE_KEY") {
-      try {
-        const pk = customPrivateKey.trim();
-        const formattedKey = pk.startsWith("0x") ? pk : `0x${pk}`;
-        const provider = getPublicRpcProvider();
-        const pkWallet = new ethers.Wallet(formattedKey, provider);
-        activeSigner = pkWallet;
-        activeSenderAddress = pkWallet.address;
-      } catch (err: any) {
-        alert("Invalid Private Key format: " + err.message);
-        return;
-      }
-    } else {
-      if (!signer || !isWalletConnected) {
-        alert("Please connect your Trust Wallet first, or switch to 'Direct Private Key' mode.");
-        return;
-      }
-      activeSigner = signer;
+    if (!signer || !isWalletConnected) {
+      alert("Please connect your Trust Wallet or browser extension first.");
+      return;
     }
+    const activeSigner = signer;
+    const activeSenderAddress = walletAddress;
 
     setIsDeployingAll(true);
     const updatedSteps = [...steps];
@@ -123,7 +104,7 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
 
       createdTxRecords.push({
         hash: tokenTx?.hash || "0x0",
-        blockNumber: 18492400,
+        blockNumber: 0,
         from: activeSenderAddress || "Deployer",
         to: tokenAddress,
         type: "TOKEN_DEPLOY",
@@ -159,7 +140,7 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
 
       createdTxRecords.push({
         hash: registryTx?.hash || "0x0",
-        blockNumber: 18492401,
+        blockNumber: 0,
         from: activeSenderAddress || "Deployer",
         to: registryAddress,
         type: "AGENT_REGISTER",
@@ -249,9 +230,7 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
       console.error("On-chain deployment error:", error);
       updatedSteps[currentStepIndex].status = "FAILED";
       const rawMsg = error?.message || "Transaction failed";
-      updatedSteps[currentStepIndex].error = rawMsg.includes("Broadcast channel")
-        ? "Browser extension channel error. Switch to 'Direct Private Key' mode below for 100% reliable deployment."
-        : rawMsg;
+      updatedSteps[currentStepIndex].error = rawMsg;
       setSteps([...updatedSteps]);
       setIsDeployingAll(false);
     }
@@ -286,52 +265,6 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
           </button>
         </div>
 
-        {/* Mode Selector Tabs */}
-        <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-800 text-xs">
-          <button
-            type="button"
-            onClick={() => setDeployMode("WALLET")}
-            className={`flex-1 flex items-center justify-center space-x-2 py-2 rounded-lg font-medium transition cursor-pointer ${
-              deployMode === "WALLET"
-                ? "bg-slate-800 text-cyan-300 font-bold shadow"
-                : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <Wallet className="w-3.5 h-3.5" />
-            <span>Trust Wallet / Extension</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setDeployMode("PRIVATE_KEY")}
-            className={`flex-1 flex items-center justify-center space-x-2 py-2 rounded-lg font-medium transition cursor-pointer ${
-              deployMode === "PRIVATE_KEY"
-                ? "bg-indigo-900/60 text-indigo-300 font-bold border border-indigo-700/50"
-                : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <Key className="w-3.5 h-3.5" />
-            <span>Direct Private Key (Bypass Extension Issues)</span>
-          </button>
-        </div>
-
-        {/* Private Key Input (if active) */}
-        {deployMode === "PRIVATE_KEY" && (
-          <div className="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-800/60 space-y-2 text-xs">
-            <label className="block text-indigo-200 font-semibold">
-              Enter Deployer Private Key (with Arbitrum Sepolia ETH):
-            </label>
-            <input
-              type="password"
-              value={customPrivateKey}
-              onChange={(e) => setCustomPrivateKey(e.target.value)}
-              placeholder="0x... (64 hex characters)"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-indigo-700/60 text-indigo-100 font-mono text-xs focus:outline-none focus:border-cyan-400"
-            />
-            <p className="text-[11px] text-indigo-300/80">
-              💡 Bypasses browser extension cross-tab / broadcast channel errors. Keys are only used locally in memory to sign the 5 deployment transactions.
-            </p>
-          </div>
-        )}
 
         {/* Network & Wallet Status Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
@@ -485,7 +418,7 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
             <button
               type="button"
               onClick={handleStartDeployment}
-              disabled={isDeployingAll || (deployMode === "WALLET" && !isWalletConnected)}
+              disabled={isDeployingAll || !isWalletConnected}
               className="w-full flex items-center justify-center space-x-2.5 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-cyan-900/40 transition disabled:opacity-50 active:scale-[0.99] cursor-pointer"
             >
               <Sparkles className="w-4 h-4" />
@@ -497,9 +430,9 @@ export const OnchainDeployerModal: React.FC<OnchainDeployerModalProps> = ({
             </button>
           )}
 
-          {deployMode === "WALLET" && !isWalletConnected && (
+          {!isWalletConnected && (
             <p className="text-[11px] text-center text-amber-400">
-              ⚠️ Please connect your Trust Wallet in the top right to deploy, or switch to &quot;Direct Private Key&quot; mode above.
+              ⚠️ Please connect your Trust Wallet in the top right to deploy.
             </p>
           )}
         </div>

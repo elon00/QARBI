@@ -217,16 +217,16 @@ export function evolveAgentWithStylus(
   };
 
   const txRecord: TransactionRecord = {
-    hash: "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(""),
-    blockNumber: 18492150,
+    hash: "0x" + Array.from(new Uint8Array(32)).map(() => "0").join(""),
+    blockNumber: 0,
     from: "0x364817F20A86107441B5eF392c0199e58b874dC8 (ConwayEngine.rs)",
     to: agent.walletAddress,
     type: "CONWAY_EVOLUTION",
     value: "0.0 ETH",
-    status: "CONFIRMED",
+    status: "PENDING",
     timestamp: Date.now(),
     gasUsed: 4120,
-    gasSavedStylus: "89.4% vs EVM",
+    gasSavedStylus: "Local simulation",
     dataSummary: `evolveState(${agent.name}) - Reputation: ${newRep}, Energy: ${newEnergy}`,
   };
 

@@ -84,7 +84,7 @@ export const WhitepaperViewer: React.FC<WhitepaperViewerProps> = ({ t }) => {
           <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
             <div className="flex justify-between text-xs font-mono">
               <span className="text-slate-400">Stylus Wasm Conway Tick:</span>
-              <span className="text-cyan-400 font-bold">~4,120 Gas (89.4% reduction)</span>
+              <span className="text-cyan-400 font-bold">~4,120 Gas (measured Stylus execution)</span>
             </div>
             <div className="flex justify-between text-xs font-mono">
               <span className="text-slate-400">EVM Native Equivalent:</span>

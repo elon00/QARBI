@@ -95,15 +95,15 @@ export const QuantumOperations: React.FC<QuantumOperationsProps> = ({
 
     const txRecord: TransactionRecord = {
       hash: txHash,
-      blockNumber: 18492300 + Math.floor(Date.now() % 1000),
+      blockNumber: 0,
       from: senderAgent?.walletAddress || "0x4b7f92aC7738240562e84773821034D5154371C8",
       to: "0x89D227316719b407137fFEe47a50C83602525150 (AgentRegistry.sol)",
       type: "QUANTUM_PORTFOLIO_OPTIMIZE",
       value: "0.0 ETH",
-      status: "CONFIRMED",
+      status: "PENDING",
       timestamp: Date.now(),
       gasUsed: 4620,
-      gasSavedStylus: "91.2% vs EVM",
+      gasSavedStylus: "Stylus Rust VM Execution",
       dataSummary: `anchorQuantumPortfolio([${portfolioResult.selectedAssets.join(",")}]) - Sharpe: ${portfolioResult.sharpeRatio}`,
     };
 
@@ -144,12 +144,12 @@ export const QuantumOperations: React.FC<QuantumOperationsProps> = ({
         const txHash = generateTxHash();
         const txRecord: TransactionRecord = {
           hash: txHash,
-          blockNumber: 18492300 + Math.floor(Date.now() % 1000),
+          blockNumber: 0,
           from: senderAgent.walletAddress,
           to: recipientAgent.walletAddress,
           type: "QUANTUM_SECURE_TRANSMIT",
           value: "0.0 ETH",
-          status: "CONFIRMED",
+          status: "PENDING",
           timestamp: Date.now(),
           gasUsed: 5120,
           gasSavedStylus: "88.7% vs EVM",

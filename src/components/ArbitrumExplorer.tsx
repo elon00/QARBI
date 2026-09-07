@@ -90,9 +90,9 @@ export const ArbitrumExplorer: React.FC<ArbitrumExplorerProps> = ({
               <span className="text-rose-400 line-through font-mono">38,500 EVM</span>
             </div>
             <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
-              <div className="bg-cyan-400 h-1.5 rounded-full" style={{ width: "89.4%" }} />
+              <div className="bg-cyan-400 h-1.5 rounded-full" style={{ width: "89%" }} />
             </div>
-            <div className="text-[10px] text-emerald-400 font-semibold">89.4% Gas Savings (Stylus Rust)</div>
+            <div className="text-[10px] text-emerald-400 font-semibold">Stylus Rust Gas Efficiency</div>
           </div>
 
           <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
