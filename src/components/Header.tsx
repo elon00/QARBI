@@ -17,6 +17,7 @@ interface HeaderProps {
   isCorrectNetwork?: boolean;
   onConnectWallet?: (walletType: "metamask" | "trust") => void;
   onDisconnectWallet?: () => void;
+  onOpenWalletModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -33,6 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
   isCorrectNetwork,
   onConnectWallet,
   onDisconnectWallet,
+  onOpenWalletModal,
 }) => {
   const [isLangMenuOpen, setIsLangMenuOpen] = React.useState(false);
   const [isWalletMenuOpen, setIsWalletMenuOpen] = React.useState(false);
@@ -206,19 +208,33 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="sm:hidden">Faucet</span>
             </button>
 
-            {/* Explicit wallet selector */}
+            {/* Modern TON-Style Wallet Trigger Button */}
             <div className="relative">
-              <button type="button" onClick={() => setIsWalletMenuOpen(!isWalletMenuOpen)} className="flex items-center space-x-2.5 px-3 py-1.5 rounded-lg border text-xs transition cursor-pointer bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-600 hover:to-indigo-600 border-indigo-500 text-white font-medium shadow-md shadow-indigo-900/40">
-                <Wallet className="w-3.5 h-3.5 text-white" />
-                <span>{isWalletConnected ? shortAddress : "Connect Wallet"}</span>
-              </button>
-              {isWalletMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-50 p-2 space-y-2">
-                  <div className="px-2 pt-1 text-[10px] uppercase tracking-wider text-slate-500">Switch Wallet</div>
-                  <button type="button" onClick={() => { setIsWalletMenuOpen(false); onConnectWallet?.("metamask"); }} className="w-full text-left px-3 py-3 rounded-lg hover:bg-slate-800 border border-slate-700"><strong>🦊 MetaMask</strong><span className="block text-[10px] text-slate-400 mt-1">Connect or switch to MetaMask</span></button>
-                  <button type="button" onClick={() => { setIsWalletMenuOpen(false); onConnectWallet?.("trust"); }} className="w-full text-left px-3 py-3 rounded-lg hover:bg-slate-800 border border-slate-700"><strong>🛡️ Trust Wallet</strong><span className="block text-[10px] text-slate-400 mt-1">Connect or switch to Trust Wallet</span></button>
-                  {isWalletConnected && <button type="button" onClick={() => { setIsWalletMenuOpen(false); onDisconnectWallet?.(); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-rose-950/40 border border-slate-700 text-rose-300"><strong>Disconnect App Session</strong><span className="block text-[10px] text-slate-500 mt-1">Clears QARBI connection state; wallet permissions remain under your wallet control.</span></button>}
-                </div>
+              {isWalletConnected && walletAddress ? (
+                <button
+                  type="button"
+                  onClick={() => onOpenWalletModal?.()}
+                  className="flex items-center space-x-2.5 px-3.5 py-1.5 rounded-xl border text-xs transition cursor-pointer bg-slate-900/90 hover:bg-slate-800/90 border-cyan-500/40 hover:border-cyan-400 text-slate-200 font-mono shadow-lg shadow-cyan-950/30 active:scale-95"
+                >
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <div className="text-right">
+                    <div className="text-[10px] text-slate-400 font-sans">
+                      {userBalanceEth.toFixed(3)} ETH · {userBalanceQarbi.toLocaleString()} QARBI
+                    </div>
+                    <div className="font-bold text-cyan-300">
+                      {shortAddress}
+                    </div>
+                  </div>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onOpenWalletModal?.()}
+                  className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white shadow-lg shadow-cyan-500/25 active:scale-95 hover:brightness-110"
+                >
+                  <Wallet className="w-4 h-4 text-white" />
+                  <span>Connect Wallet</span>
+                </button>
               )}
             </div>
           </div>

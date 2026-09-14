@@ -16,6 +16,7 @@ const ArbitrumExplorer = lazy(() => import("./components/ArbitrumExplorer").then
 const WhitepaperViewer = lazy(() => import("./components/WhitepaperViewer").then((m) => ({ default: m.WhitepaperViewer })));
 const FaucetModal = lazy(() => import("./components/FaucetModal").then((m) => ({ default: m.FaucetModal })));
 const OnchainDeployerModal = lazy(() => import("./components/OnchainDeployerModal").then((m) => ({ default: m.OnchainDeployerModal })));
+const WalletModal = lazy(() => import("./components/WalletModal").then((m) => ({ default: m.WalletModal })));
 const WalletQrCard = lazy(() => import("./components/WalletQrCard").then((m) => ({ default: m.WalletQrCard })));
 
 export function App() {
@@ -30,6 +31,9 @@ export function App() {
   const [isEmergencyLocked, setIsEmergencyLocked] = useState(false);
   const [isFaucetOpen, setIsFaucetOpen] = useState(false);
   const [isDeployerOpen, setIsDeployerOpen] = useState(false);
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const [walletConnectError, setWalletConnectError] = useState<string | null>(null);
+  const [isWalletConnecting, setIsWalletConnecting] = useState(false);
   const [terminalActiveAgent, setTerminalActiveAgent] = useState<string | undefined>();
 
   const [wallet, setWallet] = useState<WalletState>({
@@ -74,15 +78,20 @@ export function App() {
   }, []);
 
   const handleConnectWallet = async (walletType: "metamask" | "trust" = "metamask") => {
+    setIsWalletConnecting(true);
+    setWalletConnectError(null);
     try {
       const res = await connectWallet(walletType);
       const balances = await fetchLiveBalances(res.address);
       setWallet({ isConnected: true, address: res.address, chainId: res.chainId, isCorrectNetwork: res.isCorrectNetwork, qarbiBalance: balances.qarbiBalance, ethBalance: balances.ethBalance, provider: res.provider, signer: res.signer });
       setUserBalanceQarbi(balances.qarbiBalance);
       setUserBalanceEth(balances.ethBalance);
+      setIsWalletModalOpen(false);
     } catch (err: any) {
       console.error("Wallet connection failed:", err);
-      alert(err.message || "Failed to connect wallet");
+      setWalletConnectError(err.message || "Failed to connect wallet");
+    } finally {
+      setIsWalletConnecting(false);
     }
   };
 
@@ -90,6 +99,8 @@ export function App() {
     setWallet({ isConnected: false, address: null, chainId: null, isCorrectNetwork: false, qarbiBalance: 0, ethBalance: 0, provider: null, signer: null });
     setUserBalanceQarbi(0);
     setUserBalanceEth(0);
+    setIsWalletModalOpen(false);
+    setWalletConnectError(null);
   };
 
   const handleDeploymentSuccess = (_newContracts: Record<string, string>, createdTxRecords: TransactionRecord[]) => setTransactions((prev) => [...createdTxRecords, ...prev]);
@@ -105,7 +116,25 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col">
-      <Header t={t} currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} userBalanceQarbi={userBalanceQarbi} userBalanceEth={userBalanceEth} onOpenFaucet={() => setIsFaucetOpen(true)} onOpenDeployer={() => setIsDeployerOpen(true)} isEmergencyLocked={isEmergencyLocked} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} isCorrectNetwork={wallet.isCorrectNetwork} onConnectWallet={handleConnectWallet} onDisconnectWallet={handleDisconnectWallet} />
+      <Header
+        t={t}
+        currentLanguage={currentLanguage}
+        onLanguageChange={setCurrentLanguage}
+        userBalanceQarbi={userBalanceQarbi}
+        userBalanceEth={userBalanceEth}
+        onOpenFaucet={() => setIsFaucetOpen(true)}
+        onOpenDeployer={() => setIsDeployerOpen(true)}
+        isEmergencyLocked={isEmergencyLocked}
+        walletAddress={wallet.address}
+        isWalletConnected={wallet.isConnected}
+        isCorrectNetwork={wallet.isCorrectNetwork}
+        onConnectWallet={handleConnectWallet}
+        onDisconnectWallet={handleDisconnectWallet}
+        onOpenWalletModal={() => {
+          setWalletConnectError(null);
+          setIsWalletModalOpen(true);
+        }}
+      />
       <Navigation activeTab={activeTab} onSelectTab={setActiveTab} t={t} agentCount={agents.length} openTaskCount={tasks.filter((task) => task.status === "OPEN").length} isEmergencyLocked={isEmergencyLocked} />
       
       {/* Statutory Legal & International Compliance Banner */}
@@ -138,6 +167,20 @@ export function App() {
       </main>
       <Suspense fallback={null}><OnchainDeployerModal isOpen={isDeployerOpen} onClose={() => setIsDeployerOpen(false)} signer={wallet.signer} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} ethBalance={wallet.ethBalance} onDeploymentSuccess={handleDeploymentSuccess} t={t} /></Suspense>
       <Suspense fallback={null}><FaucetModal isOpen={isFaucetOpen} onClose={() => setIsFaucetOpen(false)} onClaim={handleClaimFaucet} t={t} signer={wallet.signer} walletAddress={wallet.address} isWalletConnected={wallet.isConnected} /></Suspense>
+      <Suspense fallback={null}>
+        <WalletModal
+          isOpen={isWalletModalOpen}
+          onClose={() => setIsWalletModalOpen(false)}
+          onConnectWallet={handleConnectWallet}
+          isConnecting={isWalletConnecting}
+          errorMessage={walletConnectError}
+          connectedAddress={wallet.address}
+          chainId={wallet.chainId}
+          onDisconnect={handleDisconnectWallet}
+          ethBalance={wallet.ethBalance}
+          qarbiBalance={wallet.qarbiBalance}
+        />
+      </Suspense>
       <Suspense fallback={null}>{wallet.isConnected && wallet.address && <WalletQrCard address={wallet.address} label="Connected MetaMask / EVM wallet" />}</Suspense>
       <footer className="border-t border-slate-900 bg-slate-950/80 py-6 text-center text-xs text-slate-400">© 2026 QARBI Protocol · Arbitrum Sepolia</footer>
     </div>
