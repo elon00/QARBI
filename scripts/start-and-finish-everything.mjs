@@ -12,7 +12,7 @@ const reportPath = resolve(reportDir, "master-finisher-report.json");
 function record(name, status, evidence = "") {
   results.push({ name, status, evidence });
   const icon = status === "PASS" ? "PASS" : status === "SKIP" ? "SKIP" : "FAIL";
-  console.log(`[${icon}] ${name}${evidence ? ` — ${evidence}` : ""}`);
+  console.log(`[${icon}] ${name}${evidence ? ` â€” ${evidence}` : ""}`);
 }
 
 function command(name, file, args, options = {}) {
@@ -47,8 +47,8 @@ function command(name, file, args, options = {}) {
   }
 }
 
-console.log("QMOOSA MASTER PROJECT FINISHER — QARBI PROTOCOL");
-console.log("REALITY MODE — evidence first, no fabricated PASS\n");
+console.log("QMOOSA MASTER PROJECT FINISHER â€” QARBI PROTOCOL");
+console.log("REALITY MODE â€” evidence first, no fabricated PASS\n");
 
 // DISCOVER
 record("root package manifest", existsSync("package.json") ? "PASS" : "FAIL", existsSync("package.json") ? "package.json present" : "package.json missing");
@@ -85,6 +85,7 @@ try {
   const ignoredDynamicPatterns = [
     "URS_SCORECARD.json",
     "URS_EVIDENCE_CERTIFICATE.json",
+    "src/contracts/",
     "contractArtifacts.ts",
     "deployedAddresses.json"
   ];
