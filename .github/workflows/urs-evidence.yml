@@ -72,7 +72,7 @@ jobs:
           test -d dist
 
       - name: Upload immutable CI evidence bundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: urs-evidence-${{ github.sha }}-node-${{ matrix.node }}
           if-no-files-found: error
