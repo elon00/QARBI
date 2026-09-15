@@ -48,6 +48,7 @@
     "reality:universal": "tsx scripts/reality-universal.ts",
     "reality:certify": "tsx scripts/generate-urs-certificate.ts",
     "finish": "node scripts/qarbi-finish.mjs",
+    "qmoosa:finish": "node scripts/start-and-finish-everything.mjs",
     "test": "npm run test:nist && npm run test:quantum && npm run audit:crypto && npm run finish"
   },
   "dependencies": {
@@ -64,7 +65,6 @@
     "motion": "^12.23.24",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
-    "solc": "^0.8.24",
     "vite": "^6.2.3"
   },
   "devDependencies": {
@@ -72,8 +72,12 @@
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
     "esbuild": "^0.25.0",
+    "solc": "^0.8.24",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2"
+  },
+  "overrides": {
+    "tmp": "^0.2.7"
   }
 }
