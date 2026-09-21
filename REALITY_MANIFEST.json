@@ -2,9 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "name": "QARBI_REALITY_MANIFEST",
   "version": "1.0.0",
-  "standard": "Zero-Trust Evidence-Based Truth in Engineering (URS v1.0)",
-  "last_updated": "2026-09-07T14:30:00.000Z",
-  "truth_principle": "Doodh ka doodh, paani ka paani — jo real hai sirf wahi production claim hoga. Jo simulation hai use ya to REAL banaya jayega, ya clearly experimental/simulation rakha jayega.",
+  "standard": "Zero-Trust Evidence-Based Truth in Engineering (URS; repository claims must match current reproducible and external evidence)",
+  "last_updated": "2026-09-21T00:00:00.000Z",
+  "truth_principle": "Only independently evidenced capabilities may be called production-verified. Local compilation/tests prove local behavior only; they do not prove deployment, on-chain state, external-provider behavior, or production readiness.",
   "categories": {
     "REAL": {
       "symbol": "🟢",
@@ -45,13 +45,13 @@
     {
       "id": "pqc-evm-commitment",
       "name": "EVM Keccak-256 Public Key Commitment Hash",
-      "category": "REAL",
+      "category": "EXPERIMENTAL",
       "real_inputs": true,
       "algorithm": "Keccak-256 hash of 1952-byte ML-DSA-65 public key",
       "reproducibility": "100% reproducible via audit:crypto",
       "external_verification": "AgentRegistry.sol bytes32 pqcCommitmentHash on Arbitrum Sepolia",
-      "production_allowed": true,
-      "notes": "Anchors post-quantum identity into 32-byte EVM state."
+      "production_allowed": false,
+      "notes": "Anchors post-quantum identity into 32-byte EVM state. Current repository evidence does not independently establish live contract address/bytecode/transaction state; external chain evidence is required before REAL/production-verified classification."
     },
     {
       "id": "dual-hybrid-conjunction",
@@ -78,35 +78,35 @@
     {
       "id": "agent-registry-contract",
       "name": "Arbitrum Sepolia AgentRegistry Contract",
-      "category": "REAL",
+      "category": "EXPERIMENTAL",
       "real_inputs": true,
       "algorithm": "Solidity 0.8.24 on-chain agent registry",
       "reproducibility": "100% reproducible via compile:contracts",
       "external_verification": "Arbitrum Sepolia RPC & Arbiscan",
-      "production_allowed": true,
-      "notes": "Stores agent metadata, budgets, and pqcCommitmentHash."
+      "production_allowed": false,
+      "notes": "Stores agent metadata, budgets, and pqcCommitmentHash. Current repository evidence does not independently establish live contract address/bytecode/transaction state; external chain evidence is required before REAL/production-verified classification."
     },
     {
       "id": "task-marketplace-contract",
       "name": "Arbitrum Sepolia TaskMarket Contract",
-      "category": "REAL",
+      "category": "EXPERIMENTAL",
       "real_inputs": true,
       "algorithm": "Solidity 0.8.24 decentralized escrow marketplace",
       "reproducibility": "100% reproducible via compile:contracts",
       "external_verification": "Arbitrum Sepolia RPC & Arbiscan",
-      "production_allowed": true,
-      "notes": "Escrow locking and bounty payout for autonomous tasks."
+      "production_allowed": false,
+      "notes": "Escrow locking and bounty payout for autonomous tasks. Current repository evidence does not independently establish live contract address/bytecode/transaction state; external chain evidence is required before REAL/production-verified classification."
     },
     {
       "id": "gemini-intent-orchestrator",
       "name": "Gemini 2.0 Agentic Intent Engine",
-      "category": "REAL",
+      "category": "EXPERIMENTAL",
       "real_inputs": true,
       "algorithm": "Google GenAI SDK intent parsing & planning",
       "reproducibility": "100% reproducible when GEMINI_API_KEY is configured",
       "external_verification": "Google GenAI API endpoints",
-      "production_allowed": true,
-      "notes": "Decomposes natural language into validated transaction payloads."
+      "production_allowed": false,
+      "notes": "Decomposes natural language into validated transaction payloads. Provider-backed execution requires configured credentials and reproducible external-provider evidence; repository-local checks alone are insufficient."
     },
     {
       "id": "conway-state-engine",
@@ -144,13 +144,13 @@
     {
       "id": "quantum-portfolio-optimizer",
       "name": "Post-Quantum Portfolio Optimizer (QUBO & SQA)",
-      "category": "REAL",
+      "category": "SIMULATION",
       "real_inputs": true,
       "algorithm": "Markowitz-to-QUBO mapping, Simulated Quantum Annealing with transverse tunneling, and NIST FIPS 204 ML-DSA-65 attestation",
       "reproducibility": "100% reproducible via npm run test:quantum",
       "external_verification": "Analytical QUBO symmetry and NIST FIPS 204 signature verification",
-      "production_allowed": true,
-      "notes": "Optimal asset allocation across Arbitrum Sepolia DeFi tokens."
+      "production_allowed": false,
+      "notes": "The optimizer uses simulated quantum annealing on classical compute. Cryptographic attestation can be tested locally, but no quantum-hardware or on-chain anchoring claim is implied without separate evidence."
     },
     {
       "id": "post-quantum-secure-communication",
@@ -163,5 +163,18 @@
       "production_allowed": true,
       "notes": "End-to-end authenticated encryption between autonomous agents."
     }
-  ]
+  ],
+  "evidence_policy": {
+    "status_vocabulary": [
+      "VERIFIED",
+      "PARTIAL",
+      "UNVERIFIED",
+      "FAILED",
+      "BLOCKED"
+    ],
+    "local_tests_are_deployment_proof": false,
+    "compile_is_onchain_proof": false,
+    "external_claims_require_external_evidence": true,
+    "production_requires_applicable_build_test_ci_security_and_deployment_evidence": true
+  }
 }
