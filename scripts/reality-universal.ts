@@ -61,9 +61,32 @@ async function runQarbiUniversalRealityAudit() {
   const manifestPath = path.join(ROOT_DIR, 'REALITY_MANIFEST.json');
   if (!fs.existsSync(manifestPath)) throw new Error('REALITY_MANIFEST.json missing');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  if (!Array.isArray(manifest.features) || manifest.features.length === 0) {
+    throw new Error('Reality manifest must register at least one feature');
+  }
+  const policy = manifest.evidence_policy;
+  if (!policy || policy.local_tests_are_deployment_proof !== false ||
+      policy.compile_is_onchain_proof !== false ||
+      policy.external_claims_require_external_evidence !== true ||
+      policy.production_requires_applicable_build_test_ci_security_and_deployment_evidence !== true) {
+    throw new Error('Reality manifest evidence_policy is missing or fail-open');
+  }
+  const allowedCategories = new Set(['REAL', 'EXPERIMENTAL', 'SIMULATION', 'ROADMAP', 'BLOCKED']);
+  for (const feature of manifest.features) {
+    if (!feature.id || !allowedCategories.has(feature.category) || typeof feature.production_allowed !== 'boolean') {
+      throw new Error(`Invalid reality taxonomy for feature: ${feature?.id ?? 'UNKNOWN'}`);
+    }
+    if (feature.production_allowed && feature.category !== 'REAL') {
+      throw new Error(`Policy violation: ${feature.id} enables production while classified ${feature.category}`);
+    }
+    if (feature.production_allowed && policy.external_claims_require_external_evidence &&
+        (!feature.external_verification || !String(feature.external_verification).trim())) {
+      throw new Error(`Policy violation: ${feature.id} enables production without external verification requirements`);
+    }
+  }
   const featuresCount = manifest.features.length;
-  console.log(`  ✅ Audited Manifest: ${featuresCount} registered subsystems with explicit truth taxonomy`);
-  gateResults.push({ gate: 1, name: 'Claim Freeze & Manifest Registration', status: 'PASS', score: 10, details: `${featuresCount} features registered` });
+  console.log(`  ✅ Audited Manifest: ${featuresCount} registered subsystems; fail-closed evidence policy enforced`);
+  gateResults.push({ gate: 1, name: 'Claim Freeze & Manifest Registration', status: 'PASS', score: 10, details: `${featuresCount} features registered; evidence policy enforced` });
 
   // GATE 2: Simulation Scanner
   logGate(2, 'Simulation & Math.random() Scanner in Cryptographic Path');
