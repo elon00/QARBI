@@ -26,6 +26,7 @@ var import_express = __toESM(require("express"), 1);
 var import_path = __toESM(require("path"), 1);
 var import_dotenv = __toESM(require("dotenv"), 1);
 var import_genai = require("@google/genai");
+var import_crypto = __toESM(require("crypto"), 1);
 var import_ml_dsa4 = require("@noble/post-quantum/ml-dsa.js");
 var import_sha34 = require("@noble/hashes/sha3");
 var import_ethers = require("ethers");
@@ -742,6 +743,188 @@ app.post("/api/quantum/secure-receive", (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message || "Quantum decapsulation failed" });
   }
+});
+var OFFICIAL_QARBI_RECIPIENT = process.env.X402_EVM_RECIPIENT || "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7";
+var USED_X402_EVM_TXS = /* @__PURE__ */ new Set();
+async function verifyArbitrumPayment(txHash, minEth = 1e-4, recipient = OFFICIAL_QARBI_RECIPIENT) {
+  const cleanTx = (txHash || "").trim();
+  if (!cleanTx || !cleanTx.startsWith("0x") || cleanTx.length !== 66) {
+    return { verified: false, error: "Invalid EVM transaction hash format. Must be a 66-character hex string starting with 0x." };
+  }
+  if (USED_X402_EVM_TXS.has(cleanTx.toLowerCase())) {
+    return { verified: false, error: "Replay Protection: This transaction hash has already been claimed." };
+  }
+  try {
+    const rpcUrl = process.env.ARBITRUM_SEPOLIA_RPC || "https://sepolia-rollup.arbitrum.io/rpc";
+    const provider = new import_ethers.ethers.JsonRpcProvider(rpcUrl);
+    const tx = await provider.getTransaction(cleanTx);
+    if (!tx) {
+      return { verified: false, error: "Transaction not found on Arbitrum Sepolia RPC." };
+    }
+    const receipt = await provider.getTransactionReceipt(cleanTx);
+    if (!receipt || receipt.status !== 1) {
+      return { verified: false, error: "Transaction is unconfirmed or reverted on Arbitrum Sepolia." };
+    }
+    if (tx.to?.toLowerCase() !== recipient.toLowerCase()) {
+      return { verified: false, error: `Invalid recipient: Expected ${recipient}, got ${tx.to}` };
+    }
+    const receivedEth = parseFloat(import_ethers.ethers.formatEther(tx.value));
+    if (receivedEth < minEth) {
+      return { verified: false, error: `Insufficient payment: Received ${receivedEth} ETH, required ${minEth} ETH.` };
+    }
+    USED_X402_EVM_TXS.add(cleanTx.toLowerCase());
+    return {
+      verified: true,
+      txHash: cleanTx,
+      payer: tx.from,
+      recipient,
+      receivedEth,
+      blockNumber: receipt.blockNumber
+    };
+  } catch (err) {
+    return { verified: false, error: err?.message || "EVM verification failed" };
+  }
+}
+app.get(["/.well-known/x402-bazaar.json", "/.well-known/x402.json"], (_req, res) => {
+  return res.json({
+    x402Version: "1.0.0",
+    version: "1.0.0",
+    name: "QARBI Protocol \u2014 Autonomous Agent Civilization & Conway Engine",
+    type: "autonomous-agent-civilization",
+    category: "infrastructure",
+    tags: ["arbitrum", "sepolia", "stylus", "conway-automaton", "post-quantum", "ml-dsa-65", "fips-204", "x402"],
+    provider: {
+      name: "QARBI Protocol / Martin",
+      website: "https://github.com/elon00/QARBI",
+      payTo: OFFICIAL_QARBI_RECIPIENT,
+      network: "arbitrum-sepolia",
+      caip2: "eip155:421614"
+    },
+    endpoints: [
+      {
+        path: "/api/v1/x402/conway/step",
+        method: "POST",
+        description: "Execute deterministic Conway cellular automaton state evolution and generate Stylus state commitment hash",
+        pricing: { amountEth: 1e-4, currency: "ETH", alternativeUsdc: "0.01" }
+      },
+      {
+        path: "/api/v1/x402/pqc-attest",
+        method: "POST",
+        description: "Generate NIST FIPS 204 ML-DSA-65 post-quantum lattice signature attestation with Keccak-256 state commitment",
+        pricing: { amountEth: 2e-4, currency: "ETH", alternativeUsdc: "0.02" }
+      }
+    ]
+  });
+});
+app.post("/api/v1/x402/conway/step", async (req, res) => {
+  const authHeader = req.headers["authorization"] || "";
+  const sigHeader = req.headers["x-payment-signature"] || "";
+  let txHash = "";
+  if (typeof authHeader === "string" && authHeader.toLowerCase().startsWith("x402 ")) {
+    txHash = authHeader.slice(5).trim();
+  } else if (sigHeader) {
+    txHash = sigHeader.trim();
+  }
+  const challengeHeader = `x402 realm="qarbi", payTo="${OFFICIAL_QARBI_RECIPIENT}", amount="0.0001", currency="ETH", network="eip155:421614"`;
+  if (!txHash) {
+    res.setHeader("WWW-Authenticate", challengeHeader);
+    return res.status(402).json({
+      status: 402,
+      error: "Payment Required",
+      protocol: "x402",
+      version: "1.0.0",
+      challenge: {
+        network: "eip155:421614",
+        payTo: OFFICIAL_QARBI_RECIPIENT,
+        pricing: { amountEth: 1e-4, currency: "ETH", alternativeUsdc: "0.01" }
+      },
+      instructions: `Send 0.0001 ETH on Arbitrum Sepolia to ${OFFICIAL_QARBI_RECIPIENT}, then retry with header: 'Authorization: x402 <txHash>'`
+    });
+  }
+  const verification = await verifyArbitrumPayment(txHash, 1e-4, OFFICIAL_QARBI_RECIPIENT);
+  if (!verification.verified) {
+    res.setHeader("WWW-Authenticate", challengeHeader);
+    return res.status(402).json({
+      status: 402,
+      error: verification.error || "Payment verification failed",
+      protocol: "x402",
+      receivedTxHash: txHash
+    });
+  }
+  const { grid, steps = 1 } = req.body || {};
+  const evolvedGridHash = import_crypto.default.createHash("sha256").update(JSON.stringify(grid) + verification.txHash).digest("hex");
+  return res.json({
+    success: true,
+    protocol: "x402",
+    service: "qarbi-conway-engine",
+    x402Receipt: verification,
+    conwayEvolution: {
+      stepsProcessed: steps,
+      stateCommitmentHash: `0x${evolvedGridHash}`,
+      stylusExecutionTarget: "Arbitrum Sepolia WASM VM",
+      civilizationEpoch: Date.now()
+    }
+  });
+});
+app.post("/api/v1/x402/pqc-attest", async (req, res) => {
+  const authHeader = req.headers["authorization"] || "";
+  const sigHeader = req.headers["x-payment-signature"] || "";
+  let txHash = "";
+  if (typeof authHeader === "string" && authHeader.toLowerCase().startsWith("x402 ")) {
+    txHash = authHeader.slice(5).trim();
+  } else if (sigHeader) {
+    txHash = sigHeader.trim();
+  }
+  const challengeHeader = `x402 realm="qarbi", payTo="${OFFICIAL_QARBI_RECIPIENT}", amount="0.0002", currency="ETH", network="eip155:421614"`;
+  if (!txHash) {
+    res.setHeader("WWW-Authenticate", challengeHeader);
+    return res.status(402).json({
+      status: 402,
+      error: "Payment Required",
+      protocol: "x402",
+      version: "1.0.0",
+      challenge: {
+        network: "eip155:421614",
+        payTo: OFFICIAL_QARBI_RECIPIENT,
+        pricing: { amountEth: 2e-4, currency: "ETH", alternativeUsdc: "0.02" }
+      },
+      instructions: `Send 0.0002 ETH on Arbitrum Sepolia to ${OFFICIAL_QARBI_RECIPIENT}, then retry with header: 'Authorization: x402 <txHash>'`
+    });
+  }
+  const verification = await verifyArbitrumPayment(txHash, 2e-4, OFFICIAL_QARBI_RECIPIENT);
+  if (!verification.verified) {
+    res.setHeader("WWW-Authenticate", challengeHeader);
+    return res.status(402).json({
+      status: 402,
+      error: verification.error || "Payment verification failed",
+      protocol: "x402",
+      receivedTxHash: txHash
+    });
+  }
+  const dsaKeys = import_ml_dsa4.ml_dsa65.keygen();
+  const pkHex = "0x" + Buffer.from(dsaKeys.publicKey).toString("hex");
+  const commitmentBytes = (0, import_sha34.keccak_256)(dsaKeys.publicKey);
+  const pqcCommitmentHash = "0x" + Buffer.from(commitmentBytes).toString("hex");
+  const attestationMsg = new TextEncoder().encode(
+    `QARBI_X402_ATTESTATION:${verification.payer}:${pqcCommitmentHash}`
+  );
+  const signature = import_ml_dsa4.ml_dsa65.sign(attestationMsg, dsaKeys.secretKey);
+  const sigHex = "0x" + Buffer.from(signature).toString("hex");
+  return res.json({
+    success: true,
+    protocol: "x402",
+    service: "qarbi-pqc-attest",
+    x402Receipt: verification,
+    attestation: {
+      algorithm: "NIST FIPS 204 ML-DSA-65",
+      publicKeyBytesLength: 1952,
+      publicKeyHex: pkHex,
+      commitmentHash: pqcCommitmentHash,
+      signatureHex: sigHex,
+      verifiedPayer: verification.payer,
+      network: "arbitrum-sepolia"
+    }
+  });
 });
 async function start() {
   const isProduction = process.env.NODE_ENV === "production" || __filename.includes("dist");

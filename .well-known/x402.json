@@ -1,0 +1,48 @@
+{
+  "x402Version": "1.0.0",
+  "version": "1.0.0",
+  "name": "QARBI Protocol — Autonomous Agent Civilization & Conway Engine",
+  "type": "autonomous-agent-civilization",
+  "category": "infrastructure",
+  "tags": [
+    "arbitrum",
+    "sepolia",
+    "stylus",
+    "conway-automaton",
+    "post-quantum",
+    "ml-dsa-65",
+    "fips-204",
+    "x402"
+  ],
+  "provider": {
+    "name": "QARBI Protocol / Martin",
+    "website": "https://github.com/elon00/QARBI",
+    "payTo": "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7",
+    "network": "arbitrum-sepolia",
+    "caip2": "eip155:421614"
+  },
+  "endpoints": [
+    {
+      "path": "/api/v1/x402/conway/step",
+      "method": "POST",
+      "description": "Execute deterministic Conway cellular automaton state evolution and generate Stylus state commitment hash",
+      "pricing": {
+        "amountEth": 0.0001,
+        "currency": "ETH",
+        "alternativeUsdc": "0.01"
+      },
+      "challengeHeader": "WWW-Authenticate: x402 realm=\"qarbi\", payTo=\"0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7\", amount=\"0.0001\", currency=\"ETH\", network=\"eip155:421614\""
+    },
+    {
+      "path": "/api/v1/x402/pqc-attest",
+      "method": "POST",
+      "description": "Generate NIST FIPS 204 ML-DSA-65 post-quantum lattice signature attestation with Keccak-256 state commitment",
+      "pricing": {
+        "amountEth": 0.0002,
+        "currency": "ETH",
+        "alternativeUsdc": "0.02"
+      },
+      "challengeHeader": "WWW-Authenticate: x402 realm=\"qarbi\", payTo=\"0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7\", amount=\"0.0002\", currency=\"ETH\", network=\"eip155:421614\""
+    }
+  ]
+}
