@@ -71,7 +71,7 @@ if (!envContent.includes('QUICKNODE_STREAM_SECRET') || envContent.includes('your
 fs.writeFileSync(envPath, envContent, 'utf8');
 console.log(`✅ [2/4] Project .env configured automatically with QuickNode settings.`);
 
-// 3. Open browser tabs
+// Helper to open browser tabs
 function openUrl(url) {
   try {
     if (process.platform === 'win32') {
@@ -84,30 +84,52 @@ function openUrl(url) {
   } catch (e) {}
 }
 
-console.log(`✅ [3/4] Opening QuickNode Build Plan Checkout in your browser...`);
-openUrl(QUICKNODE_CHECKOUT_URL);
+async function main() {
+  // Check if server is already active or needs to be started
+  let isAlreadyRunning = false;
+  try {
+    const checkRes = await fetch(`${APP_URL}/api/health`, { signal: AbortSignal.timeout(1500) });
+    if (checkRes.ok) isAlreadyRunning = true;
+  } catch {}
 
-// Open the QARBI app after a short delay so the server has a moment to start
-setTimeout(() => {
-  console.log(`✅ [4/4] Opening QARBI Web App in your browser (${APP_URL})...\n`);
-  openUrl(APP_URL);
-}, 2000);
+  if (isAlreadyRunning) {
+    console.log(`✅ [3/4] QARBI Protocol Server is already running & healthy on ${APP_URL}!`);
+    console.log(`✅ [4/4] Opening QARBI Web App and QuickNode Portal in your browser...\n`);
+    openUrl(QUICKNODE_CHECKOUT_URL);
+    openUrl(APP_URL);
+    console.log(`=====================================================================`);
+    console.log(`🎉 READY! App is running at: ${APP_URL}`);
+    console.log(`👉 Just press Ctrl+V in the QuickNode checkout to paste coupon: ${COUPON_CODE}`);
+    console.log(`=====================================================================\n`);
+    process.exit(0);
+  } else {
+    console.log(`✅ [3/4] Opening QuickNode Build Plan Checkout in your browser...`);
+    openUrl(QUICKNODE_CHECKOUT_URL);
 
-console.log(`=====================================================================`);
-console.log(`⚡ STARTING QARBI PROTOCOL SERVER...`);
-console.log(`=====================================================================`);
-console.log(`👉 Just press Ctrl+V in the QuickNode checkout to paste your coupon: ${COUPON_CODE}`);
-console.log(`👉 Choose MONTHLY billing on the Build plan for the coupon to apply!`);
-console.log(`👉 When your QuickNode endpoint is ready, paste it in the UI popup.\n`);
+    setTimeout(() => {
+      console.log(`✅ [4/4] Opening QARBI Web App in your browser (${APP_URL})...\n`);
+      openUrl(APP_URL);
+    }, 2000);
 
-// Start the server with tsx
-const tsxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-const child = spawn(tsxCmd, ['tsx', 'server.ts'], {
-  cwd: rootDir,
-  stdio: 'inherit',
-  shell: true,
-});
+    console.log(`=====================================================================`);
+    console.log(`⚡ STARTING QARBI PROTOCOL SERVER...`);
+    console.log(`=====================================================================`);
+    console.log(`👉 Just press Ctrl+V in the QuickNode checkout to paste your coupon: ${COUPON_CODE}`);
+    console.log(`👉 Choose MONTHLY billing on the Build plan for the coupon to apply!`);
+    console.log(`👉 When your QuickNode endpoint is ready, paste it in the UI popup.\n`);
 
-child.on('exit', (code) => {
-  process.exit(code || 0);
-});
+    // Start the server with tsx
+    const tsxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+    const child = spawn(tsxCmd, ['tsx', 'server.ts'], {
+      cwd: rootDir,
+      stdio: 'inherit',
+      shell: true,
+    });
+
+    child.on('exit', (code) => {
+      process.exit(code || 0);
+    });
+  }
+}
+
+main();
