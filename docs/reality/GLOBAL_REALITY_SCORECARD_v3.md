@@ -1,7 +1,7 @@
 # QARBI Protocol — Global Reality-Gated Scorecard v3.0
 
-**Evaluated At:** `2026-10-15T17:27:44.506Z`  
-**Commit:** [`6074c3f5`](https://github.com/elon00/QARBI/commit/6074c3f5ed8afe8e27ace90af49ac498eda9c5d3)  
+**Evaluated At:** `2026-10-15T17:51:34.702Z`  
+**Commit:** [`d48adfb5`](https://github.com/elon00/QARBI/commit/d48adfb5aa3f2acb0e05d67a1c807d39781d6488)  
 **Branch:** `feature/quicknode-raven-rea-rsi-blueprint`  
 **Engineering Score:** **`55 / 100`**  
 **Production Certification Gate:** **`LOCKED (Fail-Closed)`**  

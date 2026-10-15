@@ -1,9 +1,9 @@
 {
   "standard": "UNIVERSAL REALITY SYSTEM v2.0",
   "title": "QARBI PROTOCOL URS SCORECARD",
-  "auditedAt": "2026-09-15T14:42:35.785Z",
+  "auditedAt": "2026-10-15T17:53:01.927Z",
   "commitSha": "LOCAL_INSPECTED_TRANSFORMATION",
-  "durationMs": 945,
+  "durationMs": 2122,
   "totalGates": 9,
   "passedGates": 9,
   "ursWeakestLinkScore": "10 / 10",
@@ -18,7 +18,7 @@
       "name": "Claim Freeze & Manifest Registration",
       "status": "PASS",
       "score": 10,
-      "details": "12 features registered"
+      "details": "12 features registered; evidence policy enforced"
     },
     {
       "gate": 2,
@@ -39,7 +39,7 @@
       "name": "EVM Keccak-256 Commitment Integrity",
       "status": "PASS",
       "score": 10,
-      "details": "Commitment: 0x562eaa780f8cb7..."
+      "details": "Commitment: 0x656f47e10290e9..."
     },
     {
       "gate": 5,
@@ -67,7 +67,7 @@
       "name": "Arbitrum Sepolia RPC Health",
       "status": "PASS",
       "score": 10,
-      "details": "Active Block 309179096"
+      "details": "Active Block 319494807"
     },
     {
       "gate": 9,

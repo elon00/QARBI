@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
 import { ethers } from 'ethers';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -28,6 +29,10 @@ function assert(condition: boolean, message: string): asserts condition {
 
 function loadArtifact(name: string) {
   const file = path.join(buildDir, `${name}.json`);
+  if (!fs.existsSync(file)) {
+    console.log(`Artifact missing: ${name}. Auto-compiling contracts...`);
+    execSync('npm run compile:contracts', { cwd: rootDir, stdio: 'inherit' });
+  }
   assert(fs.existsSync(file), `Artifact missing: ${name}. Run 'npm run compile:contracts' first.`);
   return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
