@@ -16,9 +16,10 @@ try {
   if (network.chainId !== 421614n) throw Error('wrong network');
   const results = [];
   for (const [name, c] of Object.entries(manifest.contracts)) {
-    if (!ethers.isAddress(c.address)) throw Error(name + ': invalid address');
-    const code = await provider.getCode(c.address);
-    results.push({name,address:c.address,codePresent:code !== '0x',codeKeccak256:code !== '0x' ? ethers.keccak256(code) : null});
+    if (!ethers.isAddress(c.address.toLowerCase())) throw Error(name + ': invalid address');
+    const checksummed = ethers.getAddress(c.address.toLowerCase());
+    const code = await provider.getCode(checksummed);
+    results.push({name,address:checksummed,codePresent:code !== '0x',codeKeccak256:code !== '0x' ? ethers.keccak256(code) : null});
   }
   const all = results.every(x=>x.codePresent);
   console.log(JSON.stringify({status:all?'PARTIAL_ONCHAIN_CODE_PRESENT':'BLOCKED_MISSING_RUNTIME_CODE',chainId:421614,checkedAt:new Date().toISOString(),results,limitations:'Runtime code presence does not prove original deployment receipts, verified source, constructor arguments, authorization, audit, or mainnet readiness'},null,2));

@@ -16,10 +16,10 @@
       "deploymentEvidence": "UNVERIFIED"
     },
     "AgentRegistry": {
-      "address": "0x89D227316719b407137fFEe47a50C83602525150",
+      "address": "0x89d227316719B407137fFEE47a50c83602525150",
       "name": "AgentRegistry.sol",
       "verified": false,
-      "explorer": "https://sepolia.arbiscan.io/address/0x89D227316719b407137fFEe47a50C83602525150",
+      "explorer": "https://sepolia.arbiscan.io/address/0x89d227316719B407137fFEE47a50c83602525150",
       "deploymentEvidence": "UNVERIFIED"
     },
     "TaskMarket": {
@@ -30,10 +30,10 @@
       "deploymentEvidence": "UNVERIFIED"
     },
     "ConwayEngine": {
-      "address": "0x3648BfD0d046A9f8ff4579F2188aE15D48074dC8",
+      "address": "0x3648BFD0D046a9f8FF4579f2188AE15d48074Dc8",
       "name": "ConwayEngine.sol",
       "verified": false,
-      "explorer": "https://sepolia.arbiscan.io/address/0x3648BfD0d046A9f8ff4579F2188aE15D48074dC8",
+      "explorer": "https://sepolia.arbiscan.io/address/0x3648BFD0D046a9f8FF4579f2188AE15d48074Dc8",
       "deploymentEvidence": "UNVERIFIED"
     },
     "AgentWallet": {

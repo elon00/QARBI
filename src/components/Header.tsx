@@ -1,5 +1,5 @@
 import React from "react";
-import { ShieldCheck, Cpu, Globe, Droplets, Wallet, Sparkles, ChevronDown, CheckCircle2, AlertCircle, Rocket } from "lucide-react";
+import { ShieldCheck, Cpu, Globe, Droplets, Wallet, Sparkles, ChevronDown, CheckCircle2, AlertCircle, Rocket, Zap } from "lucide-react";
 import { LanguageCode, TranslationStrings } from "../types";
 import { LANGUAGE_OPTIONS } from "../data/translations";
 
@@ -11,6 +11,7 @@ interface HeaderProps {
   userBalanceEth: number;
   onOpenFaucet: () => void;
   onOpenDeployer?: () => void;
+  onOpenQuickNode?: () => void;
   isEmergencyLocked: boolean;
   walletAddress?: string | null;
   isWalletConnected?: boolean;
@@ -26,6 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
   userBalanceEth,
   onOpenFaucet,
   onOpenDeployer,
+  onOpenQuickNode,
   isEmergencyLocked,
   walletAddress,
   isWalletConnected,
@@ -157,6 +159,22 @@ export const Header: React.FC<HeaderProps> = ({
                 <Rocket className="w-3.5 h-3.5 text-emerald-200" />
                 <span className="hidden sm:inline">1-Click Deploy</span>
                 <span className="sm:hidden">Deploy</span>
+              </button>
+            )}
+
+            {/* QuickNode Singapore Open House Button */}
+            {onOpenQuickNode && (
+              <button
+                type="button"
+                onClick={onOpenQuickNode}
+                className="flex items-center space-x-1.5 px-3 py-2 text-xs font-bold rounded-lg bg-gradient-to-r from-cyan-950 via-blue-950 to-indigo-950 hover:from-cyan-900 hover:to-indigo-900 text-cyan-200 border border-cyan-500/50 shadow-md shadow-cyan-950/40 transition active:scale-95 cursor-pointer"
+                title="QuickNode 3-Month Free Credits & Open House Singapore Hub"
+              >
+                <Zap className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                <span className="hidden md:inline font-mono">QuickNode</span>
+                <span className="px-1.5 py-0.5 rounded text-[9px] bg-amber-400 text-slate-950 font-black tracking-tight">
+                  $147 FREE
+                </span>
               </button>
             )}
 
