@@ -1,6 +1,6 @@
 {
-  "baselineCommit": "1ac991cfcf0f1097d58d01c76d052d937fde99d3",
-  "evidenceHash": "67e1fe7ceba48d18bc39e31df7bd70739ecda25ee108ad876ebee699f3044e84",
+  "baselineCommit": "f2622852d83f49f43534fbfcf03e576f22f15de6",
+  "evidenceHash": "f613979689f23b940293bf883d03614c207d700b9278f6b3db8c1911ad104669",
   "evaluatedScore": 0.9924999999999999,
   "validationResults": {
     "typecheck": true,
@@ -9,6 +9,6 @@
     "quantumSuite": true,
     "contractSecurity": true
   },
-  "durationMs": 48342,
+  "durationMs": 97361,
   "status": "BOUNDED_RSI_VERIFIED"
 }

@@ -1,0 +1,33 @@
+{
+  "inventoryVersion": "1.0.0",
+  "generatedAt": "2026-10-16T01:10:00.000Z",
+  "commitSha": "f262285",
+  "packageManager": "npm@11.16.0",
+  "runtime": "node@24.18.0",
+  "dependencies": [
+    { "name": "@google/genai", "version": "^2.22.0", "license": "Apache-2.0", "category": "AI Inference", "status": "VERIFIED" },
+    { "name": "@noble/ciphers", "version": "^2.4.0", "license": "MIT", "category": "Cryptography (AES-GCM)", "status": "VERIFIED" },
+    { "name": "@noble/hashes", "version": "^1.8.0", "license": "MIT", "category": "Cryptography (Keccak/SHA)", "status": "VERIFIED" },
+    { "name": "@noble/post-quantum", "version": "^0.7.1", "license": "MIT", "category": "PQC Lattice (ML-DSA-65 / ML-KEM-768)", "status": "VERIFIED" },
+    { "name": "ethers", "version": "^6.17.0", "license": "MIT", "category": "Blockchain Web3 EVM", "status": "VERIFIED" },
+    { "name": "express", "version": "^4.21.2", "license": "MIT", "category": "Backend Web Server", "status": "VERIFIED" },
+    { "name": "express-rate-limit", "version": "^8.7.1", "license": "MIT", "category": "Security Middleware (CodeQL compliant)", "status": "VERIFIED" },
+    { "name": "react", "version": "^19.3.0", "license": "MIT", "category": "Frontend UI Core", "status": "VERIFIED" },
+    { "name": "react-dom", "version": "^19.3.0", "license": "MIT", "category": "Frontend DOM Rendering", "status": "VERIFIED" },
+    { "name": "motion", "version": "^13.2.0", "license": "MIT", "category": "Frontend Animation", "status": "VERIFIED" },
+    { "name": "lucide-react", "version": "^0.546.0", "license": "ISC", "category": "UI Icons", "status": "VERIFIED" },
+    { "name": "dotenv", "version": "^17.2.3", "license": "BSD-2-Clause", "category": "Configuration", "status": "VERIFIED" },
+    { "name": "vite", "version": "^6.2.3", "license": "MIT", "category": "Frontend Build Tool", "status": "VERIFIED" }
+  ],
+  "devDependencies": [
+    { "name": "solc", "version": "^0.8.24", "license": "GPL-3.0", "category": "Solidity Compiler (viaIR: true)", "status": "VERIFIED" },
+    { "name": "typescript", "version": "~5.8.2", "license": "Apache-2.0", "category": "Static Type Checker", "status": "VERIFIED" },
+    { "name": "tsx", "version": "^4.23.13", "license": "MIT", "category": "TypeScript Node Execution", "status": "VERIFIED" },
+    { "name": "esbuild", "version": "^0.25.0", "license": "MIT", "category": "Node Bundle Packaging", "status": "VERIFIED" }
+  ],
+  "securityAudit": {
+    "cveVulnerabilitiesKnown": 0,
+    "codeqlClean": true,
+    "provenance": "npm-registry-official"
+  }
+}

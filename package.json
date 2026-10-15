@@ -56,6 +56,7 @@
     "all": "node scripts/all-in-one.mjs",
     "finish": "node scripts/qarbi-finish.mjs",
     "qmoosa:finish": "node scripts/start-and-finish-everything.mjs",
+    "mission:verify": "node scripts/mission-verify.mjs",
     "test": "npm run compile:contracts && npm run test:nist && npm run test:quantum && npm run test:contracts && npm run audit:crypto && npm run check:truth && npm run finish"
   },
   "dependencies": {

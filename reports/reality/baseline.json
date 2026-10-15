@@ -1,0 +1,27 @@
+{
+  "baselineVersion": "1.0.0",
+  "evaluatedAt": "2026-10-16T01:10:00.000Z",
+  "repository": "https://github.com/elon00/QARBI",
+  "commitSha": "f262285",
+  "branch": "main",
+  "environment": {
+    "node": "v24.18.0",
+    "npm": "11.16.0",
+    "platform": "win32-x64",
+    "compiler": "solc@0.8.24 (viaIR: true)"
+  },
+  "ciStatus": {
+    "workflowsPassed": "4/4",
+    "buildAndQA": "PASS",
+    "ursEvidenceMatrix": "PASS",
+    "codeqlAnalysis": "PASS",
+    "pagesDeployment": "PASS"
+  },
+  "readinessSummary": {
+    "scorecardScore": 74,
+    "targetScore": 100,
+    "productionCertified": false,
+    "mainnetStatus": "LOCKED_FAIL_CLOSED",
+    "lawHeld": "Production ready != CI green"
+  }
+}
