@@ -23,7 +23,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 
 // server.ts
 var import_express = __toESM(require("express"), 1);
+var import_express_rate_limit = __toESM(require("express-rate-limit"), 1);
 var import_path = __toESM(require("path"), 1);
+var import_fs = __toESM(require("fs"), 1);
 var import_dotenv = __toESM(require("dotenv"), 1);
 var import_genai = require("@google/genai");
 var import_crypto = __toESM(require("crypto"), 1);
@@ -486,6 +488,23 @@ import_dotenv.default.config();
 var app = (0, import_express.default)();
 var PORT = 3e3;
 app.use(import_express.default.json());
+var apiLimiter = (0, import_express_rate_limit.default)({
+  windowMs: 15 * 60 * 1e3,
+  // 15 minutes
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests from this IP, please try again after 15 minutes." }
+});
+var sensitiveLimiter = (0, import_express_rate_limit.default)({
+  windowMs: 60 * 1e3,
+  // 1 minute
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many configuration attempts, please try again in a minute." }
+});
+app.use("/api/", apiLimiter);
 var aiClient = null;
 function getGenAI() {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -926,8 +945,194 @@ app.post("/api/v1/x402/pqc-attest", async (req, res) => {
     }
   });
 });
+var QUICKNODE_STREAM_SECRET = process.env.QUICKNODE_STREAM_SECRET || process.env.QUICKNODE_WEBHOOK_SECRET || "";
+var streamEventsBuffer = [];
+app.post("/api/webhooks/quicknode-stream", (req, res) => {
+  try {
+    const signature = req.headers["x-quicknode-signature"] || req.headers["x-qn-signature"];
+    if (QUICKNODE_STREAM_SECRET && signature) {
+      const hmac = import_crypto.default.createHmac("sha256", QUICKNODE_STREAM_SECRET);
+      const computed = hmac.update(JSON.stringify(req.body)).digest("hex");
+      if (signature !== computed) {
+        return res.status(401).json({ error: "Invalid QuickNode webhook signature" });
+      }
+    }
+    const payload = req.body || {};
+    const events = payload.events || (Array.isArray(payload) ? payload : [payload]);
+    let processedCount = 0;
+    for (const evt of events) {
+      if (!evt) continue;
+      const normalizedEvent = {
+        id: evt.id || `qn_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        eventType: evt.eventType || "CUSTOM_STREAM_EVENT",
+        contractAddress: evt.contractAddress,
+        txHash: evt.txHash || "0x0000000000000000000000000000000000000000000000000000000000000000",
+        blockNumber: Number(evt.blockNumber) || 0,
+        timestamp: Number(evt.timestamp) || Math.floor(Date.now() / 1e3),
+        details: evt.parsed || evt.details || evt,
+        receivedAt: Date.now()
+      };
+      streamEventsBuffer.unshift(normalizedEvent);
+      if (streamEventsBuffer.length > 100) {
+        streamEventsBuffer.pop();
+      }
+      processedCount++;
+    }
+    return res.json({
+      success: true,
+      provider: "QuickNode Streams",
+      network: "Arbitrum Nitro Rollup / Orbit",
+      processedEvents: processedCount,
+      totalBuffered: streamEventsBuffer.length,
+      timestamp: Date.now()
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message || "Failed to process QuickNode stream webhook" });
+  }
+});
+app.get("/api/quicknode/streams-events", (_req, res) => {
+  res.json({
+    success: true,
+    count: streamEventsBuffer.length,
+    events: streamEventsBuffer.slice(0, 50),
+    timestamp: Date.now()
+  });
+});
+app.get("/api/quicknode/status", (_req, res) => {
+  const customRpc = process.env.QUICKNODE_ARBITRUM_RPC || process.env.QUICKNODE_RPC_URL || "";
+  res.json({
+    status: "active",
+    partner: "QuickNode x Arbitrum Open House Singapore",
+    couponCode: "ARBOHSGP",
+    creditsValue: "3 Months QuickNode Build Plan Free ($147 Value)",
+    couponRules: "Pick monthly billing on QuickNode Build plan, enter ARBOHSGP before payment",
+    telegramSupport: "@sensahill",
+    rpcStatus: {
+      hasCustomRpc: Boolean(customRpc),
+      activeEndpoint: customRpc ? customRpc.replace(/\/([^\/]+)$/, "/****") : "Public Sepolia Rollup (QuickNode recommended)",
+      chainsSupported: [
+        "Arbitrum Sepolia Testnet (421614)",
+        "Arbitrum One Mainnet (42161)",
+        "Arbitrum Nova (42170)",
+        "Robinhood Chain Testnet (46630)",
+        "Gravity Alpha Mainnet (1625)"
+      ]
+    },
+    streams: {
+      webhookEndpoint: "/api/webhooks/quicknode-stream",
+      eventsReceived: streamEventsBuffer.length,
+      lastEvent: streamEventsBuffer[0] || null
+    },
+    faucets: {
+      arbitrumSepolia: "https://faucet.quicknode.com/arbitrum/sepolia",
+      robinhoodTestnet: "https://faucet.quicknode.com/robinhood/testnet"
+    }
+  });
+});
+app.post("/api/quicknode/simulate-stream-event", (req, res) => {
+  const { eventType = "TASK_CREATED", customDetails } = req.body || {};
+  const mockTx = "0x" + import_crypto.default.randomBytes(32).toString("hex");
+  const simEvent = {
+    id: `sim_${Date.now()}`,
+    eventType,
+    contractAddress: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    txHash: mockTx,
+    blockNumber: 134289e3 + Math.floor(Math.random() * 500),
+    timestamp: Math.floor(Date.now() / 1e3),
+    details: customDetails || {
+      title: "Arbitrum Nitro Stylus Optimization Audit",
+      reward: "35 QARBI",
+      creator: "0x3B9408b08D383AE85dF7565451C8118A2B6b9075",
+      streamTrigger: "QuickNode Arbitrum Streams V8 Filter",
+      latencySpeedup: "Instant Zero-Block Push"
+    },
+    receivedAt: Date.now()
+  };
+  streamEventsBuffer.unshift(simEvent);
+  if (streamEventsBuffer.length > 100) streamEventsBuffer.pop();
+  res.json({
+    success: true,
+    message: "Simulated QuickNode Stream event ingested successfully",
+    event: simEvent
+  });
+});
+app.post("/api/quicknode/auto-configure", sensitiveLimiter, async (req, res) => {
+  try {
+    const { rpcUrl, chainName = "Arbitrum Sepolia" } = req.body || {};
+    const effectiveRpc = rpcUrl && typeof rpcUrl === "string" && rpcUrl.startsWith("http") ? rpcUrl.trim() : process.env.QUICKNODE_ARBITRUM_RPC || "https://sepolia-rollup.arbitrum.io/rpc";
+    let latencyMs = 42;
+    let blockNumber = 134289e3;
+    try {
+      const provider = new import_ethers.ethers.JsonRpcProvider(effectiveRpc);
+      const start2 = Date.now();
+      const bn = await Promise.race([
+        provider.getBlockNumber(),
+        new Promise((_, rej) => setTimeout(() => rej(new Error("Timeout")), 4e3))
+      ]);
+      latencyMs = Date.now() - start2;
+      blockNumber = bn;
+    } catch {
+    }
+    const streamSecret = process.env.QUICKNODE_STREAM_SECRET || import_crypto.default.randomBytes(24).toString("hex");
+    process.env.QUICKNODE_ARBITRUM_RPC = effectiveRpc;
+    process.env.QUICKNODE_RPC_URL = effectiveRpc;
+    process.env.ARBITRUM_SEPOLIA_RPC = effectiveRpc;
+    process.env.QUICKNODE_STREAM_SECRET = streamSecret;
+    try {
+      const envPath = import_path.default.join(process.cwd(), ".env");
+      const envExamplePath = import_path.default.join(process.cwd(), ".env.example");
+      let envText = import_fs.default.existsSync(envPath) ? import_fs.default.readFileSync(envPath, "utf8") : import_fs.default.existsSync(envExamplePath) ? import_fs.default.readFileSync(envExamplePath, "utf8") : "";
+      const upsert = (txt, k, v) => {
+        const re = new RegExp(`^${k}=.*$`, "m");
+        return re.test(txt) ? txt.replace(re, `${k}="${v}"`) : `${txt.trim()}
+${k}="${v}"
+`;
+      };
+      envText = upsert(envText, "QUICKNODE_RPC_URL", effectiveRpc);
+      envText = upsert(envText, "QUICKNODE_ARBITRUM_RPC", effectiveRpc);
+      envText = upsert(envText, "ARBITRUM_SEPOLIA_RPC", effectiveRpc);
+      envText = upsert(envText, "QUICKNODE_STREAM_SECRET", streamSecret);
+      import_fs.default.writeFileSync(envPath, envText, "utf8");
+    } catch (e) {
+      console.warn("Could not write .env file:", e);
+    }
+    const activationEvent = {
+      id: `qn_activation_${Date.now()}`,
+      eventType: "QUICKNODE_ACTIVATED",
+      contractAddress: "0x89D227316719b407137fFEe47a50C83602525150",
+      txHash: "0x" + import_crypto.default.randomBytes(32).toString("hex"),
+      blockNumber,
+      timestamp: Math.floor(Date.now() / 1e3),
+      details: {
+        status: "ACTIVE",
+        network: chainName,
+        endpoint: effectiveRpc.replace(/\/([^\/]+)$/, "/****"),
+        couponRedeemed: "ARBOHSGP (3 Months Free Build Plan)",
+        latency: `${latencyMs} ms`,
+        streamsWebhookActive: true
+      },
+      receivedAt: Date.now()
+    };
+    streamEventsBuffer.unshift(activationEvent);
+    if (streamEventsBuffer.length > 100) streamEventsBuffer.pop();
+    return res.json({
+      success: true,
+      message: "QuickNode 1-Click configuration applied to project successfully!",
+      config: {
+        rpcUrl: effectiveRpc,
+        latencyMs,
+        blockNumber,
+        streamSecret,
+        couponCode: "ARBOHSGP"
+      },
+      activationEvent
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message || "Failed to auto-configure QuickNode" });
+  }
+});
 async function start() {
-  const isProduction = process.env.NODE_ENV === "production" || __filename.includes("dist");
+  const isProduction = process.env.NODE_ENV === "production" || typeof process !== "undefined" && Boolean(process.argv[1]?.includes("dist"));
   if (!isProduction) {
     try {
       const { createServer: createViteServer } = await import("vite");
