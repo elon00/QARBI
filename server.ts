@@ -1,4 +1,5 @@
 import express from "express";
+import rateLimit from "express-rate-limit";
 import path from "path";
 import fs from "fs";
 import dotenv from "dotenv";
@@ -16,6 +17,26 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+
+// CodeQL Compliance: Rate limiting for API and sensitive file operations
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests from this IP, please try again after 15 minutes." },
+});
+
+const sensitiveLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many configuration attempts, please try again in a minute." },
+});
+
+app.use("/api/", apiLimiter);
+
 
 // Lazy-initialized GoogleGenAI client
 let aiClient: GoogleGenAI | null = null;
@@ -667,8 +688,8 @@ app.post("/api/quicknode/simulate-stream-event", (req, res) => {
   });
 });
 
-// 1-Click Auto-Configure Endpoint for QuickNode integration
-app.post("/api/quicknode/auto-configure", async (req, res) => {
+// 1-Click Auto-Configure Endpoint for QuickNode integration (Rate-limited for file-system safety)
+app.post("/api/quicknode/auto-configure", sensitiveLimiter, async (req, res) => {
   try {
     const { rpcUrl, chainName = "Arbitrum Sepolia" } = req.body || {};
     const effectiveRpc = (rpcUrl && typeof rpcUrl === "string" && rpcUrl.startsWith("http"))
