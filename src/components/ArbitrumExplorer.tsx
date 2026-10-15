@@ -16,12 +16,14 @@ interface ArbitrumExplorerProps {
   transactions: TransactionRecord[];
   t: TranslationStrings;
   onOpenDeployer?: () => void;
+  onOpenQuickNode?: () => void;
 }
 
 export const ArbitrumExplorer: React.FC<ArbitrumExplorerProps> = ({
   transactions,
   t,
   onOpenDeployer,
+  onOpenQuickNode,
 }) => {
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
@@ -117,6 +119,73 @@ export const ArbitrumExplorer: React.FC<ArbitrumExplorerProps> = ({
               <div className="bg-emerald-400 h-1.5 rounded-full" style={{ width: "88.3%" }} />
             </div>
             <div className="text-[10px] text-emerald-400 font-semibold">88.3% Gas Savings (Stylus Rust)</div>
+          </div>
+        </div>
+      </div>
+
+      {/* QuickNode Arbitrum Open House Singapore Infrastructure Banner */}
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-cyan-950/30 to-slate-900 border border-cyan-500/30 shadow-xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-400">
+              <Zap className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h3 className="text-sm font-bold text-white">QuickNode Multi-Chain RPC & Streams Pipeline</h3>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/40">
+                  Open House Singapore Partner
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                Arbitrum One, Arbitrum Nova, and Orbit chains (Robinhood Chain & Gravity) with zero-stale blocks, archive APIs, and real-time Streams.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            {onOpenQuickNode && (
+              <button
+                type="button"
+                onClick={onOpenQuickNode}
+                className="flex items-center space-x-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-950/40 transition cursor-pointer"
+              >
+                <Zap className="w-3.5 h-3.5" />
+                <span>Open QuickNode Hub</span>
+              </button>
+            )}
+            <a
+              href="https://faucet.quicknode.com/arbitrum/sepolia"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center space-x-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition"
+            >
+              <span>Arb Faucet</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs pt-1">
+          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <div className="text-slate-400 font-medium">Free Builder Credits</div>
+            <div className="font-mono text-amber-400 font-bold mt-1 text-sm">Coupon: ARBOHSGP</div>
+            <div className="text-[10px] text-slate-400 mt-0.5">3 Months QuickNode Build Plan</div>
+          </div>
+          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <div className="text-slate-400 font-medium">Supported Orbit Chains</div>
+            <div className="font-mono text-cyan-400 font-bold mt-1 text-sm">Robinhood & Gravity</div>
+            <div className="text-[10px] text-slate-400 mt-0.5">Nitro Rollups & Orbit Endpoints</div>
+          </div>
+          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <div className="text-slate-400 font-medium">QuickNode Streams</div>
+            <div className="font-mono text-emerald-400 font-bold mt-1 text-sm">Active Webhook Receiver</div>
+            <div className="text-[10px] text-slate-400 mt-0.5">/api/webhooks/quicknode-stream</div>
+          </div>
+          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <div className="text-slate-400 font-medium">Compliance & Security</div>
+            <div className="font-mono text-slate-200 font-bold mt-1 text-sm">SOC 2 & ISO 27001</div>
+            <div className="text-[10px] text-slate-400 mt-0.5">Full Archive + Trace APIs</div>
           </div>
         </div>
       </div>

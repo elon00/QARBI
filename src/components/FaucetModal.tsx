@@ -178,6 +178,34 @@ export const FaucetModal: React.FC<FaucetModalProps> = ({
             )}
           </button>
         )}
+
+        {/* QuickNode Official Faucets for Arbitrum Open House Singapore */}
+        <div className="pt-2 border-t border-slate-800 space-y-2">
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="text-slate-400 font-medium">QuickNode Official Faucets:</span>
+            <span className="text-cyan-400 text-[10px] font-mono">Open House Singapore</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <a
+              href="https://faucet.quicknode.com/arbitrum/sepolia"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 text-[11px] text-slate-300 hover:text-white transition"
+            >
+              <span>⚡ Arb Sepolia ETH</span>
+              <ExternalLink className="w-3 h-3 text-cyan-400" />
+            </a>
+            <a
+              href="https://faucet.quicknode.com/robinhood/testnet"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-purple-500/50 text-[11px] text-slate-300 hover:text-white transition"
+            >
+              <span>🚀 Robinhood Faucet</span>
+              <ExternalLink className="w-3 h-3 text-purple-400" />
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );

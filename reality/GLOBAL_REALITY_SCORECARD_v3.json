@@ -1,0 +1,138 @@
+{
+  "version": "3.0.0",
+  "title": "QARBI Protocol — Global 12-Gate Universal Reality Scorecard",
+  "evaluatedAt": "2026-10-15T18:09:49.575Z",
+  "commitSha": "1ac991cfcf0f1097d58d01c76d052d937fde99d3",
+  "branchName": "feature/quicknode-raven-rea-rsi-blueprint",
+  "summary": {
+    "engineeringScore": 55,
+    "totalGates": 12,
+    "passedGates": 4,
+    "partialGates": 5,
+    "blockedGates": 3,
+    "isProductionCertified": false,
+    "mainnetStatus": "LOCKED_FAIL_CLOSED"
+  },
+  "gates": [
+    {
+      "id": "G01",
+      "name": "Clean Build & Deterministic CI",
+      "weight": 10,
+      "score": 100,
+      "status": "PASS",
+      "evidence": "Typecheck: 0 errors; Contracts: 5/5 compiled with solc 0.8.24 viaIR",
+      "blockers": null,
+      "nextSafeAction": "Maintain clean TypeScript and Solc viaIR compilation."
+    },
+    {
+      "id": "G02",
+      "name": "Security & Dependency Audit",
+      "weight": 10,
+      "score": 80,
+      "status": "PARTIAL",
+      "evidence": "Truth & Secret-Exposure Guards: 0 violations; CodeQL automated AST scanning active",
+      "blockers": "Formal Slither/Mythril static analysis report and full dependency CVE audit pending",
+      "nextSafeAction": "Run Slither and yarn/npm audit fix in isolated sandbox."
+    },
+    {
+      "id": "G03",
+      "name": "PQC ML-DSA / ML-KEM Cryptography",
+      "weight": 10,
+      "score": 95,
+      "status": "PASS",
+      "evidence": "Official NIST FIPS 204/203 & RFC 5869 KAT vectors: PASS; Quantum SQA/bSB Portfolio & PQC Agent Channel: PASS; Standalone Cryptographic Auditor: 27/27 assertions PASS",
+      "blockers": "Third-party cryptographic audit firm attestation pending",
+      "nextSafeAction": "Prepare FIPS 204/203 submission package for external cryptographer review."
+    },
+    {
+      "id": "G04",
+      "name": "Actual Testnet Contracts",
+      "weight": 15,
+      "score": 25,
+      "status": "BLOCKED",
+      "evidence": "Manifest chainId: 421614; VerificationStatus: UNVERIFIED_LEGACY_RECORD; Bytecode check: BLOCKED_MISSING_RUNTIME_CODE",
+      "blockers": "Historical recorded addresses have no verified runtime bytecode on Arbitrum Sepolia; no funded deployer key in CI",
+      "nextSafeAction": "Fund a dedicated testnet wallet on Arbitrum Sepolia via faucet and execute `node scripts/deploy.js` with human sign-off."
+    },
+    {
+      "id": "G05",
+      "name": "Token, Escrow and Wallet Safety",
+      "weight": 10,
+      "score": 80,
+      "status": "PARTIAL",
+      "evidence": "Smart Contract Invariants (6 Tiers): Supply Conservation, Escrow Machine, Velocity Caps, Killswitch PASS",
+      "blockers": "Live onchain transaction fuzzing and escrow soak test on Arbitrum Sepolia pending contract deployment",
+      "nextSafeAction": "Deploy test suite to local Hardhat/Anvil node for 10,000-iteration state fuzzing."
+    },
+    {
+      "id": "G06",
+      "name": "QuickNode Reality",
+      "weight": 10,
+      "score": 50,
+      "status": "PARTIAL",
+      "evidence": "Tooling scripts/quicknode-reality-gate.mjs ready; Public fallback active; Custom endpoint configured: false",
+      "blockers": "User private QuickNode HTTPS endpoint not exported in current environment",
+      "nextSafeAction": "Set QUICKNODE_ARBITRUM_SEPOLIA_RPC=\"https://...\" and run `node scripts/quicknode-reality-gate.mjs`."
+    },
+    {
+      "id": "G07",
+      "name": "Streams & Event Finality",
+      "weight": 10,
+      "score": 60,
+      "status": "PARTIAL",
+      "evidence": "Stream edge filter present: true; Webhook receiver configured in server.ts",
+      "blockers": "Live QuickNode Streams webhook destination verification and reorg finality soak test pending live contracts",
+      "nextSafeAction": "Configure webhook URL in QuickNode Streams dashboard pointing to server endpoint."
+    },
+    {
+      "id": "G08",
+      "name": "Raven RSI + REA Bounded Automation",
+      "weight": 10,
+      "score": 85,
+      "status": "PASS",
+      "evidence": "Bounded 6-step RSI Loop Verified: Score 99.3/100; Zero mainnet deployment, zero key exposure enforced",
+      "blockers": "Production standalone daemon orchestration pending",
+      "nextSafeAction": "Connect real-time GitHub PR bot adapter with least-privilege token."
+    },
+    {
+      "id": "G09",
+      "name": "Frontend, Multi-Wallet & UX",
+      "weight": 10,
+      "score": 80,
+      "status": "PASS",
+      "evidence": "Vite config: true; Web3 multi-wallet & QuickNode switcher: true; Dist built cleanly",
+      "blockers": null,
+      "nextSafeAction": "Run Cypress / Playwright automated browser E2E test suite."
+    },
+    {
+      "id": "G10",
+      "name": "Operations & Resilience",
+      "weight": 10,
+      "score": 75,
+      "status": "PARTIAL",
+      "evidence": "All-in-one automation script present: true; Fail-closed RPC fallback active",
+      "blockers": "Prometheus / Grafana metrics exporter and automatic alerting pending",
+      "nextSafeAction": "Add healthcheck endpoint monitoring and crash restart policy."
+    },
+    {
+      "id": "G11",
+      "name": "External Security Assurance",
+      "weight": 15,
+      "score": 0,
+      "status": "BLOCKED",
+      "evidence": "Zero fraudulent or fabricated audit reports. Real world security firm engagement required.",
+      "blockers": "No formal third-party audit firm (OpenZeppelin, Trail of Bits, CertiK, etc.) has conducted a comprehensive smart contract and PQC review.",
+      "nextSafeAction": "Freeze protocol specifications and submit audit request to independent security firm."
+    },
+    {
+      "id": "G12",
+      "name": "Deployment Release Controls",
+      "weight": 15,
+      "score": 0,
+      "status": "BLOCKED",
+      "evidence": "Mainnet deployment is strictly locked. No deployment keys configured.",
+      "blockers": "Mandatory fail-closed rule: All preceding gates and external audit MUST pass before mainnet unlocks.",
+      "nextSafeAction": "Keep mainnet deployment locked. Verify all Sepolia testnet layers first."
+    }
+  ]
+}

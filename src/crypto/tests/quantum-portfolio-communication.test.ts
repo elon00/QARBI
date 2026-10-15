@@ -146,10 +146,21 @@ async function runQuantumTestSuite() {
   // ──────────────────────────────────────────────────────────────────────────
   console.log('\n▶ [TIER 7/7] Fail-Closed Adversarial Tamper Rejection...');
 
+  // Helper to reliably flip bits in a hex string (XOR with 0xff guarantees byte inversion with zero chance of collision)
+  const tamperHex = (hexStr: string, byteOffset = 5): string => {
+    const has0x = hexStr.startsWith('0x');
+    const raw = has0x ? hexStr.slice(2) : hexStr;
+    const charPos = byteOffset * 2;
+    const originalByte = parseInt(raw.slice(charPos, charPos + 2), 16);
+    const invertedByte = (originalByte ^ 0xff).toString(16).padStart(2, '0');
+    const tamperedRaw = raw.slice(0, charPos) + invertedByte + raw.slice(charPos + 2);
+    return has0x ? '0x' + tamperedRaw : tamperedRaw;
+  };
+
   // 1. Bit-flip in ciphertext payload
   const tamperedPayloadPkg = {
     ...securePkg,
-    encryptedPayloadHex: securePkg.encryptedPayloadHex.slice(0, 10) + 'ff' + securePkg.encryptedPayloadHex.slice(12),
+    encryptedPayloadHex: tamperHex(securePkg.encryptedPayloadHex, 5),
   };
   const tamperedPayloadRes = quantumSecureChannel.receiveSecureMessage(agentBob.kemKeys.secretKey, tamperedPayloadPkg);
   assert(!tamperedPayloadRes.success && tamperedPayloadRes.tamperDetected === true, 'Tampered encrypted payload must be strictly rejected');
@@ -157,7 +168,7 @@ async function runQuantumTestSuite() {
   // 2. Bit-flip in ML-DSA signature
   const tamperedSigPkg = {
     ...securePkg,
-    mlDsaSignatureHex: securePkg.mlDsaSignatureHex.slice(0, 10) + 'aa' + securePkg.mlDsaSignatureHex.slice(12),
+    mlDsaSignatureHex: tamperHex(securePkg.mlDsaSignatureHex, 5),
   };
   const tamperedSigRes = quantumSecureChannel.receiveSecureMessage(agentBob.kemKeys.secretKey, tamperedSigPkg);
   assert(!tamperedSigRes.success && tamperedSigRes.tamperDetected === true, 'Tampered ML-DSA signature must be strictly rejected');
@@ -165,7 +176,7 @@ async function runQuantumTestSuite() {
   // 3. Bit-flip in KEM ciphertext
   const tamperedKemPkg = {
     ...securePkg,
-    kemCiphertextHex: securePkg.kemCiphertextHex.slice(0, 10) + 'ee' + securePkg.kemCiphertextHex.slice(12),
+    kemCiphertextHex: tamperHex(securePkg.kemCiphertextHex, 5),
   };
   const tamperedKemRes = quantumSecureChannel.receiveSecureMessage(agentBob.kemKeys.secretKey, tamperedKemPkg);
   assert(!tamperedKemRes.success && tamperedKemRes.tamperDetected === true, 'Tampered KEM ciphertext must be strictly rejected');

@@ -44,6 +44,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Enforce deployment truth and secret-exposure gates
+        run: npm run check:truth
+
       - name: Compile contracts
         run: npm run compile:contracts
 
@@ -56,8 +59,17 @@ jobs:
       - name: Standalone cryptographic audit
         run: npm run audit:crypto
 
+      - name: Smart contract security & invariant test suite
+        run: npm run test:contracts
+
+      - name: Raven RSI + REA bounded agentic verification
+        run: npm run gate:rsi
+
       - name: Universal Reality Engine
         run: npm run reality:universal
+
+      - name: Global 12 Reality Gates scorecard
+        run: npm run reality:scorecard
 
       - name: Production build
         run: npm run build
@@ -69,6 +81,9 @@ jobs:
         run: |
           test -f reality/URS_EVIDENCE_CERTIFICATE.json
           test -f docs/reality/URS_EVIDENCE_CERTIFICATE.md
+          test -f reality/GLOBAL_REALITY_SCORECARD_v3.json
+          test -f docs/reality/GLOBAL_REALITY_SCORECARD_v3.md
+          test -f reality/RAVEN_REA_RSI_AUDIT.json
           test -d dist
 
       - name: Upload immutable CI evidence bundle
@@ -82,5 +97,8 @@ jobs:
             PACKAGE_LOCK_SHA256.txt
             reality/URS_EVIDENCE_CERTIFICATE.json
             docs/reality/URS_EVIDENCE_CERTIFICATE.md
+            reality/GLOBAL_REALITY_SCORECARD_v3.json
+            docs/reality/GLOBAL_REALITY_SCORECARD_v3.md
+            reality/RAVEN_REA_RSI_AUDIT.json
             dist/
           retention-days: 90

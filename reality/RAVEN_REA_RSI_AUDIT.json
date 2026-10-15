@@ -1,0 +1,14 @@
+{
+  "baselineCommit": "1ac991cfcf0f1097d58d01c76d052d937fde99d3",
+  "evidenceHash": "67e1fe7ceba48d18bc39e31df7bd70739ecda25ee108ad876ebee699f3044e84",
+  "evaluatedScore": 0.9924999999999999,
+  "validationResults": {
+    "typecheck": true,
+    "compileContracts": true,
+    "nistVectors": true,
+    "quantumSuite": true,
+    "contractSecurity": true
+  },
+  "durationMs": 48342,
+  "status": "BOUNDED_RSI_VERIFIED"
+}

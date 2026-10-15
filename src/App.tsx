@@ -11,6 +11,7 @@ import { WhitepaperViewer } from "./components/WhitepaperViewer";
 import { QuantumOperations } from "./components/QuantumOperations";
 import { FaucetModal } from "./components/FaucetModal";
 import { OnchainDeployerModal } from "./components/OnchainDeployerModal";
+import { QuickNodeModal } from "./components/QuickNodeModal";
 import {
   INITIAL_AGENTS,
   INITIAL_TASKS,
@@ -34,6 +35,7 @@ export function App() {
   const [isEmergencyLocked, setIsEmergencyLocked] = useState<boolean>(false);
   const [isFaucetOpen, setIsFaucetOpen] = useState<boolean>(false);
   const [isDeployerOpen, setIsDeployerOpen] = useState<boolean>(false);
+  const [isQuickNodeOpen, setIsQuickNodeOpen] = useState<boolean>(false);
   const [terminalActiveAgent, setTerminalActiveAgent] = useState<string | undefined>(undefined);
 
   const [wallet, setWallet] = useState<WalletState>({
@@ -228,6 +230,7 @@ export function App() {
         userBalanceEth={userBalanceEth}
         onOpenFaucet={() => setIsFaucetOpen(true)}
         onOpenDeployer={() => setIsDeployerOpen(true)}
+        onOpenQuickNode={() => setIsQuickNodeOpen(true)}
         isEmergencyLocked={isEmergencyLocked}
         walletAddress={wallet.address}
         isWalletConnected={wallet.isConnected}
@@ -307,6 +310,7 @@ export function App() {
             transactions={transactions}
             t={t}
             onOpenDeployer={() => setIsDeployerOpen(true)}
+            onOpenQuickNode={() => setIsQuickNodeOpen(true)}
           />
         )}
 
@@ -338,6 +342,12 @@ export function App() {
         signer={wallet.signer}
         walletAddress={wallet.address}
         isWalletConnected={wallet.isConnected}
+      />
+
+      {/* QuickNode Arbitrum Open House Singapore Modal */}
+      <QuickNodeModal
+        isOpen={isQuickNodeOpen}
+        onClose={() => setIsQuickNodeOpen(false)}
       />
 
       {/* Protocol Footer */}

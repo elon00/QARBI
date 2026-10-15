@@ -44,12 +44,19 @@
     "check:repo": "node scripts/qarbi-finish.mjs --audit-only",
     "test:nist": "tsx src/crypto/tests/official-nist-vectors.test.ts",
     "test:quantum": "tsx src/crypto/tests/quantum-portfolio-communication.test.ts",
+    "test:contracts": "tsx test/smart-contracts-security.test.ts",
+    "verify:contracts": "node scripts/verify-testnet-contracts.mjs",
+    "gate:quicknode": "node scripts/quicknode-reality-gate.mjs",
+    "gate:rsi": "node scripts/raven-rea-rsi-runner.mjs",
     "audit:crypto": "node scripts/audit-crypto.mjs",
     "reality:universal": "tsx scripts/reality-universal.ts",
+    "reality:scorecard": "node scripts/reality-scorecard-v3.mjs",
     "reality:certify": "tsx scripts/generate-urs-certificate.ts",
+    "quicknode:setup": "node scripts/quicknode-automation.mjs",
+    "all": "node scripts/all-in-one.mjs",
     "finish": "node scripts/qarbi-finish.mjs",
     "qmoosa:finish": "node scripts/start-and-finish-everything.mjs",
-    "test": "npm run test:nist && npm run test:quantum && npm run audit:crypto && npm run finish"
+    "test": "npm run compile:contracts && npm run test:nist && npm run test:quantum && npm run test:contracts && npm run audit:crypto && npm run check:truth && npm run finish"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
@@ -61,6 +68,7 @@
     "dotenv": "^17.2.3",
     "ethers": "^6.17.0",
     "express": "^4.21.2",
+    "express-rate-limit": "^8.7.1",
     "lucide-react": "^0.546.0",
     "motion": "^12.23.24",
     "react": "^19.0.1",

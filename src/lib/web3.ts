@@ -10,6 +10,43 @@ export const ARBITRUM_SEPOLIA_CHAIN_ID = 421614;
 export const ARBITRUM_SEPOLIA_HEX_CHAIN_ID = "0x66eee";
 export const ARBITRUM_SEPOLIA_RPC = "https://sepolia-rollup.arbitrum.io/rpc";
 
+let currentActiveRpc = ARBITRUM_SEPOLIA_RPC;
+let currentActiveChainId = ARBITRUM_SEPOLIA_CHAIN_ID;
+
+if (typeof window !== "undefined") {
+  const saved = localStorage.getItem("qarbi_quicknode_rpc");
+  if (saved && saved.startsWith("http")) {
+    currentActiveRpc = saved;
+  }
+}
+
+export function getActiveRpcUrl(): string {
+  if (typeof window !== "undefined") {
+    const saved = localStorage.getItem("qarbi_quicknode_rpc");
+    if (saved && saved.startsWith("http")) return saved;
+  }
+  return currentActiveRpc;
+}
+
+export function setActiveRpcUrl(url: string): void {
+  currentActiveRpc = url;
+  if (typeof window !== "undefined") {
+    if (url) {
+      localStorage.setItem("qarbi_quicknode_rpc", url);
+    } else {
+      localStorage.removeItem("qarbi_quicknode_rpc");
+    }
+  }
+}
+
+export function getActiveChainId(): number {
+  return currentActiveChainId;
+}
+
+export function setActiveChainId(chainId: number): void {
+  currentActiveChainId = chainId;
+}
+
 export interface WalletState {
   isConnected: boolean;
   address: string | null;
@@ -60,8 +97,9 @@ export function getInjectedProvider(): any {
 }
 
 export function getPublicRpcProvider(): ethers.JsonRpcProvider {
-  return new ethers.JsonRpcProvider(ARBITRUM_SEPOLIA_RPC);
+  return new ethers.JsonRpcProvider(getActiveRpcUrl());
 }
+
 
 export async function checkWalletConnection(): Promise<{
   address: string | null;
