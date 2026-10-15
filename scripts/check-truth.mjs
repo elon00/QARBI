@@ -37,3 +37,21 @@ for (const file of files) {
 
 if (failed) process.exit(1);
 console.log('TRUTH CHECK PASS');
+
+
+// Safety regression: deployer must not manufacture a success manifest or disclose keys.
+const deploy = fs.readFileSync('scripts/deploy.js', 'utf8');
+const legacy = JSON.parse(fs.readFileSync('src/contracts/deployedAddresses.json', 'utf8'));
+if (/console\.log\([^\n]*(?:wallet\.privateKey|privateKey)/.test(deploy)) {
+  console.error('TRUTH CHECK FAIL: deploy script exposes private key');
+  process.exit(1);
+}
+if (/Wallet\.createRandom\(/.test(deploy)) {
+  console.error('TRUTH CHECK FAIL: deploy script invents temporary signing wallet');
+  process.exit(1);
+}
+if (Object.values(legacy.contracts || {}).some(c => c.verified === true)) {
+  console.error('TRUTH CHECK FAIL: historical manifest asserts unproven verification');
+  process.exit(1);
+}
+console.log('DEPLOYMENT TRUTH SAFETY CHECK PASS');
