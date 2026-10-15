@@ -44,6 +44,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Enforce deployment truth and secret-exposure gates
+        run: npm run check:truth
+
       - name: Compile contracts
         run: npm run compile:contracts
 
