@@ -1,0 +1,54 @@
+{
+  "status": "VERIFIED_ON_CHAIN_RUNTIME_CODE",
+  "chainId": 421614,
+  "network": "Arbitrum Sepolia",
+  "blockNumber": 319532025,
+  "checkedAt": "2026-10-15T20:36:37.904Z",
+  "rpcUsed": "https://sepolia-rollup.arbitrum.io/rpc",
+  "deployer": "0xbbaaD9B836f9bd61cD0d616a016Cc911A2E1f60D",
+  "contractsCount": 5,
+  "allContractsVerified": true,
+  "results": [
+    {
+      "name": "QARBIToken",
+      "address": "0xd74F17527C480BFd0016be31792403ea2F69f842",
+      "codePresent": true,
+      "bytecodeBytes": 3032,
+      "codeKeccak256": "0x75d18410da3c7a9f4f2ea91047066f321954819143fa5c035d1a1aa1214efbed",
+      "explorer": "https://sepolia.arbiscan.io/address/0xd74F17527C480BFd0016be31792403ea2F69f842"
+    },
+    {
+      "name": "AgentRegistry",
+      "address": "0xA4984b0b33e685fc6171EE234c66007cd10c18AC",
+      "codePresent": true,
+      "bytecodeBytes": 5529,
+      "codeKeccak256": "0xcaaf7cd79d5fbfe522544dc78c64521642999138738a0921c0a32e58ddd8b8a6",
+      "explorer": "https://sepolia.arbiscan.io/address/0xA4984b0b33e685fc6171EE234c66007cd10c18AC"
+    },
+    {
+      "name": "TaskMarket",
+      "address": "0x59FA58058f72A766da1c706Ec8FcEae743B450DE",
+      "codePresent": true,
+      "bytecodeBytes": 5678,
+      "codeKeccak256": "0x05227dc5e0433ed573918f856351a12c7faa88b35291028e3a01cde2bbaf3ab4",
+      "explorer": "https://sepolia.arbiscan.io/address/0x59FA58058f72A766da1c706Ec8FcEae743B450DE"
+    },
+    {
+      "name": "ConwayEngine",
+      "address": "0x7A168D432500F421116A29f337613aeffa33a0bA",
+      "codePresent": true,
+      "bytecodeBytes": 1265,
+      "codeKeccak256": "0xe2dfeab4dd8672daf5beb9ad154f1a0c80b0d49c6d91f87cb6d751aa046b45af",
+      "explorer": "https://sepolia.arbiscan.io/address/0x7A168D432500F421116A29f337613aeffa33a0bA"
+    },
+    {
+      "name": "AgentWallet",
+      "address": "0x37da753Eb54989D13c9eD461597c9a19a588345E",
+      "codePresent": true,
+      "bytecodeBytes": 1978,
+      "codeKeccak256": "0x245b771dc5d5ad7c714154b969100566cc4a0e86cbc48cdd8998b5a729b765ae",
+      "explorer": "https://sepolia.arbiscan.io/address/0x37da753Eb54989D13c9eD461597c9a19a588345E"
+    }
+  ],
+  "limitations": "Live on-chain bytecode presence confirms deployment. Arbiscan source-code verification and external audits remain independent steps."
+}

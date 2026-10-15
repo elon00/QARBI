@@ -1,49 +1,42 @@
 {
   "network": "Arbitrum Sepolia",
   "chainId": 421614,
-  "rpcUrl": "https://sepolia-rollup.arbitrum.io/rpc",
+  "rpcProvider": "configured externally; credentials intentionally omitted",
   "explorerUrl": "https://sepolia.arbiscan.io",
-  "deployer": "0xEfF9a49955fA9d4c7CbEF2CE52bdeb5e0C9D7C80",
-  "deployedAt": "2026-08-16T11:10:51.601Z",
+  "deployer": "0xbbaaD9B836f9bd61cD0d616a016Cc911A2E1f60D",
+  "deployedAt": "2026-10-15T20:23:05.438Z",
   "contracts": {
     "QARBIToken": {
-      "address": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
+      "address": "0xd74F17527C480BFd0016be31792403ea2F69f842",
       "name": "QARBIToken.sol",
       "symbol": "QARBI",
       "decimals": 18,
       "verified": false,
-      "explorer": "https://sepolia.arbiscan.io/address/0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
-      "deploymentEvidence": "UNVERIFIED"
+      "explorer": "https://sepolia.arbiscan.io/address/0xd74F17527C480BFd0016be31792403ea2F69f842"
     },
     "AgentRegistry": {
-      "address": "0x89d227316719B407137fFEE47a50c83602525150",
+      "address": "0xA4984b0b33e685fc6171EE234c66007cd10c18AC",
       "name": "AgentRegistry.sol",
       "verified": false,
-      "explorer": "https://sepolia.arbiscan.io/address/0x89d227316719B407137fFEE47a50c83602525150",
-      "deploymentEvidence": "UNVERIFIED"
+      "explorer": "https://sepolia.arbiscan.io/address/0xA4984b0b33e685fc6171EE234c66007cd10c18AC"
     },
     "TaskMarket": {
-      "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "address": "0x59FA58058f72A766da1c706Ec8FcEae743B450DE",
       "name": "TaskMarket.sol",
       "verified": false,
-      "explorer": "https://sepolia.arbiscan.io/address/0x5FbDB2315678afecb367f032d93F642f64180aa3",
-      "deploymentEvidence": "UNVERIFIED"
+      "explorer": "https://sepolia.arbiscan.io/address/0x59FA58058f72A766da1c706Ec8FcEae743B450DE"
     },
     "ConwayEngine": {
-      "address": "0x3648BFD0D046a9f8FF4579f2188AE15d48074Dc8",
+      "address": "0x7A168D432500F421116A29f337613aeffa33a0bA",
       "name": "ConwayEngine.sol",
       "verified": false,
-      "explorer": "https://sepolia.arbiscan.io/address/0x3648BFD0D046a9f8FF4579f2188AE15d48074Dc8",
-      "deploymentEvidence": "UNVERIFIED"
+      "explorer": "https://sepolia.arbiscan.io/address/0x7A168D432500F421116A29f337613aeffa33a0bA"
     },
     "AgentWallet": {
-      "address": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+      "address": "0x37da753Eb54989D13c9eD461597c9a19a588345E",
       "name": "AgentWallet.sol",
       "verified": false,
-      "explorer": "https://sepolia.arbiscan.io/address/0x0165878A594ca255338adfa4d48449f69242Eb8F",
-      "deploymentEvidence": "UNVERIFIED"
+      "explorer": "https://sepolia.arbiscan.io/address/0x37da753Eb54989D13c9eD461597c9a19a588345E"
     }
-  },
-  "verificationStatus": "UNVERIFIED_LEGACY_RECORD",
-  "verificationNote": "Historical recorded addresses have not been checked against live Arbitrum Sepolia contract runtime bytecode, transaction receipts, and explorer source verification. Do not treat as deployed or verified until externally checked."
+  }
 }

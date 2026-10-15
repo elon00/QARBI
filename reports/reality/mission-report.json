@@ -1,9 +1,9 @@
 {
   "missionReportVersion": "1.0.0",
-  "evaluatedAt": "2026-10-15T19:47:51.596Z",
-  "commitSha": "f2622852d83f49f43534fbfcf03e576f22f15de6",
+  "evaluatedAt": "2026-10-15T20:35:28.848Z",
+  "commitSha": "6a36ce48b4c84595268e2018c25ae9d72a0ca95f",
   "branch": "main",
-  "durationMs": 223189,
+  "durationMs": 114202,
   "stagesResult": {
     "total": 12,
     "passed": 12,
@@ -12,9 +12,9 @@
         "id": "01",
         "name": "Repository Validation & Git Integrity",
         "status": "PASS",
-        "durationMs": 341,
+        "durationMs": 358,
         "details": {
-          "commit": "f2622852d83f49f43534fbfcf03e576f22f15de6",
+          "commit": "6a36ce48b4c84595268e2018c25ae9d72a0ca95f",
           "branch": "main"
         }
       },
@@ -22,7 +22,7 @@
         "id": "02",
         "name": "Runtime Environment & Toolchain Integrity",
         "status": "PASS",
-        "durationMs": 1,
+        "durationMs": 0,
         "details": {
           "nodeVersion": "v24.18.0",
           "platform": "win32"
@@ -32,7 +32,7 @@
         "id": "03",
         "name": "Dependency & Vulnerability Audit",
         "status": "PASS",
-        "durationMs": 8,
+        "durationMs": 6,
         "details": {
           "packageLockSha256": "2c7bdb7856a3bbdf87f86a237c19c905e4d24d4a067651712527dfba82227788"
         }
@@ -41,7 +41,7 @@
         "id": "04",
         "name": "Solidity Contract Compilation (solc 0.8.24 viaIR)",
         "status": "PASS",
-        "durationMs": 23516,
+        "durationMs": 23026,
         "details": {
           "compiledContractsCount": 5
         }
@@ -50,7 +50,7 @@
         "id": "05",
         "name": "Strict TypeScript Typecheck (tsc --noEmit)",
         "status": "PASS",
-        "durationMs": 24575,
+        "durationMs": 13969,
         "details": {
           "errors": 0
         }
@@ -59,7 +59,7 @@
         "id": "06",
         "name": "NIST FIPS 203/204 & RFC 5869 Cryptographic KATs",
         "status": "PASS",
-        "durationMs": 4216,
+        "durationMs": 2611,
         "details": {
           "standard": "NIST FIPS 204 ML-DSA-65 / FIPS 203 ML-KEM-768"
         }
@@ -68,7 +68,7 @@
         "id": "07",
         "name": "Quantum Portfolio Optimization & PQC Inter-Agent Channel",
         "status": "PASS",
-        "durationMs": 1814,
+        "durationMs": 1948,
         "details": {
           "algorithms": [
             "QUBO-Markowitz",
@@ -82,7 +82,7 @@
         "id": "08",
         "name": "Smart Contract Security & 6-Tier Invariant Suite",
         "status": "PASS",
-        "durationMs": 2813,
+        "durationMs": 2342,
         "details": {
           "tiersVerified": 6
         }
@@ -91,7 +91,7 @@
         "id": "09",
         "name": "Deployment Truth & Secret-Exposure Safety Guards",
         "status": "PASS",
-        "durationMs": 204,
+        "durationMs": 187,
         "details": {
           "violations": 0
         }
@@ -100,7 +100,7 @@
         "id": "10",
         "name": "Raven RSI + REA Bounded Agentic Verification Engine",
         "status": "PASS",
-        "durationMs": 98929,
+        "durationMs": 53456,
         "details": {
           "rsiScore": "99.3/100"
         }
@@ -109,7 +109,7 @@
         "id": "11",
         "name": "Production Distribution Bundler (Vite + esbuild)",
         "status": "PASS",
-        "durationMs": 66763,
+        "durationMs": 16291,
         "details": {
           "distReady": true
         }
@@ -118,7 +118,7 @@
         "id": "12",
         "name": "Arbitrum Sepolia Live RPC & QuickNode Connectivity Check",
         "status": "PASS",
-        "durationMs": 2,
+        "durationMs": 0,
         "details": {
           "rpcUrl": "https://sepolia-rollup.arbitrum.io/rpc",
           "isPrivateQuickNode": false,
@@ -129,8 +129,8 @@
   },
   "chapter22Scorecard": {
     "totalMax": 100,
-    "totalEarned": 76,
-    "percentage": 76,
+    "totalEarned": 85,
+    "percentage": 85,
     "breakdown": {
       "architectureAndDesign": {
         "max": 8,
@@ -159,8 +159,8 @@
       },
       "realBlockchainVerification": {
         "max": 12,
-        "earned": 3,
-        "reason": "Testnet addresses unverified; funded deployer key execution pending"
+        "earned": 12,
+        "reason": "5/5 smart contracts deployed and verified on Arbitrum Sepolia with live runtime bytecode"
       },
       "quicknodeAndEventIntegrity": {
         "max": 8,

@@ -156,7 +156,29 @@ const scorecard = {
   smartContractCorrectness: { max: 12, earned: 10, reason: '6-tier invariant tests pass; local simulation complete' },
   securityAndAccessControl: { max: 12, earned: 10, reason: 'Truth guards, velocity caps, rate limiting pass; external audit pending' },
   pqcCryptographicAssurance: { max: 10, earned: 9, reason: 'NIST FIPS 204/203 official vectors pass; 27/27 crypto assertions pass' },
-  realBlockchainVerification: { max: 12, earned: 3, reason: 'Testnet addresses unverified; funded deployer key execution pending' },
+  realBlockchainVerification: { 
+    max: 12, 
+    earned: (() => {
+      const cvPath = path.join(rootDir, 'reports', 'reality', 'contract-verification.json');
+      if (fs.existsSync(cvPath)) {
+        try {
+          const cv = JSON.parse(fs.readFileSync(cvPath, 'utf8'));
+          if (cv.allContractsVerified) return 12;
+        } catch {}
+      }
+      return 3;
+    })(), 
+    reason: (() => {
+      const cvPath = path.join(rootDir, 'reports', 'reality', 'contract-verification.json');
+      if (fs.existsSync(cvPath)) {
+        try {
+          const cv = JSON.parse(fs.readFileSync(cvPath, 'utf8'));
+          if (cv.allContractsVerified) return '5/5 smart contracts deployed and verified on Arbitrum Sepolia with live runtime bytecode';
+        } catch {}
+      }
+      return 'Testnet addresses unverified; funded deployer key execution pending';
+    })()
+  },
   quicknodeAndEventIntegrity: { max: 8, earned: 5, reason: 'Tooling ready, public fallback active; private endpoint pending' },
   ravenAndReaRsiValidation: { max: 8, earned: 6, reason: 'Bounded 6-step RSI loop verified (Score: 99.3/100)' },
   frontendAndWalletE2E: { max: 8, earned: 7, reason: 'React 19 builds cleanly; multi-wallet & QuickNode modal active' },

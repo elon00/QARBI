@@ -1,9 +1,9 @@
 # QARBI Protocol — Global Reality-Gated Scorecard v3.0
 
-**Evaluated At:** `2026-10-15T18:09:49.575Z`  
-**Commit:** [`1ac991cf`](https://github.com/elon00/QARBI/commit/1ac991cfcf0f1097d58d01c76d052d937fde99d3)  
-**Branch:** `feature/quicknode-raven-rea-rsi-blueprint`  
-**Engineering Score:** **`55 / 100`**  
+**Evaluated At:** `2026-10-15T20:33:23.643Z`  
+**Commit:** [`6a36ce48`](https://github.com/elon00/QARBI/commit/6a36ce48b4c84595268e2018c25ae9d72a0ca95f)  
+**Branch:** `main`  
+**Engineering Score:** **`62.2 / 100`**  
 **Production Certification Gate:** **`LOCKED (Fail-Closed)`**  
 **Mainnet Status:** **`LOCKED_FAIL_CLOSED`**  
 
@@ -17,7 +17,7 @@
 | **G01** | **Clean Build & Deterministic CI** | `10` | `100/100` | 🟢 **PASS** | Typecheck: 0 errors; Contracts: 5/5 compiled with solc 0.8.24 viaIR |
 | **G02** | **Security & Dependency Audit** | `10` | `80/100` | 🟡 **PARTIAL** | Truth & Secret-Exposure Guards: 0 violations; CodeQL automated AST scanning active |
 | **G03** | **PQC ML-DSA / ML-KEM Cryptography** | `10` | `95/100` | 🟢 **PASS** | Official NIST FIPS 204/203 & RFC 5869 KAT vectors: PASS; Quantum SQA/bSB Portfolio & PQC Agent Channel: PASS; Standalone Cryptographic Auditor: 27/27 assertions PASS |
-| **G04** | **Actual Testnet Contracts** | `15` | `25/100` | 🔴 **BLOCKED** | Manifest chainId: 421614; VerificationStatus: UNVERIFIED_LEGACY_RECORD; Bytecode check: BLOCKED_MISSING_RUNTIME_CODE |
+| **G04** | **Actual Testnet Contracts** | `15` | `90/100` | 🟢 **PASS** | Arbitrum Sepolia (421614); 5/5 contracts live with verified EVM bytecode; Deployer: 0xbbaaD9B836f9bd61cD0d616a016Cc911A2E1f60D; Verified at: 2026-10-15T20:30:03.551Z |
 | **G05** | **Token, Escrow and Wallet Safety** | `10` | `80/100` | 🟡 **PARTIAL** | Smart Contract Invariants (6 Tiers): Supply Conservation, Escrow Machine, Velocity Caps, Killswitch PASS |
 | **G06** | **QuickNode Reality** | `10` | `50/100` | 🟡 **PARTIAL** | Tooling scripts/quicknode-reality-gate.mjs ready; Public fallback active; Custom endpoint configured: false |
 | **G07** | **Streams & Event Finality** | `10` | `60/100` | 🟡 **PARTIAL** | Stream edge filter present: true; Webhook receiver configured in server.ts |
@@ -32,10 +32,6 @@
 ### G02 — Security & Dependency Audit (PARTIAL)
 - **Blocker:** Formal Slither/Mythril static analysis report and full dependency CVE audit pending
 - **Next Safe Action:** Run Slither and yarn/npm audit fix in isolated sandbox.
-
-### G04 — Actual Testnet Contracts (BLOCKED)
-- **Blocker:** Historical recorded addresses have no verified runtime bytecode on Arbitrum Sepolia; no funded deployer key in CI
-- **Next Safe Action:** Fund a dedicated testnet wallet on Arbitrum Sepolia via faucet and execute `node scripts/deploy.js` with human sign-off.
 
 ### G05 — Token, Escrow and Wallet Safety (PARTIAL)
 - **Blocker:** Live onchain transaction fuzzing and escrow soak test on Arbitrum Sepolia pending contract deployment

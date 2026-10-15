@@ -1,15 +1,15 @@
 {
   "version": "3.0.0",
   "title": "QARBI Protocol — Global 12-Gate Universal Reality Scorecard",
-  "evaluatedAt": "2026-10-15T18:09:49.575Z",
-  "commitSha": "1ac991cfcf0f1097d58d01c76d052d937fde99d3",
-  "branchName": "feature/quicknode-raven-rea-rsi-blueprint",
+  "evaluatedAt": "2026-10-15T20:33:23.643Z",
+  "commitSha": "6a36ce48b4c84595268e2018c25ae9d72a0ca95f",
+  "branchName": "main",
   "summary": {
-    "engineeringScore": 55,
+    "engineeringScore": 62.2,
     "totalGates": 12,
-    "passedGates": 4,
+    "passedGates": 5,
     "partialGates": 5,
-    "blockedGates": 3,
+    "blockedGates": 2,
     "isProductionCertified": false,
     "mainnetStatus": "LOCKED_FAIL_CLOSED"
   },
@@ -48,11 +48,11 @@
       "id": "G04",
       "name": "Actual Testnet Contracts",
       "weight": 15,
-      "score": 25,
-      "status": "BLOCKED",
-      "evidence": "Manifest chainId: 421614; VerificationStatus: UNVERIFIED_LEGACY_RECORD; Bytecode check: BLOCKED_MISSING_RUNTIME_CODE",
-      "blockers": "Historical recorded addresses have no verified runtime bytecode on Arbitrum Sepolia; no funded deployer key in CI",
-      "nextSafeAction": "Fund a dedicated testnet wallet on Arbitrum Sepolia via faucet and execute `node scripts/deploy.js` with human sign-off."
+      "score": 90,
+      "status": "PASS",
+      "evidence": "Arbitrum Sepolia (421614); 5/5 contracts live with verified EVM bytecode; Deployer: 0xbbaaD9B836f9bd61cD0d616a016Cc911A2E1f60D; Verified at: 2026-10-15T20:30:03.551Z",
+      "blockers": "Arbiscan public source code verification and formal external security audit pending",
+      "nextSafeAction": "Maintain testnet deployments and prepare audit verification bundle."
     },
     {
       "id": "G05",
