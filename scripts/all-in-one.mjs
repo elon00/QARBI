@@ -103,6 +103,23 @@ async function main() {
     console.log(`=====================================================================\n`);
     process.exit(0);
   } else {
+    // Clean any orphaned processes blocking ports 3000 or 24678 on Windows
+    if (process.platform === 'win32') {
+      [3000, 24678].forEach((port) => {
+        try {
+          const out = execSync(`netstat -ano | findstr :${port}`, { stdio: 'pipe' }).toString();
+          const lines = out.split('\n').filter(l => l.includes(`:${port}`) && l.includes('LISTENING'));
+          for (const line of lines) {
+            const parts = line.trim().split(/\s+/);
+            const pid = parts[parts.length - 1];
+            if (pid && pid !== '0' && pid !== String(process.pid)) {
+              execSync(`taskkill /F /PID ${pid}`, { stdio: 'ignore' });
+            }
+          }
+        } catch {}
+      });
+    }
+
     console.log(`✅ [3/4] Opening QuickNode Build Plan Checkout in your browser...`);
     openUrl(QUICKNODE_CHECKOUT_URL);
 
