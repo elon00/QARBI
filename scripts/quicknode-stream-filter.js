@@ -16,12 +16,12 @@
 
 // QARBI Canonical Verified Contract Addresses (case-insensitive)
 const QARBI_CONTRACTS = {
-  TOKEN: "0xa513e6e4b8f2a923d98304ec87f64353c4d5c853",
-  REGISTRY: "0x89d227316719b407137ffee47a50c83602525150",
-  TASK_MARKET: "0x5fbdb2315678afecb367f032d93f642f64180aa3",
-  CONWAY_ENGINE: "0x3648bfd0d046a9f8ff4579f2188ae15d48074dc8",
-  AGENT_WALLET: "0x0165878a594ca255338adfa4d48449f69242eb8f",
-  OFFICIAL_PAYMENT_RECIPIENT: "0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7"
+  TOKEN: "0xd74F17527C480BFd0016be31792403ea2F69f842",
+  REGISTRY: "0xA4984b0b33e685fc6171EE234c66007cd10c18AC",
+  TASK_MARKET: "0x59FA58058f72A766da1c706Ec8FcEae743B450DE",
+  CONWAY_ENGINE: "0x7A168D432500F421116A29f337613aeffa33a0bA",
+  AGENT_WALLET: "0x37da753Eb54989D13c9eD461597c9a19a588345E",
+  OFFICIAL_PAYMENT_RECIPIENT: "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7"
 };
 
 // Event Topic0 Hashes for Fast Indexing
@@ -37,6 +37,12 @@ const EVENT_TOPICS = {
   // ERC20: Transfer(address,address,uint256)
   TRANSFER: "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
 };
+
+// Normalized lowercase map for robust case-insensitive lookup
+const NORMALIZED_CONTRACTS = Object.fromEntries(
+  Object.entries(QARBI_CONTRACTS).map(([k, v]) => [k, v.toLowerCase()])
+);
+const TARGET_ADDRESS_SET = new Set(Object.values(NORMALIZED_CONTRACTS));
 
 /**
  * Main QuickNode Streams entrypoint
@@ -68,14 +74,13 @@ function main(stream) {
           const contractAddress = (log.address || "").toLowerCase();
           const topic0 = (log.topics && log.topics[0]) ? log.topics[0].toLowerCase() : "";
 
-          // Check if event targets any QARBI contract
-          const isTargetContract = Object.values(QARBI_CONTRACTS).includes(contractAddress);
-          if (!isTargetContract) continue;
+          // Check if event targets any QARBI contract (case-insensitive)
+          if (!TARGET_ADDRESS_SET.has(contractAddress)) continue;
 
           let detectedType = "CUSTOM_CONTRACT_EVENT";
           let parsedData = {};
 
-          if (contractAddress === QARBI_CONTRACTS.REGISTRY) {
+          if (contractAddress === NORMALIZED_CONTRACTS.REGISTRY) {
             detectedType = "AGENT_REGISTERED";
             parsedData = {
               registry: contractAddress,
@@ -83,7 +88,7 @@ function main(stream) {
               owner: log.topics[2] ? "0x" + log.topics[2].slice(-40) : null,
               logIndex: i
             };
-          } else if (contractAddress === QARBI_CONTRACTS.TASK_MARKET) {
+          } else if (contractAddress === NORMALIZED_CONTRACTS.TASK_MARKET) {
             detectedType = topic0.includes("settle") ? "TASK_SETTLED" : "TASK_CREATED";
             parsedData = {
               market: contractAddress,
@@ -91,13 +96,13 @@ function main(stream) {
               creator: log.topics[2] ? "0x" + log.topics[2].slice(-40) : null,
               logIndex: i
             };
-          } else if (contractAddress === QARBI_CONTRACTS.CONWAY_ENGINE) {
+          } else if (contractAddress === NORMALIZED_CONTRACTS.CONWAY_ENGINE) {
             detectedType = "CONWAY_STEP";
             parsedData = {
               engine: contractAddress,
               logIndex: i
             };
-          } else if (contractAddress === QARBI_CONTRACTS.TOKEN) {
+          } else if (contractAddress === NORMALIZED_CONTRACTS.TOKEN) {
             detectedType = "TOKEN_TRANSFER";
             parsedData = {
               from: log.topics[1] ? "0x" + log.topics[1].slice(-40) : null,
@@ -123,7 +128,7 @@ function main(stream) {
       // 2. Process Native ETH Autonomous x402 Payments
       for (const tx of txs) {
         const toAddr = (tx.to || "").toLowerCase();
-        if (toAddr === QARBI_CONTRACTS.OFFICIAL_PAYMENT_RECIPIENT) {
+        if (toAddr === NORMALIZED_CONTRACTS.OFFICIAL_PAYMENT_RECIPIENT) {
           const valueWei = tx.value ? BigInt(tx.value).toString() : "0";
           if (valueWei !== "0") {
             matchingEvents.push({

@@ -45,6 +45,8 @@
     "test:nist": "tsx src/crypto/tests/official-nist-vectors.test.ts",
     "test:quantum": "tsx src/crypto/tests/quantum-portfolio-communication.test.ts",
     "test:contracts": "tsx test/smart-contracts-security.test.ts",
+    "test:x402": "tsx test/x402-and-quicknode-streams.test.ts",
+    "audit:static": "node scripts/audit-static-analysis.mjs",
     "verify:contracts": "node scripts/verify-testnet-contracts.mjs",
     "gate:quicknode": "node scripts/quicknode-reality-gate.mjs",
     "gate:rsi": "node scripts/raven-rea-rsi-runner.mjs",
@@ -57,7 +59,7 @@
     "finish": "node scripts/qarbi-finish.mjs",
     "qmoosa:finish": "node scripts/start-and-finish-everything.mjs",
     "mission:verify": "node scripts/mission-verify.mjs",
-    "test": "npm run compile:contracts && npm run test:nist && npm run test:quantum && npm run test:contracts && npm run audit:crypto && npm run check:truth && npm run finish"
+    "test": "npm run compile:contracts && npm run test:nist && npm run test:quantum && npm run test:contracts && npm run test:x402 && npm run audit:static && npm run audit:crypto && npm run check:truth && npm run finish"
   },
   "dependencies": {
     "@google/genai": "^2.22.0",
