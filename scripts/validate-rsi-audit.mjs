@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Fail-closed structural and commit-bound validation of the bounded local REA/RSI audit. */
+/** Fail-closed structural, freshness and commit-bound validation of the bounded local REA/RSI audit. */
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -10,7 +10,14 @@ export const REQUIRED_RSI_CHECKS = Object.freeze([
   'quantumSuite', 'contractSecurity', 'dependencyAudit'
 ]);
 
-export function validateRsiAuditEvidence(audit, expectedCommit) {
+// A previously generated audit must never be reused as evidence for a new verification run.
+// The runner captures both timestamps at startup; the checks below tolerate clock skew
+// without treating old evidence from the same commit as current execution.
+export const MAX_RSI_EVIDENCE_AGE_MS = 30 * 60 * 1000;
+export const MAX_RSI_CLOCK_SKEW_MS = 2 * 60 * 1000;
+export const MAX_RSI_CAPTURE_DELTA_MS = 60 * 1000;
+
+export function validateRsiAuditEvidence(audit, expectedCommit, nowMs = Date.now()) {
   if (!audit || typeof audit !== 'object' || Array.isArray(audit)) {
     throw new Error('BLOCKED: missing or malformed REA/RSI audit');
   }
@@ -33,6 +40,14 @@ export function validateRsiAuditEvidence(audit, expectedCommit) {
       typeof store.rpcConfigured !== 'boolean' ||
       !Number.isSafeInteger(store.invariantsAuditTimestamp) || store.invariantsAuditTimestamp <= 0) {
     throw new Error('BLOCKED: missing, malformed or stale REA/RSI evidence store');
+  }
+  const observedAtMs = Date.parse(store.timestamp);
+  if (!Number.isSafeInteger(nowMs) ||
+      observedAtMs > nowMs + MAX_RSI_CLOCK_SKEW_MS ||
+      nowMs - observedAtMs > MAX_RSI_EVIDENCE_AGE_MS ||
+      Math.abs(store.invariantsAuditTimestamp - observedAtMs) > MAX_RSI_CAPTURE_DELTA_MS ||
+      store.invariantsAuditTimestamp > nowMs + MAX_RSI_CLOCK_SKEW_MS) {
+    throw new Error('BLOCKED: REA/RSI evidence is stale, future-dated or internally inconsistent');
   }
   const computedHash = crypto.createHash('sha256').update(JSON.stringify(store)).digest('hex');
   if (audit.evidenceHash !== computedHash) {
