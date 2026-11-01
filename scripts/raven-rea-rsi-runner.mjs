@@ -20,6 +20,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { rsiResultDigest } from './rsi-result-integrity.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -219,6 +220,10 @@ const recoveryBaseline = {
   candidateAdopted: false,
   truthCheckPassed
 };
+
+// Bind reported check outcomes and score to the persisted audit, not only its input evidence.
+// This is local integrity detection, not external attestation or cryptographic authentication.
+recoveryBaseline.resultDigest = rsiResultDigest(recoveryBaseline);
 
 const artifactDir = path.join(rootDir, 'reality');
 fs.mkdirSync(artifactDir, { recursive: true });
