@@ -12,6 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ethers } from 'ethers';
 import { validateContractManifest } from './contract-manifest-guard.mjs';
+import { safeRpcLabel } from './rpc-log-safety.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,7 +47,7 @@ try {
   process.exit(2);
 }
 
-const maskedRpc = rpc.replace(/quiknode\.pro\/[a-zA-Z0-9_-]+/, 'quiknode.pro/****');
+const maskedRpc = safeRpcLabel(endpoint);
 console.log('\n╔══════════════════════════════════════════════════════════════════════════╗');
 console.log('║   QARBI PROTOCOL — ARBITRUM SEPOLIA ON-CHAIN BYTECODE VERIFICATION       ║');
 console.log('║   "Code on chain is reality; claims without bytecode are rejected."      ║');
