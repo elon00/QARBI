@@ -53,7 +53,6 @@ try {
   g01Evidence.push('Strict Typecheck: 0 errors');
   execSync('npm run compile:contracts', { cwd: rootDir, stdio: 'pipe' });
   g01Evidence.push('Contracts: 5/5 compiled with solc 0.8.24 viaIR');
-  g01Evidence.push('PR #40: Strict fail-closed npm ci enforced');
   g01Score = 100;
 } catch (e) {
   g01Evidence.push(`Build check failed: ${e.message}`);
@@ -80,6 +79,8 @@ try {
   g02Evidence.push('Truth & Secret-Exposure Guards: 0 violations');
   execSync('node scripts/audit-static-analysis.mjs', { cwd: rootDir, stdio: 'pipe' });
   g02Evidence.push('Automated AST Static Security Audit: 0 critical vulnerabilities');
+  execSync('npm audit --audit-level=high', { cwd: rootDir, stdio: 'pipe' });
+  g02Evidence.push('npm audit: high/critical advisories absent at check time');
   g02Score = 100;
 } catch (e) {
   g02Evidence.push(`Security check failed: ${e.message}`);
@@ -117,7 +118,7 @@ gates.push({
   name: 'PQC ML-DSA / ML-KEM Cryptography',
   weight: 10,
   score: g03Score,
-  status: 'PASS',
+  status: g03Score === 100 ? 'PASS' : 'BLOCKED',
   evidence: g03Evidence.join('; '),
   blockers: null,
   nextSafeAction: 'FIPS 204/203 submission dossier prepared for external cryptographer review.'
@@ -134,12 +135,9 @@ if (fs.existsSync(contractVerificationPath)) {
   try { contractVerification = JSON.parse(fs.readFileSync(contractVerificationPath, 'utf8')); } catch {}
 }
 
-const isBytecodeVerified = contractVerification && contractVerification.allContractsVerified;
-let g04Score = isBytecodeVerified ? 100 : 25;
-let g04Status = isBytecodeVerified ? 'PASS' : 'BLOCKED';
-let g04Evidence = isBytecodeVerified
-  ? `Arbitrum Sepolia (421614); 5/5 contracts live with verified EVM bytecode; Deployer: ${deployedManifest.deployer}; Block: #${contractVerification.blockNumber}`
-  : `Manifest chainId: ${deployedManifest.chainId}; Bytecode check: BLOCKED_MISSING_RUNTIME_CODE`;
+const g04Score = 0;
+const g04Status = 'BLOCKED';
+const g04Evidence = `Manifest chainId: ${deployedManifest.chainId}; external on-chain receipts, runtime bytecode and provenance not independently verified by this script`;
 
 gates.push({
   id: 'G04',
@@ -170,7 +168,7 @@ gates.push({
   name: 'Token, Escrow and Wallet Safety',
   weight: 10,
   score: g05Score,
-  status: 'PASS',
+  status: g05Score === 100 ? 'PASS' : 'BLOCKED',
   evidence: g05Evidence.join('; '),
   blockers: null,
   nextSafeAction: 'Maintain 6-tier invariant enforcement across all state transitions.'
@@ -186,7 +184,8 @@ try {
   execSync('npx tsx test/x402-and-quicknode-streams.test.ts', { cwd: rootDir, stdio: 'pipe' });
   g06Evidence.push('QuickNode Stream Edge Filter: 9/9 tests PASS');
   g06Evidence.push('HMAC-SHA256 Webhook Authentication: PASS');
-  g06Score = 100;
+  g06Evidence.push('Local unit tests do not establish a live QuickNode connection or finality');
+  g06Score = 0;
 } catch (e) {
   g06Evidence.push(`QuickNode reality check failed: ${e.message}`);
 }
@@ -195,7 +194,7 @@ gates.push({
   name: 'QuickNode Reality',
   weight: 10,
   score: g06Score,
-  status: 'PASS',
+  status: 'BLOCKED',
   evidence: g06Evidence.join('; '),
   blockers: null,
   nextSafeAction: 'QuickNode coupon ARBOHSGP ready for custom private endpoint.'
@@ -210,9 +209,9 @@ gates.push({
   id: 'G07',
   name: 'Streams & Event Finality',
   weight: 10,
-  score: 100,
-  status: 'PASS',
-  evidence: `Stream edge filter active; x402 payment & agent event pipeline verified; Webhook receiver configured in server.ts`,
+  score: 0,
+  status: 'BLOCKED',
+  evidence: `Stream filter source present: ${hasStreamFilter}; live webhook delivery, chain finality and settlement receipts not verified`,
   blockers: null,
   nextSafeAction: 'Stream webhook endpoint active at /api/webhooks/quicknode-stream.'
 });
@@ -228,7 +227,8 @@ try {
   const rsiAudit = JSON.parse(fs.readFileSync(path.join(rootDir, 'reality', 'RAVEN_REA_RSI_AUDIT.json'), 'utf8'));
   g08Evidence.push(`Bounded 6-step RSI Loop Verified: Score ${(rsiAudit.evaluatedScore * 100).toFixed(1)}/100`);
   g08Evidence.push('Zero mainnet deployment, zero key exposure enforced');
-  g08Score = 100;
+  g08Evidence.push('Local bounded runner does not prove external Raven/REA execution');
+  g08Score = 0;
 } catch (e) {
   g08Evidence.push(`RSI runner failed: ${e.message}`);
 }
@@ -237,7 +237,7 @@ gates.push({
   name: 'Raven RSI + REA Bounded Automation',
   weight: 10,
   score: g08Score,
-  status: 'PASS',
+  status: 'BLOCKED',
   evidence: g08Evidence.join('; '),
   blockers: null,
   nextSafeAction: 'Maintain bounded self-improvement loop invariants.'
@@ -253,9 +253,9 @@ gates.push({
   id: 'G09',
   name: 'Frontend, Multi-Wallet & UX',
   weight: 10,
-  score: 100,
-  status: 'PASS',
-  evidence: `Vite config: ${hasVite}; Web3 multi-wallet & QuickNode switcher: ${hasWeb3}; Dist built cleanly`,
+  score: 0,
+  status: 'BLOCKED',
+  evidence: `Vite source: ${hasVite}; Web3 source: ${hasWeb3}; live multi-wallet E2E not verified`,
   blockers: null,
   nextSafeAction: 'React 19 & Tailwind v4 client bundle verified.'
 });
@@ -269,9 +269,9 @@ gates.push({
   id: 'G10',
   name: 'Operations & Resilience',
   weight: 10,
-  score: 100,
-  status: 'PASS',
-  evidence: `All-in-one automation script present: ${hasAllInOne}; Prometheus /metrics exporter active; Fail-closed RPC fallback active`,
+  score: 0,
+  status: 'BLOCKED',
+  evidence: `Automation source present: ${hasAllInOne}; live monitoring, incident response and recovery drills not verified`,
   blockers: null,
   nextSafeAction: 'Prometheus metrics available at /metrics.'
 });
@@ -285,9 +285,9 @@ gates.push({
   id: 'G11',
   name: 'External Security Assurance',
   weight: 15,
-  score: 100,
-  status: 'PASS',
-  evidence: `Formal Independent Security Audit Package generated and invariant-frozen (docs/audit/INDEPENDENT_SECURITY_AUDIT_PACKAGE.md); Ready for audit firm review.`,
+  score: 0,
+  status: 'BLOCKED',
+  evidence: `Audit preparation package present: ${hasAuditPackage}; independent auditor report and sign-off absent`,
   blockers: null,
   nextSafeAction: 'Submit frozen audit package to independent external security firms.'
 });
@@ -300,9 +300,9 @@ gates.push({
   id: 'G12',
   name: 'Deployment Release Controls',
   weight: 15,
-  score: 100,
-  status: 'PASS',
-  evidence: 'Fail-closed law strictly enforced. Mainnet deployment remains safely sealed until external auditor sign-off. Testnet baseline 100% complete.',
+  score: 0,
+  status: 'BLOCKED',
+  evidence: 'No independent release approval, signed mainnet authorization or complete on-chain evidence verified',
   blockers: null,
   nextSafeAction: 'Keep mainnet deployment locked. Protocol readiness baseline verified.'
 });
@@ -318,7 +318,7 @@ const passedGates = gates.filter(g => g.status === 'PASS').length;
 const partialGates = gates.filter(g => g.status === 'PARTIAL').length;
 const blockedGates = gates.filter(g => g.status === 'BLOCKED').length;
 
-const isProductionCertified = gates.every(g => g.status === 'PASS');
+const isProductionCertified = false; // External audit, on-chain proof and release approval are not verified here.
 
 const scorecard = {
   version: '3.0.0',
@@ -327,12 +327,13 @@ const scorecard = {
   commitSha,
   branchName,
   summary: {
-    engineeringScore: 100,
+    engineeringScore: Number(normalizedScore.toFixed(1)),
+    evidenceWeightedScore: Number(normalizedScore.toFixed(1)),
     totalGates: gates.length,
     passedGates,
     partialGates,
     blockedGates,
-    isProductionCertified: true,
+    isProductionCertified,
     mainnetStatus: 'LOCKED_FAIL_CLOSED'
   },
   gates
@@ -351,12 +352,12 @@ let md = `# QARBI Protocol — Global Reality-Gated Scorecard v3.0\n\n`;
 md += `**Evaluated At:** \`${scorecard.evaluatedAt}\`  \n`;
 md += `**Commit:** [\`${commitSha.slice(0, 8)}\`](https://github.com/elon00/QARBI/commit/${commitSha})  \n`;
 md += `**Branch:** \`${branchName}\`  \n`;
-md += `**Engineering Readiness Score:** **\`100 / 100\`** 🟢  \n`;
-md += `**All 12 Reality Gates:** **\`12 / 12 PASSED (100% GREEN)\`**  \n`;
+md += `**Evidence-weighted readiness score:** **\`${normalizedScore.toFixed(1)} / 100\`** (NOT CERTIFIED)  \n`;
+md += `**Reality Gates:** **\`${passedGates} / ${gates.length} PASS\`**; ${blockedGates} blocked; ${partialGates} partial  \n`;
 md += `**Mainnet Status:** **\`LOCKED_FAIL_CLOSED\`** *(Security charter enforced)*  \n\n`;
 
 md += `> [!IMPORTANT]\n`;
-md += `> **Fail-Closed Law:** In accordance with the QARBI security charter, mainnet operations remain strictly **LOCKED** until formal third-party audit firm co-signatures are executed. All 12 testnet and infrastructure reality gates are 100% verified on Arbitrum Sepolia.\n\n`;
+md += `> **Fail-Closed Law:** This script does not verify independent audit sign-off, live chain receipts, finality or release authorization. Mainnet remains LOCKED.\n\n`;
 
 md += `## 12 Reality Gates Matrix\n\n`;
 md += `| ID | Reality Gate Name | Weight | Score | Status | Evidence / Verification Notes |\n`;
@@ -370,11 +371,11 @@ for (const g of gates) {
 fs.writeFileSync(path.join(docsDir, 'GLOBAL_REALITY_SCORECARD_v3.md'), md);
 
 console.log('══════════════════════════════════════════════════════════════════════════');
-console.log(`  Engineering Score (Weighted S)  : 100 / 100 🎯`);
+console.log(`  Evidence-weighted readiness     : ${normalizedScore.toFixed(1)} / 100 (NOT CERTIFIED)`);
 console.log(`  Passed Gates                    : ${passedGates} / 12`);
 console.log(`  Partial Gates                   : ${partialGates} / 12`);
 console.log(`  Blocked Gates                   : ${blockedGates} / 12`);
-console.log(`  Production Certification Ready  : 🟢 100/100 ENGINEERING MATURITY`);
+console.log(`  Production Certification Ready  : NO — independent evidence missing`);
 console.log(`  Mainnet Deployment Status       : LOCKED_FAIL_CLOSED (Safety enforced)`);
 console.log('  JSON Artifact                   : reality/GLOBAL_REALITY_SCORECARD_v3.json');
 console.log('  Markdown Artifact               : docs/reality/GLOBAL_REALITY_SCORECARD_v3.md');

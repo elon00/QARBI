@@ -32,8 +32,23 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Audit dependency vulnerabilities (high and critical)
+        run: npm audit --audit-level=high
+
       - name: Run truth, environment and build verification
         run: npm test
+
+      - name: Execute bounded REA/RSI runner and verify fail-closed audit evidence
+        run: |
+          npm run gate:rsi
+          node --input-type=module -e "import fs from 'node:fs'; const a = JSON.parse(fs.readFileSync('reality/RAVEN_REA_RSI_AUDIT.json','utf8')); const checks = Object.values(a.validationResults || {}); if (a.candidateAdopted !== false || a.status !== 'REVIEW_REQUIRED_NOT_ADOPTED' || a.truthCheckPassed !== true || checks.length !== 6 || checks.some(v => v !== true)) throw new Error('Bounded REA/RSI evidence failed closed'); console.log('REA/RSI bounded runtime evidence PASS; not external Raven/REA verification or production certification');"
+
+      - name: Verify conservative scorecard and REA/RSI syntax
+        run: |
+          node --check scripts/reality-scorecard-v3.mjs
+          node --check scripts/raven-rea-rsi-runner.mjs
+          npm run reality:scorecard
+          node --input-type=module -e "import fs from 'node:fs'; const s = JSON.parse(fs.readFileSync('reality/GLOBAL_REALITY_SCORECARD_v3.json', 'utf8')); if (s.summary.isProductionCertified || s.summary.engineeringScore >= 100 || !['G04','G11','G12'].every(id => s.gates.some(g => g.id === id && g.status === 'BLOCKED'))) throw new Error('Reality scorecard must remain uncertified without external evidence');"
 
       - name: Verify Build Artifacts
         run: |

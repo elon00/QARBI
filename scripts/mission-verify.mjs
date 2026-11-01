@@ -4,7 +4,7 @@
  * 
  * Invocation: npm run mission:verify
  * 
- * Executes all 12 zero-mock verification stages:
+ * Executes bounded verification stages; external evidence is not implied:
  *  1. Repository Hygiene & Git Integrity
  *  2. Runtime Environment & Toolchain
  *  3. Dependency & Supply-Chain Integrity
@@ -24,7 +24,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execSync } from 'node:child_process';
+import { execSync, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -33,7 +33,7 @@ const rootDir = path.resolve(__dirname, '..');
 
 const startTime = Date.now();
 console.log('\n╔══════════════════════════════════════════════════════════════════════════╗');
-console.log('║       QARBI PROTOCOL — THE 100/100 MASTER MISSION VERIFICATION RUNNER     ║');
+console.log('║       QARBI PROTOCOL — EVIDENCE-FIRST MASTER MISSION VERIFICATION RUNNER     ║');
 console.log('║   "Production Ready != CI Green • Reality Before Claims • Mainnet Locked" ║');
 console.log('╚══════════════════════════════════════════════════════════════════════════╝\n');
 
@@ -74,7 +74,7 @@ runStage('02', 'Runtime Environment & Toolchain Integrity', () => {
 });
 
 // STAGE 3: Dependency Inventory
-runStage('03', 'Dependency & Vulnerability Audit', () => {
+runStage('03', 'Dependency Lockfile Presence and Hash', () => {
   const pkgLock = path.join(rootDir, 'package-lock.json');
   if (!fs.existsSync(pkgLock)) throw new Error('Missing package-lock.json');
   const lockHash = crypto.createHash('sha256').update(fs.readFileSync(pkgLock)).digest('hex');
@@ -148,36 +148,69 @@ runStage('12', 'x402 Autonomous Commerce & QuickNode Streams Verification', () =
 // STAGE 13: Static Security & AST Vulnerability Audit
 runStage('13', 'Automated Static Security & AST Vulnerability Audit', () => {
   execSync('npm run audit:static', { cwd: rootDir, stdio: 'pipe' });
-  return { contractsAudited: 5, criticalIssues: 0, eip170Compliant: true };
+  return { staticAuditCommand: 'PASS', independentAudit: false };
 });
 
 // STAGE 14: Live Provider Reality Check
-runStage('14', 'Arbitrum Sepolia Live RPC & QuickNode Connectivity Check', () => {
+runStage('14', 'Arbitrum Sepolia Live RPC Chain ID Check', () => {
   const rpcUrl = process.env.QUICKNODE_ARBITRUM_SEPOLIA_RPC || process.env.ARBITRUM_SEPOLIA_RPC || 'https://sepolia-rollup.arbitrum.io/rpc';
-  const isPrivateQuickNode = Boolean(process.env.QUICKNODE_ARBITRUM_SEPOLIA_RPC);
-  return { rpcUrl: rpcUrl.replace(/\/([^\/]{4,})$/, '/****'), isPrivateQuickNode, fallbackActive: !isPrivateQuickNode };
+  // Verify the actual JSON-RPC response, not merely the presence of a configured URL.
+  // The URL may contain credentials: pass it via environment, never print it.
+  const check = `
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 7000);
+    fetch(process.env.QARBI_RPC_VERIFY_URL, {
+      method: 'POST',
+      headers: {'content-type':'application/json'},
+      body: JSON.stringify({jsonrpc:'2.0',id:1,method:'eth_chainId',params:[]}),
+      signal: controller.signal
+    }).then(async response => {
+      if (!response.ok) throw Error('HTTP ' + response.status);
+      const payload = await response.json();
+      if (payload.error || payload.result !== '0x66eee') throw Error('Unexpected chain ID or RPC error');
+      process.stdout.write(payload.result);
+    }).catch(error => {
+      console.error('RPC verification failed:', error.message);
+      process.exitCode = 1;
+    }).finally(() => clearTimeout(timer));
+  `;
+  let chainId;
+  try {
+    chainId = requireRpcCheck(check, rpcUrl);
+  } catch {
+    throw new Error('BLOCKED: Arbitrum Sepolia RPC response not verified');
+  }
+  if (chainId !== '0x66eee') throw new Error('BLOCKED: incorrect Arbitrum Sepolia chain ID');
+  return { verifiedChainId: 421614, rpcResponded: true, deploymentVerified: false };
 });
+
+function requireRpcCheck(check, rpcUrl) {
+  return execFileSync(process.execPath, ['-e', check], {
+    cwd: rootDir,
+    env: { ...process.env, QARBI_RPC_VERIFY_URL: rpcUrl },
+    encoding: 'utf8',
+    timeout: 10000,
+    stdio: ['ignore', 'pipe', 'pipe']
+  }).trim();
+}
 
 const totalDuration = Date.now() - startTime;
 const passedCount = stages.filter(s => s.status === 'PASS').length;
 
-// Scorecard from Chapter 22 (100/100 Complete Target)
+// Conservative readiness score; never infer 100/100 from local checks.
+// Engineering checks are not production or market certification.
+// Release-dependent points remain zero until independent live-chain and security evidence is reviewed.
+const engineeringPassed = ['04','05','06','07','08','09','11','12','13']
+  .every(id => stages.some(stage => stage.id === id && stage.status === 'PASS'));
 const scorecard = {
-  architectureAndDesign: { max: 8, earned: 8, reason: 'Modular PQC, Conway automaton, x402 Bazaar and multi-agent coordination architecture' },
-  buildCiAndReproducibility: { max: 10, earned: 10, reason: 'Strict fail-closed npm ci enforced via PR #40; 4/4 GitHub CI workflows green' },
-  smartContractCorrectness: { max: 12, earned: 12, reason: '6-tier invariant tests pass; static security audit passes with 0 critical issues' },
-  securityAndAccessControl: { max: 12, earned: 12, reason: 'Formal security audit package created; truth guards, velocity caps, rate limiting pass' },
-  pqcCryptographicAssurance: { max: 10, earned: 10, reason: 'NIST FIPS 204/203 official vectors pass; 27/27 crypto assertions pass' },
-  realBlockchainVerification: { 
-    max: 12, 
-    earned: 12, 
-    reason: '5/5 smart contracts deployed and verified on Arbitrum Sepolia with live runtime bytecode'
+  reproducibleEngineering: {
+    max: 20, earned: engineeringPassed ? 20 : 0,
+    reason: engineeringPassed ? 'Required local engineering stages passed in this run' : 'One or more required engineering stages failed'
   },
-  quicknodeAndEventIntegrity: { max: 8, earned: 8, reason: 'QuickNode stream filter, webhook HMAC-SHA256, and x402 payment suites pass 100%' },
-  ravenAndReaRsiValidation: { max: 8, earned: 8, reason: 'Bounded 6-step RSI loop verified with score 99.3/100' },
-  frontendAndWalletE2E: { max: 8, earned: 8, reason: 'React 19 builds cleanly; multi-wallet & QuickNode modal active' },
-  reliabilityAndObservability: { max: 6, earned: 6, reason: 'Prometheus /metrics exporter active; rate limiting & error handling pass' },
-  documentationAndGovernance: { max: 6, earned: 6, reason: 'Complete handbook, reality scorecard v3, independent audit package, and baseline docs present' }
+  independentSecurityAudit: { max: 20, earned: 0, reason: 'Independent security audit not validated by this runner' },
+  onChainContractAndE2E: { max: 20, earned: 0, reason: 'Deployment receipts and end-to-end on-chain events not verified by this runner' },
+  operationsAndGovernance: { max: 20, earned: 0, reason: 'Production operational controls and approvals not independently verified' },
+  marketAndCompliance: { max: 20, earned: 0, reason: 'Market/customer and jurisdiction-specific legal readiness not independently verified' }
 };
 
 let totalEarned = 0;
@@ -212,11 +245,12 @@ const report = {
 };
 
 const reportPath = path.join(rootDir, 'reports', 'reality', 'mission-report.json');
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8');
 
 console.log('\n══════════════════════════════════════════════════════════════════════════');
 console.log(`  MISSION STAGES PASSED      : ${passedCount} / ${stages.length}`);
-console.log(`  CHAPTER 22 SCORECARD SCORE : ${totalEarned} / ${totalMax} (${report.chapter22Scorecard.percentage}/100)`);
+console.log(`  EVIDENCE-BASED READINESS   : ${totalEarned} / ${totalMax} (${report.chapter22Scorecard.percentage}/100; NOT CERTIFIED)`);
 console.log(`  PRODUCTION CERTIFICATION   : 🔴 NOT CERTIFIED (Fail-Closed)`);
 console.log(`  MAINNET DEPLOYMENT STATUS  : 🔒 LOCKED_FAIL_CLOSED`);
 console.log(`  AUDIT REPORT PERSISTED     : reports/reality/mission-report.json`);
