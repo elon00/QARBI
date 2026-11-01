@@ -17,7 +17,7 @@ for(const domain of domains) {
     failures.push(domain);
   }
 }
-if (evidence.release_blockers?.length || evidence.mainnet_authorized !== true) {
+if (!Array.isArray(evidence.release_blockers) || evidence.release_blockers.length !== 0 || evidence.mainnet_authorized !== true) {
   failures.push('unresolved blockers or mainnet authorization absent');
 }
 const score=(10-domains.filter(d=>failures.includes(d)).length)*10;
