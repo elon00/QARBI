@@ -1,7 +1,7 @@
-/** Return only the public origin of an HTTPS RPC URL; never persist API-key paths, queries or userinfo. */
+/** Avoid persisting RPC credentials from any URL component, including the hostname. */
 export function safeRpcLabel(endpoint) {
   if (!(endpoint instanceof URL) || endpoint.protocol !== 'https:') {
     throw new Error('BLOCKED: HTTPS RPC endpoint required');
   }
-  return endpoint.origin;
+  return 'HTTPS_RPC_ENDPOINT_REDACTED';
 }
