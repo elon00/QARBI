@@ -62,7 +62,7 @@
     "test": "npm run compile:contracts && npm run test:nist && npm run test:quantum && npm run test:contracts && npm run test:x402 && npm run audit:static && npm run audit:crypto && npm run check:truth && npm run finish"
   },
   "dependencies": {
-    "@google/genai": "^2.22.0",
+    "@google/genai": "^2.29.1",
     "@noble/ciphers": "^2.4.0",
     "@noble/hashes": "^1.8.0",
     "@noble/post-quantum": "^0.7.1",
