@@ -38,6 +38,11 @@ jobs:
       - name: Run truth, environment and build verification
         run: npm test
 
+      - name: Execute bounded REA/RSI runner and verify fail-closed audit evidence
+        run: |
+          npm run gate:rsi
+          node --input-type=module -e "import fs from 'node:fs'; const a = JSON.parse(fs.readFileSync('reality/RAVEN_REA_RSI_AUDIT.json','utf8')); const checks = Object.values(a.validationResults || {}); if (a.candidateAdopted !== false || a.status !== 'REVIEW_REQUIRED_NOT_ADOPTED' || a.truthCheckPassed !== true || checks.length !== 6 || checks.some(v => v !== true)) throw new Error('Bounded REA/RSI evidence failed closed'); console.log('REA/RSI bounded runtime evidence PASS; not external Raven/REA verification or production certification');"
+
       - name: Verify conservative scorecard and REA/RSI syntax
         run: |
           node --check scripts/reality-scorecard-v3.mjs
