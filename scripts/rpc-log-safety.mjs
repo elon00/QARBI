@@ -5,3 +5,8 @@ export function safeRpcLabel(endpoint) {
   }
   return 'HTTPS_RPC_ENDPOINT_REDACTED';
 }
+
+/** Provider exceptions may embed full credential-bearing RPC URLs. Never stringify them in logs. */
+export function safeRpcFailureMessage(_error) {
+  return 'RPC verification failed (provider details redacted)';
+}
