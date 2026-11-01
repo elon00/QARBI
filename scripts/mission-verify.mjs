@@ -126,10 +126,14 @@ runStage('09', 'Deployment Truth & Secret-Exposure Safety Guards', () => {
 
 // STAGE 10: Raven RSI + REA Bounded Automation
 runStage('10', 'Raven RSI + REA Bounded Agentic Verification Engine', () => {
-  execSync('npm run gate:rsi', { cwd: rootDir, stdio: 'pipe' });
+  const invocationChallenge = crypto.randomBytes(16).toString('hex');
+  execSync('npm run gate:rsi', {
+    cwd: rootDir, stdio: 'pipe',
+    env: { ...process.env, QARBI_RSI_RUN_CHALLENGE: invocationChallenge }
+  });
   const rsiAudit = JSON.parse(fs.readFileSync(path.join(rootDir, 'reality', 'RAVEN_REA_RSI_AUDIT.json'), 'utf8'));
   const expectedCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: rootDir, encoding: 'utf8' }).trim();
-  return verifiedRsiStageDetails(rsiAudit, expectedCommit);
+  return verifiedRsiStageDetails(rsiAudit, expectedCommit, invocationChallenge);
 });
 
 // STAGE 11: Production Bundler

@@ -5,12 +5,14 @@ import { verifiedRsiStageDetails } from '../scripts/mission-rsi-stage.mjs';
 import { REQUIRED_RSI_CHECKS } from '../scripts/validate-rsi-audit.mjs';
 
 const commit = 'a'.repeat(40);
+const CHALLENGE = 'ab'.repeat(16);
 const valid = () => {
   const now = Date.now();
   const evidenceStore = {
     timestamp: new Date(now).toISOString(), gitCommit: commit, gitBranch: 'review',
     nodeVersion: 'v22.16.0', platform: 'linux', rpcConfigured: false,
-    deployedManifestState: 'UNVERIFIED_TESTNET_RECORD', invariantsAuditTimestamp: now
+    deployedManifestState: 'UNVERIFIED_TESTNET_RECORD', invariantsAuditTimestamp: now,
+    invocationChallenge: CHALLENGE
   };
   return {
     status: 'REVIEW_REQUIRED_NOT_ADOPTED', candidateAdopted: false, truthCheckPassed: true,
@@ -22,7 +24,7 @@ const valid = () => {
 };
 
 test('mission stage accepts complete bounded evidence but never claims external Raven verification', () => {
-  assert.deepEqual(verifiedRsiStageDetails(valid(), commit), { rsiScore: '70.0/100', externalRavenVerified: false });
+  assert.deepEqual(verifiedRsiStageDetails(valid(), commit, CHALLENGE), { rsiScore: '70.0/100', externalRavenVerified: false });
 });
 
 test('mission stage rejects fabricated, incomplete and failed RSI evidence', () => {
@@ -36,5 +38,15 @@ test('mission stage rejects fabricated, incomplete and failed RSI evidence', () 
     { ...valid(), evidenceHash: 'fake' },
     { ...valid(), evaluatedScore: 1 },
     tampered
-  ]) assert.throws(() => verifiedRsiStageDetails(audit, commit), /BLOCKED/);
+  ]) assert.throws(() => verifiedRsiStageDetails(audit, commit, CHALLENGE), /BLOCKED/);
+});
+
+test('mission stage rejects same-commit evidence from a different invocation', () => {
+  const replayed = valid();
+  assert.throws(() => verifiedRsiStageDetails(replayed, commit, 'cd'.repeat(16)), /BLOCKED/);
+  assert.throws(() => verifiedRsiStageDetails(replayed, commit), /BLOCKED/);
+  const missing = valid();
+  delete missing.evidenceStore.invocationChallenge;
+  missing.evidenceHash = crypto.createHash('sha256').update(JSON.stringify(missing.evidenceStore)).digest('hex');
+  assert.throws(() => verifiedRsiStageDetails(missing, commit, CHALLENGE), /BLOCKED/);
 });

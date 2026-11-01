@@ -42,6 +42,11 @@ console.log('▶ [STEP 1/6] OBSERVE: Capturing System State & Evidence Ingestion
 const gitCommit = execSync('git rev-parse HEAD', { cwd: rootDir }).toString().trim();
 const gitBranch = execSync('git rev-parse --abbrev-ref HEAD', { cwd: rootDir }).toString().trim();
 
+const invocationChallenge = process.env.QARBI_RSI_RUN_CHALLENGE;
+if (invocationChallenge !== undefined && !/^[a-f0-9]{32}$/.test(invocationChallenge)) {
+  throw new Error('BLOCKED: malformed REA/RSI mission invocation challenge');
+}
+
 const evidenceStore = {
   timestamp: new Date().toISOString(),
   gitCommit,
@@ -50,7 +55,8 @@ const evidenceStore = {
   platform: process.platform,
   rpcConfigured: Boolean(process.env.QUICKNODE_ARBITRUM_SEPOLIA_RPC || process.env.ARBITRUM_SEPOLIA_RPC),
   deployedManifestState: 'UNVERIFIED_TESTNET_RECORD',
-  invariantsAuditTimestamp: Date.now()
+  invariantsAuditTimestamp: Date.now(),
+  ...(invocationChallenge ? { invocationChallenge } : {})
 };
 
 const evidenceHash = crypto.createHash('sha256').update(JSON.stringify(evidenceStore)).digest('hex');
