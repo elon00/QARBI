@@ -26,6 +26,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { execSync, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { missionExitCode } from './mission-status.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,7 +42,7 @@ const stages = [];
 
 function runStage(id, name, fn) {
   const t0 = Date.now();
-  process.stdout.write(`▶ [STAGE ${id}/12] ${name}... `);
+  process.stdout.write(`▶ [STAGE ${id}/14] ${name}... `);
   try {
     const details = fn();
     const duration = Date.now() - t0;
@@ -229,6 +230,8 @@ const report = {
   stagesResult: {
     total: stages.length,
     passed: passedCount,
+    failed: stages.filter(s => s.status === 'FAILED').length,
+    blocked: stages.filter(s => s.status === 'BLOCKED').length,
     stages
   },
   chapter22Scorecard: {
@@ -255,3 +258,10 @@ console.log(`  PRODUCTION CERTIFICATION   : 🔴 NOT CERTIFIED (Fail-Closed)`);
 console.log(`  MAINNET DEPLOYMENT STATUS  : 🔒 LOCKED_FAIL_CLOSED`);
 console.log(`  AUDIT REPORT PERSISTED     : reports/reality/mission-report.json`);
 console.log('══════════════════════════════════════════════════════════════════════════\n');
+
+// A written report is not a successful verification when any stage failed or was blocked.
+// Preserve the evidence artifact, then return a nonzero status to CI and callers.
+process.exitCode = missionExitCode(stages);
+if (process.exitCode !== 0) {
+  console.error('MISSION VERIFICATION FAILED OR BLOCKED: see reports/reality/mission-report.json');
+}
