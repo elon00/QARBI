@@ -35,6 +35,9 @@ jobs:
       - name: Audit dependency vulnerabilities (high and critical)
         run: npm audit --audit-level=high
 
+      - name: Verify mission exit-code fail-closed regression cases
+        run: node --test test/mission-status.test.mjs
+
       - name: Run truth, environment and build verification
         run: npm test
 
