@@ -7,7 +7,10 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const auditOnly = process.argv.includes("--audit-only");
 const run = (cmd, args = []) => {
   console.log(`\n▶ ${cmd} ${args.join(" ")}`);
-  execFileSync(cmd, args, { cwd: root, stdio: "inherit", shell: process.platform === "win32" });
+  const windowsNpm = process.platform === "win32" && cmd === "npm";
+  const executable = windowsNpm ? "cmd.exe" : cmd;
+  const safeArgs = windowsNpm ? ["/d", "/c", "npm.cmd", ...args] : args;
+  execFileSync(executable, safeArgs, { cwd: root, stdio: "inherit", shell: false });
 };
 const assert = (condition, message) => {
   if (!condition) throw new Error(`FINISH GATE FAIL: ${message}`);
