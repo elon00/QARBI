@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import { validateRsiAuditEvidence, REQUIRED_RSI_CHECKS } from '../scripts/validate-rsi-audit.mjs';
+import { rsiResultDigest } from '../scripts/rsi-result-integrity.mjs';
 
 const COMMIT = 'a'.repeat(40);
 const valid = () => {
@@ -11,13 +12,16 @@ const valid = () => {
     nodeVersion: 'v22.16.0', platform: 'linux', rpcConfigured: false,
     deployedManifestState: 'UNVERIFIED_TESTNET_RECORD', invariantsAuditTimestamp: now
   };
-  return {
+  const audit = {
     status: 'REVIEW_REQUIRED_NOT_ADOPTED', candidateAdopted: false, truthCheckPassed: true,
     baselineCommit: COMMIT, evidenceStore,
     evidenceHash: crypto.createHash('sha256').update(JSON.stringify(evidenceStore)).digest('hex'),
     evaluatedScore: 0.7,
-    validationResults: Object.fromEntries(REQUIRED_RSI_CHECKS.map(key => [key, true]))
+    validationResults: Object.fromEntries(REQUIRED_RSI_CHECKS.map(key => [key, true])),
+    durationMs: 42
   };
+  audit.resultDigest = rsiResultDigest(audit);
+  return audit;
 };
 
 test('accepts complete, commit-bound local evidence without certifying production', () => {
@@ -47,6 +51,17 @@ test('rejects adoption, truth failures, invalid status and stale or forged commi
   assert.throws(() => validateRsiAuditEvidence(valid(), 'd'.repeat(40)), /BLOCKED/);
 });
 
+
+test('rejects altered result fields even when input evidence hash remains unchanged', () => {
+  const changedDuration = valid(); changedDuration.durationMs += 1;
+  const changedChecks = valid(); changedChecks.validationResults.typecheck = false;
+  const changedScore = valid(); changedScore.evaluatedScore = 0.5;
+  const missingDigest = valid(); delete missingDigest.resultDigest;
+  const invalidDuration = valid(); invalidDuration.durationMs = -1; invalidDuration.resultDigest = rsiResultDigest(invalidDuration);
+  for (const audit of [changedDuration, changedChecks, changedScore, missingDigest, invalidDuration]) {
+    assert.throws(() => validateRsiAuditEvidence(audit, COMMIT), /BLOCKED/);
+  }
+});
 
 test('rejects tampered or missing evidence preimage and inconsistent score', () => {
   const changed = valid();
