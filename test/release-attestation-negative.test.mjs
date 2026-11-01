@@ -38,3 +38,34 @@ test('reject invalid evidence URL even when status says verified', () => {
   assert.equal(result.status, 1);
   assert.match(result.stderr, /BLOCKED/);
 });
+
+ 
+// These are synthetic schema fixtures, not independent evidence or release authorization.
+const completeAttestationFixture = () => ({
+  domains: Object.fromEntries(
+    ['build','tests','security','contracts','e2e','pqc','wallet','operations','governance','market']
+      .map(name => [name, { status: 'verified', evidence_url: 'https://example.org/fixture', verified_at: '2026-11-01', verifier: 'test-fixture' }])
+  ),
+  mainnet_authorized: true
+});
+test('rejects missing release blocker inventory even with ten verified-looking domains', () => {
+  const result = runWithManifest(completeAttestationFixture());
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /BLOCKED/);
+});
+test('rejects malformed release blocker inventories instead of treating them as empty', () => {
+  for (const release_blockers of [null, {}, 0, false, '']) {
+    const result = runWithManifest({ ...completeAttestationFixture(), release_blockers });
+    assert.equal(result.status, 1, `accepted malformed blocker inventory ${JSON.stringify(release_blockers)}`);
+    assert.match(result.stderr, /BLOCKED/);
+  }
+});
+test('still rejects a nonempty blocker inventory', () => {
+  const result = runWithManifest({ ...completeAttestationFixture(), release_blockers: ['independent audit missing'] });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /BLOCKED/);
+});
+test('accepts empty blocker array for schema validation only (not release certification)', () => {
+  const result = runWithManifest({ ...completeAttestationFixture(), release_blockers: [] });
+  assert.equal(result.status, 0);
+});
