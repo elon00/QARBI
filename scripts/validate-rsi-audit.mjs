@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /** Fail-closed structural and commit-bound validation of the bounded local REA/RSI audit. */
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
@@ -22,9 +23,24 @@ export function validateRsiAuditEvidence(audit, expectedCommit) {
   if (!/^[a-f0-9]{64}$/.test(audit.evidenceHash || '')) {
     throw new Error('BLOCKED: missing or malformed REA/RSI evidence hash');
   }
+  const store = audit.evidenceStore;
+  if (!store || typeof store !== 'object' || Array.isArray(store) ||
+      store.gitCommit !== expectedCommit || store.deployedManifestState !== 'UNVERIFIED_TESTNET_RECORD' ||
+      typeof store.timestamp !== 'string' || !Number.isFinite(Date.parse(store.timestamp)) ||
+      typeof store.gitBranch !== 'string' || !store.gitBranch ||
+      typeof store.nodeVersion !== 'string' || !store.nodeVersion ||
+      typeof store.platform !== 'string' || !store.platform ||
+      typeof store.rpcConfigured !== 'boolean' ||
+      !Number.isSafeInteger(store.invariantsAuditTimestamp) || store.invariantsAuditTimestamp <= 0) {
+    throw new Error('BLOCKED: missing, malformed or stale REA/RSI evidence store');
+  }
+  const computedHash = crypto.createHash('sha256').update(JSON.stringify(store)).digest('hex');
+  if (audit.evidenceHash !== computedHash) {
+    throw new Error('BLOCKED: REA/RSI evidence hash does not match recorded evidence');
+  }
   if (typeof audit.evaluatedScore !== 'number' || !Number.isFinite(audit.evaluatedScore) ||
-      audit.evaluatedScore < 0 || audit.evaluatedScore > 0.7 + 1e-10) {
-    throw new Error('BLOCKED: invalid bounded evidence-only score');
+      Math.abs(audit.evaluatedScore - 0.7) > 1e-10) {
+    throw new Error('BLOCKED: RSI score inconsistent with required passing checks');
   }
   const checks = audit.validationResults;
   if (!checks || typeof checks !== 'object' || Array.isArray(checks) ||
