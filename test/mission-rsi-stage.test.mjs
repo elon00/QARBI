@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import { verifiedRsiStageDetails } from '../scripts/mission-rsi-stage.mjs';
 import { REQUIRED_RSI_CHECKS } from '../scripts/validate-rsi-audit.mjs';
+import { rsiResultDigest } from '../scripts/rsi-result-integrity.mjs';
 
 const commit = 'a'.repeat(40);
 const CHALLENGE = 'ab'.repeat(16);
@@ -14,13 +15,16 @@ const valid = () => {
     deployedManifestState: 'UNVERIFIED_TESTNET_RECORD', invariantsAuditTimestamp: now,
     invocationChallenge: CHALLENGE
   };
-  return {
+  const audit = {
     status: 'REVIEW_REQUIRED_NOT_ADOPTED', candidateAdopted: false, truthCheckPassed: true,
     baselineCommit: commit, evidenceStore,
     evidenceHash: crypto.createHash('sha256').update(JSON.stringify(evidenceStore)).digest('hex'),
     evaluatedScore: 0.7,
-    validationResults: Object.fromEntries(REQUIRED_RSI_CHECKS.map(key => [key, true]))
+    validationResults: Object.fromEntries(REQUIRED_RSI_CHECKS.map(key => [key, true])),
+    durationMs: 42
   };
+  audit.resultDigest = rsiResultDigest(audit);
+  return audit;
 };
 
 test('mission stage accepts complete bounded evidence but never claims external Raven verification', () => {
