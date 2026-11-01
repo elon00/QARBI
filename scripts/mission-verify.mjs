@@ -27,6 +27,7 @@ import crypto from 'node:crypto';
 import { execSync, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { missionExitCode } from './mission-status.mjs';
+import { verifiedRsiStageDetails } from './mission-rsi-stage.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -127,7 +128,8 @@ runStage('09', 'Deployment Truth & Secret-Exposure Safety Guards', () => {
 runStage('10', 'Raven RSI + REA Bounded Agentic Verification Engine', () => {
   execSync('npm run gate:rsi', { cwd: rootDir, stdio: 'pipe' });
   const rsiAudit = JSON.parse(fs.readFileSync(path.join(rootDir, 'reality', 'RAVEN_REA_RSI_AUDIT.json'), 'utf8'));
-  return { rsiScore: (rsiAudit.evaluatedScore * 100).toFixed(1) + '/100' };
+  const expectedCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: rootDir, encoding: 'utf8' }).trim();
+  return verifiedRsiStageDetails(rsiAudit, expectedCommit);
 });
 
 // STAGE 11: Production Bundler
