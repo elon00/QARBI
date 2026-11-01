@@ -27,7 +27,7 @@ const rootDir = path.resolve(__dirname, '..');
 
 console.log('\n╔══════════════════════════════════════════════════════════════════════════╗');
 console.log('║   QARBI PROTOCOL — BOUNDED RAVEN RSI + REA AGENTIC VERIFICATION ENGINE   ║');
-console.log('║   "Autonomous improvement within mathematically proven security bounds" ║');
+console.log('║   "Bounded evidence collection; independent security review required" ║');
 function assert(condition, message) {
   if (!condition) throw new Error(`RSI INVARIANT VIOLATION: ${message}`);
 }
@@ -66,7 +66,7 @@ let truthCheckPassed = false;
 try {
   execSync('node scripts/check-truth.mjs', { cwd: rootDir, stdio: 'pipe' });
   truthCheckPassed = true;
-  console.log('  ✓ Deployment truth guards: Zero fabricated wallets or claims detected');
+  console.log('  ✓ Deployment truth guard script passed (scope-limited)');
 } catch (err) {
   console.error('  ❌ Truth check inspection failed');
 }
@@ -79,12 +79,12 @@ const hasRandomWallet = /Wallet\.createRandom\(/.test(deployScript);
 if (hasKeyLogging || hasRandomWallet) {
   throw new Error('CRITICAL INSPECTION BREACH: Deployer key logging or fake wallet generator found');
 }
-console.log('  ✓ Private key hygiene: No signing keys logged or generated in deployer');
+console.log('  ✓ Limited deployer source-pattern scan passed (not a secrets audit)');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STEP 3: PLAN (Bounded Candidate Proposal)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\n▶ [STEP 3/6] PLAN: Generating Bounded Candidate Proposal...');
+console.log('\n▶ [STEP 3/6] PLAN: Recording Bounded Candidate Metadata (No Patch)...');
 
 // Raven Agent Boundary Rules:
 // - Scope MUST be bounded (test improvements, docs, non-security-critical logic)
@@ -104,7 +104,7 @@ const candidatePatch = {
   requiresHumanReview: true
 };
 
-console.log(`  ✓ Proposed Candidate ${candidatePatch.id}:`);
+console.log(`  ✓ Candidate metadata ${candidatePatch.id} (no code generated):`);
 console.log(`    • Scope: ${candidatePatch.boundedAutonomyScope}`);
 console.log(`    • Modifies Signers: ${candidatePatch.modifiesSigners} (STRICTLY PROHIBITED)`);
 console.log(`    • Touches Mainnet : ${candidatePatch.touchesMainnet} (STRICTLY PROHIBITED)`);
