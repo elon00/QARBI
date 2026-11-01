@@ -33,7 +33,7 @@ const rootDir = path.resolve(__dirname, '..');
 
 const startTime = Date.now();
 console.log('\n╔══════════════════════════════════════════════════════════════════════════╗');
-console.log('║       QARBI PROTOCOL — THE 100/100 MASTER MISSION VERIFICATION RUNNER     ║');
+console.log('║       QARBI PROTOCOL — EVIDENCE-FIRST MASTER MISSION VERIFICATION RUNNER     ║');
 console.log('║   "Production Ready != CI Green • Reality Before Claims • Mainnet Locked" ║');
 console.log('╚══════════════════════════════════════════════════════════════════════════╝\n');
 
@@ -197,7 +197,7 @@ function requireRpcCheck(check, rpcUrl) {
 const totalDuration = Date.now() - startTime;
 const passedCount = stages.filter(s => s.status === 'PASS').length;
 
-// Scorecard from Chapter 22 (100/100 Complete Target)
+// Conservative readiness score; never infer 100/100 from local checks.
 // Engineering checks are not production or market certification.
 // Release-dependent points remain zero until independent live-chain and security evidence is reviewed.
 const engineeringPassed = ['04','05','06','07','08','09','11','12','13']
