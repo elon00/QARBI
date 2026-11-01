@@ -1,41 +1,47 @@
 # QARBI one-paste engineering gate. Windows PowerShell 5.1+
 # Safe by design: no deployment, no spending, no GitHub push/merge or signer access.
+# Uses a new isolated clone each run; npm warnings do not mask the real process exit code.
 $ErrorActionPreference='Stop'
 $root=Join-Path $env:USERPROFILE 'QARBI-Readiness'
-$src=Join-Path $root 'source'
-$out=Join-Path $root ('master-'+(Get-Date -Format 'yyyyMMdd-HHmmss'))
+$out=Join-Path $root ('master-'+(Get-Date -Format 'yyyyMMdd-HHmmss')+'-'+[guid]::NewGuid().ToString('N').Substring(0,8))
+$src=Join-Path $out 'source'
 New-Item -ItemType Directory -Force -Path $out | Out-Null
 function Require($x,$link) { if(-not (Get-Command $x -ErrorAction SilentlyContinue)){throw "Missing $x. Install: $link"} }
 Require git 'https://git-scm.com/downloads/win'
 Require node 'https://nodejs.org/'
 Require npm 'https://nodejs.org/'
-if(Test-Path $src) {
-  $origin=(& git -C $src remote get-url origin 2>$null)
-  if($LASTEXITCODE -ne 0 -or "$origin" -notmatch '^https://github.com/elon00/QARBI(\.git)?$'){throw 'Existing source is not elon00/QARBI'}
-  if((& git -C $src status --porcelain)){throw 'Source folder has local edits; preserving them. Move folder and retry.'}
-  & git -C $src fetch origin main
-  if($LASTEXITCODE -ne 0){throw 'Git fetch failed'}
-  & git -C $src checkout -B qarbi-audit-snapshot FETCH_HEAD
-  if($LASTEXITCODE -ne 0){throw 'Checkout failed'}
-} else {
-  & git clone --branch main https://github.com/elon00/QARBI.git $src
-  if($LASTEXITCODE -ne 0){throw 'Clone failed'}
-}
+# Always use an isolated checkout. Existing source directories may be locked or dirty.
+# Never move, reset, delete, or overwrite the user's working files.
+& git clone --depth 1 --branch main https://github.com/elon00/QARBI.git $src
+if($LASTEXITCODE -ne 0){throw 'Git clone failed; see network and Git configuration'}
+
 $sha=(& git -C $src rev-parse HEAD).Trim()
 $pkg=Get-Content -Raw (Join-Path $src 'package.json')|ConvertFrom-Json
 $scripts=@($pkg.scripts.PSObject.Properties.Name)
 $checks=New-Object System.Collections.ArrayList
 function Check($label,$command,$enabled=$true){
-  $log=Join-Path $out (($label -replace '[^a-zA-Z0-9-]','_')+'.log')
-  if(-not $enabled){[void]$checks.Add([pscustomobject]@{name=$label;status='NOT_RUN';log='';reason='Command unavailable'});return}
+  $log=Join-Path $out (($label -replace '[^a-zA-Z0-9-]','_')+'.stdout.log')
+  $err=Join-Path $out (($label -replace '[^a-zA-Z0-9-]','_')+'.stderr.log')
+  if(-not $enabled){[void]$checks.Add([pscustomobject]@{name=$label;status='NOT_RUN';log='';reason='Command unavailable or dependency install failed'});return}
   Write-Host "Running $label" -ForegroundColor Cyan
-  Push-Location $src
-  try { & cmd.exe /d /c $command *> $log; $exit=$LASTEXITCODE }
-  catch { $exit=1; $_ | Out-File -Append -FilePath $log }
-  finally { Pop-Location }
-  $status=if($exit -eq 0){'PASS'}else{'FAIL'}
-  Write-Host "$label : $status"
-  [void]$checks.Add([pscustomobject]@{name=$label;status=$status;log=$log;exit_code=$exit})
+  try {
+    # Redirect native stderr separately: npm warnings must not become PowerShell exceptions.
+    $p=Start-Process -FilePath 'cmd.exe' -ArgumentList @('/d','/c',$command) -WorkingDirectory $src -RedirectStandardOutput $log -RedirectStandardError $err -NoNewWindow -PassThru
+    if(-not $p.WaitForExit(1200000)){
+      try{$p.Kill()}catch{}
+      [void]$checks.Add([pscustomobject]@{name=$label;status='BLOCKED';log=$log;stderr=$err;reason='20-minute timeout'})
+      Write-Host "$label : BLOCKED (timeout)" -ForegroundColor Yellow
+      return
+    }
+    $p.Refresh()
+    $exit=$p.ExitCode
+    $status=if($exit -eq 0){'PASS'}else{'FAIL'}
+    [void]$checks.Add([pscustomobject]@{name=$label;status=$status;log=$log;stderr=$err;exit_code=$exit})
+    Write-Host "$label : $status (exit $exit)"
+  }catch{
+    [void]$checks.Add([pscustomobject]@{name=$label;status='BLOCKED';log=$log;stderr=$err;reason=$_.Exception.Message})
+    Write-Host "$label : BLOCKED - $($_.Exception.Message)" -ForegroundColor Red
+  }
 }
 Check 'npm-ci' 'npm ci'
 $depOK=$checks[0].status -eq 'PASS'
