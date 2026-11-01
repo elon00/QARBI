@@ -54,6 +54,7 @@ jobs:
         run: |
           npm run gate:rsi
           node --test test/rsi-audit-evidence.test.mjs
+          node --test test/rsi-audit-freshness.test.mjs
           node scripts/validate-rsi-audit.mjs
 
       - name: Verify conservative scorecard and REA/RSI syntax
