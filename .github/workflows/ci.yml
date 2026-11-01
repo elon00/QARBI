@@ -38,6 +38,9 @@ jobs:
       - name: Verify mission exit-code fail-closed regression cases
         run: node --test test/mission-status.test.mjs
 
+      - name: Reject incomplete or ambiguous testnet contract manifests
+        run: node --test test/contract-manifest-guard.test.mjs
+
       - name: Run truth, environment and build verification
         run: npm test
 
