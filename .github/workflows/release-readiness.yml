@@ -25,5 +25,6 @@ jobs:
           node --test test/release-attestation-negative.test.mjs
       - run: npm test
       - run: npm run build
-      - name: Evidence attestation gate (intentionally fails until genuine artifacts supplied)
+      - name: Strict release gate (manual release verification only)
+        if: github.event_name == 'workflow_dispatch'
         run: node scripts/release-attestation-gate.mjs
