@@ -120,50 +120,60 @@ const validationResults = {};
 try {
   execSync('npm run typecheck', { cwd: rootDir, stdio: 'pipe' });
   validationResults.typecheck = true;
-  console.log('  ✓ [1/5] Typecheck (tsc --noEmit): PASS');
+  console.log('  ✓ [1/6] Typecheck (tsc --noEmit): PASS');
 } catch {
   validationResults.typecheck = false;
-  console.log('  ❌ [1/5] Typecheck: FAIL');
+  console.log('  ❌ [1/6] Typecheck: FAIL');
 }
 
 // 2. Contracts compilation
 try {
   execSync('npm run compile:contracts', { cwd: rootDir, stdio: 'pipe' });
   validationResults.compileContracts = true;
-  console.log('  ✓ [2/5] Compile Contracts (solc 0.8.24 viaIR): PASS');
+  console.log('  ✓ [2/6] Compile Contracts (solc 0.8.24 viaIR): PASS');
 } catch {
   validationResults.compileContracts = false;
-  console.log('  ❌ [2/5] Compile Contracts: FAIL');
+  console.log('  ❌ [2/6] Compile Contracts: FAIL');
 }
 
 // 3. Official NIST vectors
 try {
   execSync('npm run test:nist', { cwd: rootDir, stdio: 'pipe' });
   validationResults.nistVectors = true;
-  console.log('  ✓ [3/5] NIST FIPS 204/203 & RFC Vectors: PASS');
+  console.log('  ✓ [3/6] NIST FIPS 204/203 & RFC Vectors: PASS');
 } catch {
   validationResults.nistVectors = false;
-  console.log('  ❌ [3/5] NIST Vectors: FAIL');
+  console.log('  ❌ [3/6] NIST Vectors: FAIL');
 }
 
 // 4. Quantum portfolio & secure channel
 try {
   execSync('npm run test:quantum', { cwd: rootDir, stdio: 'pipe' });
   validationResults.quantumSuite = true;
-  console.log('  ✓ [4/5] Quantum SQA/bSB & PQC Channel: PASS');
+  console.log('  ✓ [4/6] Quantum SQA/bSB & PQC Channel: PASS');
 } catch {
   validationResults.quantumSuite = false;
-  console.log('  ❌ [4/5] Quantum Suite: FAIL');
+  console.log('  ❌ [4/6] Quantum Suite: FAIL');
 }
 
 // 5. Smart contracts security invariants
 try {
   execSync('npx tsx test/smart-contracts-security.test.ts', { cwd: rootDir, stdio: 'pipe' });
   validationResults.contractSecurity = true;
-  console.log('  ✓ [5/5] Smart Contract Invariants (6 Tiers): PASS');
+  console.log('  ✓ [5/6] Smart Contract Invariants (6 Tiers): PASS');
 } catch {
   validationResults.contractSecurity = false;
-  console.log('  ❌ [5/5] Smart Contract Invariants: FAIL');
+  console.log('  ❌ [5/6] Smart Contract Invariants: FAIL');
+}
+
+// 6. Supply-chain dependency audit: fail closed on high/critical advisories
+try {
+  execSync('npm audit --audit-level=high', { cwd: rootDir, stdio: 'pipe' });
+  validationResults.dependencyAudit = true;
+  console.log('  ✓ [6/6] Dependency security audit: PASS');
+} catch {
+  validationResults.dependencyAudit = false;
+  console.log('  ❌ [6/6] Dependency security audit: FAIL or unavailable');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -172,7 +182,7 @@ try {
 console.log('\n▶ [STEP 5/6] ADOPT OR REJECT: Evaluating Acceptance Equation...');
 
 // Score(c) = 0.25*T + 0.25*V + 0.20*R + 0.15*P + 0.15*O
-const T = (validationResults.typecheck && validationResults.nistVectors && validationResults.quantumSuite && validationResults.contractSecurity) ? 1.0 : 0.0;
+const T = (validationResults.typecheck && validationResults.nistVectors && validationResults.quantumSuite && validationResults.contractSecurity && validationResults.dependencyAudit) ? 1.0 : 0.0;
 const V = (truthCheckPassed && !candidatePatch.modifiesSigners && !candidatePatch.touchesMainnet) ? 1.0 : 0.0;
 const R = validationResults.compileContracts ? 1.0 : 0.0;
 const P = 0.0; // No performance/memory benchmark evidence collected in this run
