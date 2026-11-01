@@ -5,6 +5,7 @@ on:
     paths:
       - 'release-evidence/**'
       - 'scripts/release-attestation-gate.mjs'
+      - 'scripts/QARBI_MASTER_ALL_IN_ONE.ps1'
       - '.github/workflows/release-readiness.yml'
 permissions:
   contents: read
@@ -28,3 +29,22 @@ jobs:
       - name: Strict release gate (manual release verification only)
         if: github.event_name == 'workflow_dispatch'
         run: node scripts/release-attestation-gate.mjs
+
+  windows-powershell-syntax:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Windows PowerShell 5.1 master runner syntax
+        shell: powershell
+        run: |
+          $tokens = $null
+          $errors = $null
+          $path = (Resolve-Path 'scripts/QARBI_MASTER_ALL_IN_ONE.ps1').Path
+          [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
+          Write-Host 'Windows PowerShell parser: PASS (syntax only; not an execution or production certificate)'
