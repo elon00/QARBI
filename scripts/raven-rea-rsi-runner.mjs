@@ -204,6 +204,7 @@ console.log('\n▶ [STEP 6/6] MONITOR & RECOVER: Baseline Snapshot & Audit Trail
 
 const recoveryBaseline = {
   baselineCommit: gitCommit,
+  evidenceStore,
   evidenceHash,
   evaluatedScore: rsiScore,
   validationResults,
