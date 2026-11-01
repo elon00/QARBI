@@ -41,6 +41,9 @@ jobs:
       - name: Reject incomplete or ambiguous testnet contract manifests
         run: node --test test/contract-manifest-guard.test.mjs
 
+      - name: Verify RPC logging redacts credential-bearing URL components
+        run: node --test test/rpc-log-safety.test.mjs
+
       - name: Run truth, environment and build verification
         run: npm test
 
