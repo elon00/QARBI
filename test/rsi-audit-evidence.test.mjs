@@ -5,10 +5,11 @@ import { validateRsiAuditEvidence, REQUIRED_RSI_CHECKS } from '../scripts/valida
 
 const COMMIT = 'a'.repeat(40);
 const valid = () => {
+  const now = Date.now();
   const evidenceStore = {
-    timestamp: '2026-11-01T00:00:00.000Z', gitCommit: COMMIT, gitBranch: 'review',
+    timestamp: new Date(now).toISOString(), gitCommit: COMMIT, gitBranch: 'review',
     nodeVersion: 'v22.16.0', platform: 'linux', rpcConfigured: false,
-    deployedManifestState: 'UNVERIFIED_TESTNET_RECORD', invariantsAuditTimestamp: 1793491200000
+    deployedManifestState: 'UNVERIFIED_TESTNET_RECORD', invariantsAuditTimestamp: now
   };
   return {
     status: 'REVIEW_REQUIRED_NOT_ADOPTED', candidateAdopted: false, truthCheckPassed: true,
