@@ -18,6 +18,11 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - name: Verify runner syntax and negative release tests
+        run: |
+          node --check scripts/mission-verify.mjs
+          node --check scripts/raven-rea-rsi-runner.mjs
+          node --test test/release-attestation-negative.test.mjs
       - run: npm test
       - run: npm run build
       - name: Evidence attestation gate (intentionally fails until genuine artifacts supplied)
