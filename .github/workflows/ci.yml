@@ -44,6 +44,9 @@ jobs:
       - name: Verify RPC logging redacts credential-bearing URL components
         run: node --test test/rpc-log-safety.test.mjs
 
+      - name: Verify RSI result digest integrity
+        run: node --test test/rsi-result-integrity.test.mjs
+
       - name: Reject fabricated, replayed or stale REA/RSI mission stage evidence
         run: |
           node --test test/mission-rsi-stage.test.mjs
