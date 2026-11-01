@@ -11,6 +11,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ethers } from 'ethers';
+import { validateContractManifest } from './contract-manifest-guard.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,8 +39,10 @@ if (endpoint.protocol !== 'https:') {
 const manifestPath = path.join(rootDir, 'src', 'contracts', 'deployedAddresses.json');
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
 
-if (manifest.chainId !== 421614 || !manifest.contracts) {
-  console.error('❌ BLOCKED: Invalid manifest or network is not Arbitrum Sepolia (421614)');
+try {
+  validateContractManifest(manifest);
+} catch (error) {
+  console.error('❌ ' + error.message);
   process.exit(2);
 }
 
