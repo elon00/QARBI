@@ -175,17 +175,17 @@ console.log('\n▶ [STEP 5/6] ADOPT OR REJECT: Evaluating Acceptance Equation...
 const T = (validationResults.typecheck && validationResults.nistVectors && validationResults.quantumSuite && validationResults.contractSecurity) ? 1.0 : 0.0;
 const V = (truthCheckPassed && !candidatePatch.modifiesSigners && !candidatePatch.touchesMainnet) ? 1.0 : 0.0;
 const R = validationResults.compileContracts ? 1.0 : 0.0;
-const P = 0.95; // Deterministic execution without memory leak
-const O = 1.0;  // Structured evidence logging
+const P = 0.0; // No performance/memory benchmark evidence collected in this run
+const O = 0.0;  // Audit artifact has not yet been persisted or independently inspected
 
 const rsiScore = 0.25 * T + 0.25 * V + 0.20 * R + 0.15 * P + 0.15 * O;
 console.log(`  • Formula: Score(c) = 0.25*${T} + 0.25*${V} + 0.20*${R} + 0.15*${P} + 0.15*${O}`);
 console.log(`  • Calculated RSI Score: ${(rsiScore * 100).toFixed(1)} / 100`);
 
-const isAdopted = rsiScore >= 0.85 && T === 1.0 && V === 1.0;
-assert(isAdopted, 'Candidate patch did not achieve acceptance threshold');
-console.log(`  ✅ CANDIDATE ADOPTED INTO REVIEW QUEUE (Score: ${(rsiScore * 100).toFixed(1)} >= 85.0)`);
-console.log('  🔒 BOUNDED AUTONOMY ENFORCED: Patch staged for review. Zero autonomous mainnet deploy.');
+const isAdopted = false; // No candidate patch was generated, tested, or committed
+console.log('  REVIEW REQUIRED: No candidate code patch was generated; automatic adoption prohibited.');
+console.log(`  Evidence-only score: ${(rsiScore * 100).toFixed(1)} / 100 (not certification)`);
+console.log('  BOUNDED AUTONOMY: No patch staged. Zero autonomous mainnet deployment.');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STEP 6: MONITOR & RECOVER (Rollback Baseline)
@@ -198,7 +198,9 @@ const recoveryBaseline = {
   evaluatedScore: rsiScore,
   validationResults,
   durationMs: Date.now() - startTime,
-  status: 'BOUNDED_RSI_VERIFIED'
+  status: 'REVIEW_REQUIRED_NOT_ADOPTED',
+  candidateAdopted: false,
+  truthCheckPassed
 };
 
 const artifactDir = path.join(rootDir, 'reality');
@@ -209,5 +211,10 @@ console.log(`  ✓ Rollback Baseline preserved in reality/RAVEN_REA_RSI_AUDIT.js
 console.log(`  ✓ Execution completed in ${recoveryBaseline.durationMs} ms`);
 
 console.log('\n══════════════════════════════════════════════════════════════════════════');
-console.log('🏆 RAVEN RSI + REA BOUNDED EXPERIMENT COMPLETED SUCCESSFULLY');
+console.log('RAVEN RSI + REA EVIDENCE COLLECTION FINISHED — NOT CERTIFIED');
 console.log('══════════════════════════════════════════════════════════════════════════\n');
+
+if (!truthCheckPassed || Object.values(validationResults).some(value => value !== true)) {
+  console.error('REA/RSI verification failed: one or more checks did not pass.');
+  process.exitCode = 1;
+}
