@@ -4,7 +4,7 @@
  * 
  * Invocation: npm run mission:verify
  * 
- * Executes all 12 zero-mock verification stages:
+ * Executes bounded verification stages; external evidence is not implied:
  *  1. Repository Hygiene & Git Integrity
  *  2. Runtime Environment & Toolchain
  *  3. Dependency & Supply-Chain Integrity
@@ -74,7 +74,7 @@ runStage('02', 'Runtime Environment & Toolchain Integrity', () => {
 });
 
 // STAGE 3: Dependency Inventory
-runStage('03', 'Dependency & Vulnerability Audit', () => {
+runStage('03', 'Dependency Lockfile Presence and Hash', () => {
   const pkgLock = path.join(rootDir, 'package-lock.json');
   if (!fs.existsSync(pkgLock)) throw new Error('Missing package-lock.json');
   const lockHash = crypto.createHash('sha256').update(fs.readFileSync(pkgLock)).digest('hex');
@@ -148,11 +148,11 @@ runStage('12', 'x402 Autonomous Commerce & QuickNode Streams Verification', () =
 // STAGE 13: Static Security & AST Vulnerability Audit
 runStage('13', 'Automated Static Security & AST Vulnerability Audit', () => {
   execSync('npm run audit:static', { cwd: rootDir, stdio: 'pipe' });
-  return { contractsAudited: 5, criticalIssues: 0, eip170Compliant: true };
+  return { staticAuditCommand: 'PASS', independentAudit: false };
 });
 
 // STAGE 14: Live Provider Reality Check
-runStage('14', 'Arbitrum Sepolia Live RPC & QuickNode Connectivity Check', () => {
+runStage('14', 'Arbitrum Sepolia Live RPC Chain ID Check', () => {
   const rpcUrl = process.env.QUICKNODE_ARBITRUM_SEPOLIA_RPC || process.env.ARBITRUM_SEPOLIA_RPC || 'https://sepolia-rollup.arbitrum.io/rpc';
   // Verify the actual JSON-RPC response, not merely the presence of a configured URL.
   // The URL may contain credentials: pass it via environment, never print it.
@@ -245,6 +245,7 @@ const report = {
 };
 
 const reportPath = path.join(rootDir, 'reports', 'reality', 'mission-report.json');
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8');
 
 console.log('\n══════════════════════════════════════════════════════════════════════════');
