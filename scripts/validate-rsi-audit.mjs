@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { rsiResultDigest } from './rsi-result-integrity.mjs';
 
 export const REQUIRED_RSI_CHECKS = Object.freeze([
   'typecheck', 'compileContracts', 'nistVectors',
@@ -52,6 +53,11 @@ export function validateRsiAuditEvidence(audit, expectedCommit, nowMs = Date.now
   const computedHash = crypto.createHash('sha256').update(JSON.stringify(store)).digest('hex');
   if (audit.evidenceHash !== computedHash) {
     throw new Error('BLOCKED: REA/RSI evidence hash does not match recorded evidence');
+  }
+  if (!Number.isSafeInteger(audit.durationMs) || audit.durationMs < 0 ||
+      !/^[a-f0-9]{64}$/.test(audit.resultDigest || '') ||
+      audit.resultDigest !== rsiResultDigest(audit)) {
+    throw new Error('BLOCKED: REA/RSI result digest or execution duration is invalid');
   }
   if (typeof audit.evaluatedScore !== 'number' || !Number.isFinite(audit.evaluatedScore) ||
       Math.abs(audit.evaluatedScore - 0.7) > 1e-10) {
