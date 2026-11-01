@@ -12,7 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ethers } from 'ethers';
 import { validateContractManifest } from './contract-manifest-guard.mjs';
-import { safeRpcLabel } from './rpc-log-safety.mjs';
+import { safeRpcLabel, safeRpcFailureMessage } from './rpc-log-safety.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -125,7 +125,7 @@ try {
     process.exitCode = 1;
   }
 } catch (e) {
-  console.error('❌ BLOCKED: ' + e.message);
+  console.error('❌ BLOCKED: ' + safeRpcFailureMessage(e));
   process.exitCode = 1;
 } finally {
   provider.destroy();
