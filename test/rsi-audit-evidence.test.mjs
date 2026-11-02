@@ -74,3 +74,21 @@ test('rejects tampered or missing evidence preimage and inconsistent score', () 
     assert.throws(() => validateRsiAuditEvidence(audit, COMMIT), /BLOCKED/);
   }
 });
+
+test('rejects malformed optional invocation challenges even with recomputed local digests', () => {
+  // Standalone audits may omit a mission challenge; if present it must match
+  // the runner's 32-character lowercase hexadecimal invocation format.
+  assert.equal(validateRsiAuditEvidence(valid(), COMMIT), true);
+  const canonical = valid();
+  canonical.evidenceStore.invocationChallenge = 'ab'.repeat(16);
+  canonical.evidenceHash = crypto.createHash('sha256').update(JSON.stringify(canonical.evidenceStore)).digest('hex');
+  canonical.resultDigest = rsiResultDigest(canonical);
+  assert.equal(validateRsiAuditEvidence(canonical, COMMIT), true);
+  for (const malformed of ['', 'AB'.repeat(16), 'x'.repeat(32), 42, null]) {
+    const audit = valid();
+    audit.evidenceStore.invocationChallenge = malformed;
+    audit.evidenceHash = crypto.createHash('sha256').update(JSON.stringify(audit.evidenceStore)).digest('hex');
+    audit.resultDigest = rsiResultDigest(audit);
+    assert.throws(() => validateRsiAuditEvidence(audit, COMMIT), /BLOCKED/);
+  }
+});
