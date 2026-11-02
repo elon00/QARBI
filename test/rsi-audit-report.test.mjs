@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { markRsiAuditUnverified } from '../scripts/rsi-audit-report.mjs';
+import { markRsiAuditUnverified, writeRsiAuditReport } from '../scripts/rsi-audit-report.mjs';
 
 test('a new RSI invocation invalidates a previous successful audit before validation', t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'qarbi-rsi-report-'));
@@ -53,4 +53,41 @@ test('runner startup failure leaves the current report blocked rather than reusi
   const current = JSON.parse(fs.readFileSync(report, 'utf8'));
   assert.equal(current.status, 'BLOCKED_CURRENT_RUN_UNVERIFIED');
   assert.equal(Object.hasOwn(current, 'resultDigest'), false);
+});
+
+test('report output symlink cannot overwrite a verification source', t => {
+  if (process.platform === 'win32') return t.skip('symlink privileges are not guaranteed on Windows');
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'qarbi-rsi-report-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const reportDir = path.join(root, 'reality');
+  fs.mkdirSync(reportDir);
+  const source = path.join(root, 'verification-source.mjs');
+  fs.writeFileSync(source, 'export const safe = true;\n');
+  fs.symlinkSync(source, path.join(reportDir, 'RAVEN_REA_RSI_AUDIT.json'));
+  assert.throws(() => markRsiAuditUnverified(root), /BLOCKED/);
+  assert.equal(fs.readFileSync(source, 'utf8'), 'export const safe = true;\n');
+});
+
+test('report directory symlink cannot redirect evidence outside checkout', t => {
+  if (process.platform === 'win32') return t.skip('symlink privileges are not guaranteed on Windows');
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'qarbi-rsi-report-'));
+  const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'qarbi-rsi-outside-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(outside, { recursive: true, force: true }));
+  fs.symlinkSync(outside, path.join(root, 'reality'), 'dir');
+  assert.throws(() => markRsiAuditUnverified(root), /BLOCKED/);
+  assert.equal(fs.existsSync(path.join(outside, 'RAVEN_REA_RSI_AUDIT.json')), false);
+});
+
+test('final successful audit writer also rejects a symlink destination', t => {
+  if (process.platform === 'win32') return t.skip('symlink privileges are not guaranteed on Windows');
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'qarbi-rsi-report-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const reportDir = path.join(root, 'reality');
+  fs.mkdirSync(reportDir);
+  const source = path.join(root, 'verification-source.mjs');
+  fs.writeFileSync(source, 'export const safe = true;\n');
+  fs.symlinkSync(source, path.join(reportDir, 'RAVEN_REA_RSI_AUDIT.json'));
+  assert.throws(() => writeRsiAuditReport(root, { status: 'REVIEW_REQUIRED_NOT_ADOPTED' }), /BLOCKED/);
+  assert.equal(fs.readFileSync(source, 'utf8'), 'export const safe = true;\n');
 });
