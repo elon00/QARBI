@@ -94,3 +94,23 @@ test('frontend and deployment inputs cannot bypass source integrity', async t =>
     });
   }
 });
+
+test('assume-unchanged index flag cannot hide modified verification source', t => {
+  const root = fixture();
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(root, 'scripts', 'runner.mjs'), 'export const verified = false;\n');
+  git(root, 'update-index', '--assume-unchanged', 'scripts/runner.mjs');
+  assert.equal(git(root, 'status', '--porcelain=v1', '--', 'scripts').trim(), '');
+  assert.match(git(root, 'ls-files', '-v', '--', 'scripts/runner.mjs'), /^h /);
+  assert.throws(() => assertCleanVerificationSources(root), /BLOCKED/);
+});
+
+test('skip-worktree index flag cannot hide modified verification source', t => {
+  const root = fixture();
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(root, 'scripts', 'runner.mjs'), 'export const verified = false;\n');
+  git(root, 'update-index', '--skip-worktree', 'scripts/runner.mjs');
+  assert.equal(git(root, 'status', '--porcelain=v1', '--', 'scripts').trim(), '');
+  assert.match(git(root, 'ls-files', '-v', '--', 'scripts/runner.mjs'), /^S /);
+  assert.throws(() => assertCleanVerificationSources(root), /BLOCKED/);
+});
