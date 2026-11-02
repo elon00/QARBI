@@ -5,7 +5,8 @@ import { execFileSync } from 'node:child_process';
 export const VERIFICATION_SOURCE_PATHS = Object.freeze([
   'scripts', 'src', 'test', 'contracts', '.github',
   'package.json', 'package-lock.json', 'server.ts', 'vite.config.ts',
-  'tsconfig.json', '.gitignore', 'netlify.toml'
+  'tsconfig.json', '.gitignore', 'netlify.toml',
+  'index.html', 'netlify/functions', 'public', 'README.md'
 ]);
 
 /** Reject modified, staged, untracked or ignored verification inputs; do not print paths. */
