@@ -17,3 +17,19 @@ test('future dated but rehashed evidence rejected',()=>assert.throws(()=>validat
 test('inconsistent dual timestamps rejected despite valid hash',()=>assert.throws(()=>validateRsiAuditEvidence(evidence(NOW,NOW-61000),COMMIT,NOW),/BLOCKED/));
 test('future invariant timestamp rejected despite valid hash',()=>assert.throws(()=>validateRsiAuditEvidence(evidence(NOW+120000,NOW+120001),COMMIT,NOW),/BLOCKED/));
 test('invalid evaluation clock rejected',()=>assert.throws(()=>validateRsiAuditEvidence(evidence(),COMMIT,NaN),/BLOCKED/));
+
+function rehashTimestamp(audit, timestamp) {
+ audit.evidenceStore.timestamp = timestamp;
+ audit.evidenceHash = crypto.createHash('sha256').update(JSON.stringify(audit.evidenceStore)).digest('hex');
+ audit.resultDigest = rsiResultDigest(audit);
+ return audit;
+}
+test('rejects ambiguous timezone-free timestamps despite matching local hashes', () => {
+ const audit = rehashTimestamp(evidence(), '2026-11-01T18:00:00');
+ assert.throws(() => validateRsiAuditEvidence(audit, COMMIT, NOW), /BLOCKED/);
+});
+test('rejects impossible calendar dates normalized by Date.parse despite matching hashes', () => {
+ const march2 = Date.parse('2026-03-02T18:00:00.000Z');
+ const audit = rehashTimestamp(evidence(march2), '2026-02-30T18:00:00.000Z');
+ assert.throws(() => validateRsiAuditEvidence(audit, COMMIT, march2), /BLOCKED/);
+});
