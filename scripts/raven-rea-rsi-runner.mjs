@@ -23,6 +23,7 @@ import { rsiResultDigest } from './rsi-result-integrity.mjs';
 import { runRsiCommand } from './rsi-bounded-command.mjs';
 import { markRsiAuditUnverified } from './rsi-audit-report.mjs';
 import { rsiAuditOutcome } from './rsi-audit-outcome.mjs';
+import { assertCleanVerificationSources } from './git-verification-source-guard.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +31,9 @@ const rootDir = path.resolve(__dirname, '..');
 
 // Invalidate prior evidence before git, inspection or test failures can abort this run.
 markRsiAuditUnverified(rootDir);
+// A commit hash alone does not bind evidence to locally modified verification code.
+// Check source inputs after invalidating any previous success report.
+assertCleanVerificationSources(rootDir);
 
 console.log('\n╔══════════════════════════════════════════════════════════════════════════╗');
 console.log('║   QARBI PROTOCOL — BOUNDED RAVEN RSI + REA AGENTIC VERIFICATION ENGINE   ║');
