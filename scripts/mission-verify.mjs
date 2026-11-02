@@ -174,8 +174,8 @@ runStage('14', 'Arbitrum Sepolia Live RPC Chain ID Check', () => {
     }).then(async response => {
       if (!response.ok) throw Error('HTTP ' + response.status);
       const payload = await response.json();
-      if (payload.error || payload.result !== '0x66eee') throw Error('Unexpected chain ID or RPC error');
-      process.stdout.write(payload.result);
+      const { assertArbitrumSepoliaChainIdResponse } = await import('./scripts/rpc-chain-id-evidence.mjs');
+      process.stdout.write(assertArbitrumSepoliaChainIdResponse(payload));
     }).catch(error => {
       console.error('RPC verification failed:', error.message);
       process.exitCode = 1;
