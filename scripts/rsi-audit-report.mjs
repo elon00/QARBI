@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 
 function assertNotSymlink(location) {
   try {
@@ -21,13 +22,28 @@ export function writeRsiAuditReport(rootDir, record) {
   fs.mkdirSync(reportDir, { recursive: true });
   assertNotSymlink(reportDir);
   assertNotSymlink(reportPath);
-  const flags = fs.constants.O_WRONLY | fs.constants.O_CREAT | fs.constants.O_TRUNC |
+  // Never truncate an existing report inode: it may be a hardlink to source.
+  // Write a private, exclusively created file and replace the directory entry.
+  const tempPath = path.join(reportDir,
+    `.RAVEN_REA_RSI_AUDIT.${process.pid}.${crypto.randomBytes(16).toString('hex')}.tmp`);
+  const flags = fs.constants.O_WRONLY | fs.constants.O_CREAT | fs.constants.O_EXCL |
     (fs.constants.O_NOFOLLOW || 0);
-  const fd = fs.openSync(reportPath, flags, 0o600);
+  let tempCreated = false;
   try {
-    fs.writeFileSync(fd, JSON.stringify(record, null, 2), 'utf8');
+    const fd = fs.openSync(tempPath, flags, 0o600);
+    tempCreated = true;
+    try {
+      fs.writeFileSync(fd, JSON.stringify(record, null, 2), 'utf8');
+      fs.fsyncSync(fd);
+    } finally {
+      fs.closeSync(fd);
+    }
+    assertNotSymlink(reportDir);
+    assertNotSymlink(reportPath);
+    fs.renameSync(tempPath, reportPath);
+    tempCreated = false;
   } finally {
-    fs.closeSync(fd);
+    if (tempCreated) fs.rmSync(tempPath, { force: true });
   }
   return reportPath;
 }
