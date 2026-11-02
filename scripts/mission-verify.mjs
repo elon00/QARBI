@@ -24,7 +24,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execSync, execFileSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
+import { runRsiCommand as execSync } from './rsi-bounded-command.mjs';
 import { fileURLToPath } from 'node:url';
 import { missionExitCode } from './mission-status.mjs';
 import { verifiedRsiStageDetails } from './mission-rsi-stage.mjs';
