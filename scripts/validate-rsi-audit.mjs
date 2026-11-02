@@ -55,6 +55,9 @@ export function validateRsiAuditEvidence(audit, expectedCommit, nowMs = Date.now
     throw new Error('BLOCKED: REA/RSI evidence hash does not match recorded evidence');
   }
   if (!Number.isSafeInteger(audit.durationMs) || audit.durationMs < 0 ||
+      // The runner captures evidence at startup: its claimed duration cannot exceed
+      // the time since capture, except for the existing bounded clock-skew allowance.
+      audit.durationMs > nowMs - observedAtMs + MAX_RSI_CLOCK_SKEW_MS ||
       !/^[a-f0-9]{64}$/.test(audit.resultDigest || '') ||
       audit.resultDigest !== rsiResultDigest(audit)) {
     throw new Error('BLOCKED: REA/RSI result digest or execution duration is invalid');
