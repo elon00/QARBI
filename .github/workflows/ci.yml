@@ -50,6 +50,9 @@ jobs:
       - name: Verify bytecode reads use a pinned snapshot block
         run: node --test test/contract-snapshot-code.test.mjs
 
+      - name: Reject malformed Arbitrum Sepolia JSON-RPC chain ID evidence
+        run: node --test test/rpc-chain-id-evidence.test.mjs
+
       - name: Verify RSI result digest integrity
         run: node --test test/rsi-result-integrity.test.mjs
 
