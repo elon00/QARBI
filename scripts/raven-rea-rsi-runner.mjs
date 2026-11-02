@@ -18,9 +18,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { rsiResultDigest } from './rsi-result-integrity.mjs';
+import { runRsiCommand } from './rsi-bounded-command.mjs';
 import { markRsiAuditUnverified } from './rsi-audit-report.mjs';
 import { rsiAuditOutcome } from './rsi-audit-outcome.mjs';
 
@@ -45,8 +45,8 @@ const startTime = Date.now();
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('▶ [STEP 1/6] OBSERVE: Capturing System State & Evidence Ingestion...');
 
-const gitCommit = execSync('git rev-parse HEAD', { cwd: rootDir }).toString().trim();
-const gitBranch = execSync('git rev-parse --abbrev-ref HEAD', { cwd: rootDir }).toString().trim();
+const gitCommit = runRsiCommand('git rev-parse HEAD', { cwd: rootDir }).toString().trim();
+const gitBranch = runRsiCommand('git rev-parse --abbrev-ref HEAD', { cwd: rootDir }).toString().trim();
 
 const invocationChallenge = process.env.QARBI_RSI_RUN_CHALLENGE;
 if (invocationChallenge !== undefined && !/^[a-f0-9]{32}$/.test(invocationChallenge)) {
@@ -76,7 +76,7 @@ console.log('\n▶ [STEP 2/6] INSPECT: REA Sandboxed Security & Invariant Inspec
 // Check 1: Truth check enforcement
 let truthCheckPassed = false;
 try {
-  execSync('node scripts/check-truth.mjs', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('node scripts/check-truth.mjs', { cwd: rootDir, stdio: 'pipe' });
   truthCheckPassed = true;
   console.log('  ✓ Deployment truth guard script passed (scope-limited)');
 } catch (err) {
@@ -130,7 +130,7 @@ const validationResults = {};
 
 // 1. TypeScript typecheck
 try {
-  execSync('npm run typecheck', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('npm run typecheck', { cwd: rootDir, stdio: 'pipe' });
   validationResults.typecheck = true;
   console.log('  ✓ [1/6] Typecheck (tsc --noEmit): PASS');
 } catch {
@@ -140,7 +140,7 @@ try {
 
 // 2. Contracts compilation
 try {
-  execSync('npm run compile:contracts', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('npm run compile:contracts', { cwd: rootDir, stdio: 'pipe' });
   validationResults.compileContracts = true;
   console.log('  ✓ [2/6] Compile Contracts (solc 0.8.24 viaIR): PASS');
 } catch {
@@ -150,7 +150,7 @@ try {
 
 // 3. Official NIST vectors
 try {
-  execSync('npm run test:nist', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('npm run test:nist', { cwd: rootDir, stdio: 'pipe' });
   validationResults.nistVectors = true;
   console.log('  ✓ [3/6] NIST FIPS 204/203 & RFC Vectors: PASS');
 } catch {
@@ -160,7 +160,7 @@ try {
 
 // 4. Quantum portfolio & secure channel
 try {
-  execSync('npm run test:quantum', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('npm run test:quantum', { cwd: rootDir, stdio: 'pipe' });
   validationResults.quantumSuite = true;
   console.log('  ✓ [4/6] Quantum SQA/bSB & PQC Channel: PASS');
 } catch {
@@ -170,7 +170,7 @@ try {
 
 // 5. Smart contracts security invariants
 try {
-  execSync('npx tsx test/smart-contracts-security.test.ts', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('npx tsx test/smart-contracts-security.test.ts', { cwd: rootDir, stdio: 'pipe' });
   validationResults.contractSecurity = true;
   console.log('  ✓ [5/6] Smart Contract Invariants (6 Tiers): PASS');
 } catch {
@@ -180,7 +180,7 @@ try {
 
 // 6. Supply-chain dependency audit: fail closed on high/critical advisories
 try {
-  execSync('npm audit --audit-level=high', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('npm audit --audit-level=high', { cwd: rootDir, stdio: 'pipe' });
   validationResults.dependencyAudit = true;
   console.log('  ✓ [6/6] Dependency security audit: PASS');
 } catch {
