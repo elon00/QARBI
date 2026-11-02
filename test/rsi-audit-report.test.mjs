@@ -91,3 +91,42 @@ test('final successful audit writer also rejects a symlink destination', t => {
   assert.throws(() => writeRsiAuditReport(root, { status: 'REVIEW_REQUIRED_NOT_ADOPTED' }), /BLOCKED/);
   assert.equal(fs.readFileSync(source, 'utf8'), 'export const safe = true;\n');
 });
+
+
+test('initial RSI invalidation does not overwrite a hardlinked verification source', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'qarbi-rsi-hardlink-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const reportDir = path.join(root, 'reality');
+  fs.mkdirSync(reportDir);
+  const source = path.join(root, 'verification-source.mjs');
+  const original = 'export const protectedSource = true;\\n';
+  fs.writeFileSync(source, original);
+  const report = path.join(reportDir, 'RAVEN_REA_RSI_AUDIT.json');
+  try { fs.linkSync(source, report); } catch (error) {
+    if (['EPERM', 'EACCES', 'ENOTSUP'].includes(error.code)) return t.skip(`hardlinks unavailable: ${error.code}`);
+    throw error;
+  }
+  markRsiAuditUnverified(root);
+  assert.equal(fs.readFileSync(source, 'utf8'), original);
+  assert.equal(JSON.parse(fs.readFileSync(report, 'utf8')).status, 'BLOCKED_CURRENT_RUN_UNVERIFIED');
+  assert.equal(fs.readdirSync(reportDir).filter(name => name.endsWith('.tmp')).length, 0);
+});
+
+test('final RSI audit write does not overwrite a hardlinked verification source', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'qarbi-rsi-hardlink-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const reportDir = path.join(root, 'reality');
+  fs.mkdirSync(reportDir);
+  const source = path.join(root, 'verification-source.mjs');
+  const original = 'export const protectedSource = true;\\n';
+  fs.writeFileSync(source, original);
+  const report = path.join(reportDir, 'RAVEN_REA_RSI_AUDIT.json');
+  try { fs.linkSync(source, report); } catch (error) {
+    if (['EPERM', 'EACCES', 'ENOTSUP'].includes(error.code)) return t.skip(`hardlinks unavailable: ${error.code}`);
+    throw error;
+  }
+  writeRsiAuditReport(root, { status: 'REVIEW_REQUIRED_NOT_ADOPTED' });
+  assert.equal(fs.readFileSync(source, 'utf8'), original);
+  assert.equal(JSON.parse(fs.readFileSync(report, 'utf8')).status, 'REVIEW_REQUIRED_NOT_ADOPTED');
+  assert.equal(fs.readdirSync(reportDir).filter(name => name.endsWith('.tmp')).length, 0);
+});
