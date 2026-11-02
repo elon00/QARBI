@@ -12,6 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ethers } from 'ethers';
 import { validateContractManifest } from './contract-manifest-guard.mjs';
+import { getRuntimeCodeAtSnapshot } from './contract-snapshot-code.mjs';
 import { safeRpcLabel, safeRpcFailureMessage } from './rpc-log-safety.mjs';
 import { markContractVerificationUnverified } from './contract-verification-report.mjs';
 
@@ -82,7 +83,7 @@ try {
       throw new Error(`${name}: invalid Ethereum address format (${c.address})`);
     }
     const checksummed = ethers.getAddress(c.address.toLowerCase());
-    const code = await provider.getCode(checksummed);
+    const code = await getRuntimeCodeAtSnapshot(provider, checksummed, blockNumber);
     const codePresent = code !== '0x' && code.length > 2;
     const bytecodeBytes = codePresent ? (code.length - 2) / 2 : 0;
     const keccak = codePresent ? ethers.keccak256(code) : null;
