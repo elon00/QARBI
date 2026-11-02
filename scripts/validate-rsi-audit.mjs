@@ -34,7 +34,12 @@ export function validateRsiAuditEvidence(audit, expectedCommit, nowMs = Date.now
   const store = audit.evidenceStore;
   if (!store || typeof store !== 'object' || Array.isArray(store) ||
       store.gitCommit !== expectedCommit || store.deployedManifestState !== 'UNVERIFIED_TESTNET_RECORD' ||
-      typeof store.timestamp !== 'string' || !Number.isFinite(Date.parse(store.timestamp)) ||
+      typeof store.timestamp !== 'string' ||
+      // The runner emits canonical UTC ISO timestamps; Date.parse alone accepts
+      // ambiguous local times and normalizes impossible calendar dates.
+      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(store.timestamp) ||
+      !Number.isFinite(Date.parse(store.timestamp)) ||
+      new Date(store.timestamp).toISOString() !== store.timestamp ||
       typeof store.gitBranch !== 'string' || !store.gitBranch ||
       typeof store.nodeVersion !== 'string' || !store.nodeVersion ||
       typeof store.platform !== 'string' || !store.platform ||
