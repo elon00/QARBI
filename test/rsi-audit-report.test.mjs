@@ -36,7 +36,8 @@ test('runner startup failure leaves the current report blocked rather than reusi
   const scripts = path.join(root, 'scripts');
   fs.mkdirSync(scripts, { recursive: true });
   for (const name of ['raven-rea-rsi-runner.mjs', 'rsi-audit-report.mjs', 'rsi-result-integrity.mjs',
-    'rsi-audit-outcome.mjs', 'validate-rsi-audit.mjs', 'rsi-bounded-command.mjs']) {
+    'rsi-audit-outcome.mjs', 'validate-rsi-audit.mjs', 'rsi-bounded-command.mjs',
+    'git-verification-source-guard.mjs']) {
     fs.copyFileSync(path.join(import.meta.dirname, '..', 'scripts', name), path.join(scripts, name));
   }
   const report = path.join(root, 'reality', 'RAVEN_REA_RSI_AUDIT.json');
@@ -48,6 +49,7 @@ test('runner startup failure leaves the current report blocked rather than reusi
     cwd: root, encoding: 'utf8', timeout: 10000
   });
   assert.notEqual(run.status, 0);
+  assert.match(run.stderr, /BLOCKED: unable to verify source worktree integrity/);
   const current = JSON.parse(fs.readFileSync(report, 'utf8'));
   assert.equal(current.status, 'BLOCKED_CURRENT_RUN_UNVERIFIED');
   assert.equal(Object.hasOwn(current, 'resultDigest'), false);
