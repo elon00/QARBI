@@ -44,6 +44,10 @@ export function validateRsiAuditEvidence(audit, expectedCommit, nowMs = Date.now
       typeof store.nodeVersion !== 'string' || !store.nodeVersion ||
       typeof store.platform !== 'string' || !store.platform ||
       typeof store.rpcConfigured !== 'boolean' ||
+      // A standalone audit may omit the mission challenge, but a present one
+      // must have the same canonical form enforced by the runner.
+      (Object.hasOwn(store, 'invocationChallenge') &&
+        (typeof store.invocationChallenge !== 'string' || !/^[a-f0-9]{32}$/.test(store.invocationChallenge))) ||
       !Number.isSafeInteger(store.invariantsAuditTimestamp) || store.invariantsAuditTimestamp <= 0) {
     throw new Error('BLOCKED: missing, malformed or stale REA/RSI evidence store');
   }
