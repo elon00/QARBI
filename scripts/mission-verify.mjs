@@ -28,6 +28,7 @@ import { execSync, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { missionExitCode } from './mission-status.mjs';
 import { verifiedRsiStageDetails } from './mission-rsi-stage.mjs';
+import { assertCleanVerificationSources } from './git-verification-source-guard.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -62,6 +63,7 @@ function runStage(id, name, fn) {
 
 // STAGE 1: Repository Validation
 runStage('01', 'Repository Validation & Git Integrity', () => {
+  assertCleanVerificationSources(rootDir);
   const commit = execSync('git rev-parse HEAD', { cwd: rootDir }).toString().trim();
   const branch = execSync('git rev-parse --abbrev-ref HEAD', { cwd: rootDir }).toString().trim();
   return { commit, branch };
