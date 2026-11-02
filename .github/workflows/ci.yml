@@ -89,6 +89,9 @@ jobs:
       - name: Run truth, environment and build verification
         run: npm test
 
+      - name: Verify scorecard subprocess deadlines and failure propagation
+        run: node --test test/scorecard-bounded-command.test.mjs
+
       - name: Verify conservative scorecard and REA/RSI syntax
         run: |
           node --check scripts/reality-scorecard-v3.mjs
