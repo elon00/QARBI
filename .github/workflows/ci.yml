@@ -44,6 +44,9 @@ jobs:
       - name: Verify RPC logging redacts credential-bearing URL components
         run: node --test test/rpc-log-safety.test.mjs
 
+      - name: Ensure contract verification reports fail closed on a new invocation
+        run: node --test test/contract-verification-report.test.mjs
+
       - name: Verify RSI result digest integrity
         run: node --test test/rsi-result-integrity.test.mjs
 
