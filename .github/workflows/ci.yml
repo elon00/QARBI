@@ -59,6 +59,9 @@ jobs:
       - name: Ensure new RSI invocations invalidate stale success reports
         run: node --test test/rsi-audit-report.test.mjs
 
+      - name: Require failed RSI checks to produce blocked audit status and nonzero exit
+        run: node --test test/rsi-audit-outcome.test.mjs
+
       - name: Reject fabricated, replayed or stale REA/RSI mission stage evidence
         run: |
           node --test test/mission-rsi-stage.test.mjs
