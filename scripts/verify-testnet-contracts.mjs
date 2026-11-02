@@ -7,14 +7,14 @@
  * directly for real EVM runtime bytecode at each contract address.
  */
 import 'dotenv/config';
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ethers } from 'ethers';
 import { validateContractManifest } from './contract-manifest-guard.mjs';
 import { getRuntimeCodeAtSnapshot } from './contract-snapshot-code.mjs';
 import { safeRpcLabel, safeRpcFailureMessage } from './rpc-log-safety.mjs';
-import { markContractVerificationUnverified } from './contract-verification-report.mjs';
+import { markContractVerificationUnverified, writeContractVerificationReport } from './contract-verification-report.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -119,9 +119,7 @@ try {
     limitations: 'Live on-chain bytecode presence confirms deployment. Arbiscan source-code verification and external audits remain independent steps.'
   };
 
-  const reportsDir = path.join(rootDir, 'reports', 'reality');
-  mkdirSync(reportsDir, { recursive: true });
-  writeFileSync(currentReportPath, JSON.stringify(verificationArtifact, null, 2));
+  writeContractVerificationReport(rootDir, verificationArtifact);
 
   if (allPresent) {
     console.log('🎉 SUCCESS: All 5 QARBI smart contracts have verified live bytecode on Arbitrum Sepolia!');
