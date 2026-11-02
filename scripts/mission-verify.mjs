@@ -28,6 +28,7 @@ import { execFileSync } from 'node:child_process';
 import { runRsiCommand as execSync } from './rsi-bounded-command.mjs';
 import { fileURLToPath } from 'node:url';
 import { missionExitCode } from './mission-status.mjs';
+import { writeMissionReport } from './mission-report-writer.mjs';
 import { verifiedRsiStageDetails } from './mission-rsi-stage.mjs';
 import { assertCleanVerificationSources } from './git-verification-source-guard.mjs';
 
@@ -256,9 +257,7 @@ const report = {
   }
 };
 
-const reportPath = path.join(rootDir, 'reports', 'reality', 'mission-report.json');
-fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8');
+const reportPath = writeMissionReport(rootDir, report);
 
 console.log('\n══════════════════════════════════════════════════════════════════════════');
 console.log(`  MISSION STAGES PASSED      : ${passedCount} / ${stages.length}`);
