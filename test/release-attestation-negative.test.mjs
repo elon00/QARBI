@@ -69,3 +69,30 @@ test('accepts empty blocker array for schema validation only (not release certif
   const result = runWithManifest({ ...completeAttestationFixture(), release_blockers: [] });
   assert.equal(result.status, 0);
 });
+
+test('rejects an HTTPS prefix without a valid host or with embedded credentials', () => {
+  for (const evidence_url of ['https://', 'https://user:secret@example.org/fixture']) {
+    const manifest = completeAttestationFixture();
+    manifest.release_blockers = [];
+    manifest.domains.build.evidence_url = evidence_url;
+    const result = runWithManifest(manifest);
+    assert.equal(result.status, 1, `accepted unsafe evidence URL ${evidence_url}`);
+    assert.match(result.stderr, /BLOCKED/);
+  }
+});
+
+test('rejects impossible future verification timestamps', () => {
+  const manifest = completeAttestationFixture();
+  manifest.release_blockers = [];
+  manifest.domains.security.verified_at = '2099-01-01T00:00:00Z';
+  const result = runWithManifest(manifest);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /BLOCKED/);
+});
+
+test('schema-complete fixtures must not be labeled as a 100/100 attested score', () => {
+  const result = runWithManifest({ ...completeAttestationFixture(), release_blockers: [] });
+  assert.equal(result.status, 0);
+  assert.doesNotMatch(result.stdout, /attested score|100\/100/i);
+  assert.match(result.stdout, /NOT CERTIFIED/i);
+});
