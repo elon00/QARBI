@@ -13,9 +13,24 @@ const validUrl = u => {
     return url.protocol === 'https:' && Boolean(url.hostname) && !url.username && !url.password;
   } catch { return false; }
 };
-const validVerificationTime = value =>
-  typeof value === 'string' && Number.isFinite(Date.parse(value)) &&
-  Date.parse(value) <= Date.now() + 2 * 60 * 1000;
+// Date.parse normalizes impossible dates (e.g. February 30) and accepts ambiguous strings.
+// Require a real ISO calendar date, optionally with a fully specified RFC3339 time.
+const validVerificationTime = value => {
+  if (typeof value !== 'string') return false;
+  const match = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,3})?(Z|[+-]\d{2}:\d{2}))?$/.exec(value);
+  if (!match) return false;
+  const [, year, month, day, hour, minute, second, zone] = match;
+  const y = Number(year), m = Number(month), d = Number(day);
+  if (y < 100 || m < 1 || m > 12 || d < 1 ||
+      d > new Date(Date.UTC(y, m, 0)).getUTCDate()) return false;
+  if (hour !== undefined && (Number(hour) > 23 || Number(minute) > 59 || Number(second) > 59)) return false;
+  if (zone && zone !== 'Z') {
+    const [offsetHours, offsetMinutes] = zone.slice(1).split(':').map(Number);
+    if (offsetHours > 23 || offsetMinutes > 59) return false;
+  }
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) && timestamp <= Date.now() + 2 * 60 * 1000;
+};
 const entries = evidence.domains ?? {};
 const failures=[];
 for(const domain of domains) {
