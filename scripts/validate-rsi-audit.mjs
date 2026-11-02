@@ -18,9 +18,30 @@ export const MAX_RSI_EVIDENCE_AGE_MS = 30 * 60 * 1000;
 export const MAX_RSI_CLOCK_SKEW_MS = 2 * 60 * 1000;
 export const MAX_RSI_CAPTURE_DELTA_MS = 60 * 1000;
 
+// Do not accept additional unverified certification or external-runtime claims
+// in a locally generated evidence document. This is schema validation only.
+const RSI_AUDIT_FIELDS = Object.freeze([
+  'baselineCommit', 'evidenceStore', 'evidenceHash', 'evaluatedScore',
+  'validationResults', 'durationMs', 'status', 'candidateAdopted',
+  'truthCheckPassed', 'resultDigest'
+]);
+const RSI_STORE_FIELDS = Object.freeze([
+  'timestamp', 'gitCommit', 'gitBranch', 'nodeVersion', 'platform',
+  'rpcConfigured', 'deployedManifestState', 'invariantsAuditTimestamp'
+]);
+function hasOnlyExpectedFields(record, required, optional = []) {
+  const keys = Object.keys(record);
+  const allowed = new Set([...required, ...optional]);
+  return required.every(key => Object.hasOwn(record, key)) &&
+    keys.every(key => allowed.has(key));
+}
+
 export function validateRsiAuditEvidence(audit, expectedCommit, nowMs = Date.now()) {
   if (!audit || typeof audit !== 'object' || Array.isArray(audit)) {
     throw new Error('BLOCKED: missing or malformed REA/RSI audit');
+  }
+  if (!hasOnlyExpectedFields(audit, RSI_AUDIT_FIELDS)) {
+    throw new Error('BLOCKED: unexpected or missing REA/RSI audit fields');
   }
   if (audit.status !== 'REVIEW_REQUIRED_NOT_ADOPTED' || audit.candidateAdopted !== false || audit.truthCheckPassed !== true) {
     throw new Error('BLOCKED: REA/RSI safety boundary or truth check failed');
@@ -33,6 +54,7 @@ export function validateRsiAuditEvidence(audit, expectedCommit, nowMs = Date.now
   }
   const store = audit.evidenceStore;
   if (!store || typeof store !== 'object' || Array.isArray(store) ||
+      !hasOnlyExpectedFields(store, RSI_STORE_FIELDS, ['invocationChallenge']) ||
       store.gitCommit !== expectedCommit || store.deployedManifestState !== 'UNVERIFIED_TESTNET_RECORD' ||
       typeof store.timestamp !== 'string' ||
       // The runner emits canonical UTC ISO timestamps; Date.parse alone accepts
