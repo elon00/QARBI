@@ -96,3 +96,36 @@ test('schema-complete fixtures must not be labeled as a 100/100 attested score',
   assert.doesNotMatch(result.stdout, /attested score|100\/100/i);
   assert.match(result.stdout, /NOT CERTIFIED/i);
 });
+
+test('rejects impossible or ambiguous release evidence dates', () => {
+  for (const verified_at of ['2026-02-30', '2026-11-31', '0', '2026-13-01']) {
+    const manifest = completeAttestationFixture();
+    manifest.release_blockers = [];
+    manifest.domains.security.verified_at = verified_at;
+    const result = runWithManifest(manifest);
+    assert.equal(result.status, 1, `accepted invalid verification date ${verified_at}`);
+    assert.match(result.stderr, /BLOCKED/);
+  }
+});
+
+test('rejects malformed RFC3339 release evidence times and offsets', () => {
+  for (const verified_at of ['2026-11-01T25:00:00Z', '2026-11-01T12:61:00Z', '2026-11-01T12:00:00+25:00']) {
+    const manifest = completeAttestationFixture();
+    manifest.release_blockers = [];
+    manifest.domains.security.verified_at = verified_at;
+    const result = runWithManifest(manifest);
+    assert.equal(result.status, 1, `accepted invalid verification timestamp ${verified_at}`);
+    assert.match(result.stderr, /BLOCKED/);
+  }
+});
+
+test('accepts valid RFC3339 timestamps with UTC or numeric offset for schema checks only', () => {
+  for (const verified_at of ['2026-11-01T12:34:56Z', '2026-11-01T18:04:56+05:30']) {
+    const manifest = completeAttestationFixture();
+    manifest.release_blockers = [];
+    manifest.domains.security.verified_at = verified_at;
+    const result = runWithManifest(manifest);
+    assert.equal(result.status, 0, `rejected valid timestamp ${verified_at}: ${result.stderr}`);
+    assert.match(result.stdout, /NOT CERTIFIED/);
+  }
+});
