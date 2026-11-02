@@ -70,9 +70,8 @@ jobs:
           node --test test/mission-rsi-stage.test.mjs
           node --test test/rsi-run-challenge.test.mjs
 
-      - name: Run truth, environment and build verification
-        run: npm test
-
+      # Run the source-integrity-bound RSI audit before npm test/finish regenerates
+      # src/contracts/contractArtifacts.ts in the checkout.
       - name: Verify REA/RSI subprocess deadlines fail closed
         run: node --test test/rsi-bounded-command.test.mjs
 
@@ -83,6 +82,9 @@ jobs:
           node --test test/rsi-audit-freshness.test.mjs
           node --test test/rsi-duration-consistency.test.mjs
           node scripts/validate-rsi-audit.mjs
+
+      - name: Run truth, environment and build verification
+        run: npm test
 
       - name: Verify conservative scorecard and REA/RSI syntax
         run: |
