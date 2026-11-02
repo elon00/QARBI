@@ -22,6 +22,7 @@ import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { rsiResultDigest } from './rsi-result-integrity.mjs';
 import { markRsiAuditUnverified } from './rsi-audit-report.mjs';
+import { rsiAuditOutcome } from './rsi-audit-outcome.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -213,6 +214,8 @@ console.log('  BOUNDED AUTONOMY: No patch staged. Zero autonomous mainnet deploy
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\n▶ [STEP 6/6] MONITOR & RECOVER: Baseline Snapshot & Audit Trail...');
 
+const outcome = rsiAuditOutcome({ truthCheckPassed, validationResults, candidateAdopted: isAdopted });
+
 const recoveryBaseline = {
   baselineCommit: gitCommit,
   evidenceStore,
@@ -220,7 +223,7 @@ const recoveryBaseline = {
   evaluatedScore: rsiScore,
   validationResults,
   durationMs: Date.now() - startTime,
-  status: 'REVIEW_REQUIRED_NOT_ADOPTED',
+  status: outcome.status,
   candidateAdopted: false,
   truthCheckPassed
 };
@@ -240,7 +243,7 @@ console.log('\n═════════════════════�
 console.log('RAVEN RSI + REA EVIDENCE COLLECTION FINISHED — NOT CERTIFIED');
 console.log('══════════════════════════════════════════════════════════════════════════\n');
 
-if (!truthCheckPassed || Object.values(validationResults).some(value => value !== true)) {
-  console.error('REA/RSI verification failed: one or more checks did not pass.');
-  process.exitCode = 1;
+if (outcome.exitCode !== 0) {
+  console.error('REA/RSI verification BLOCKED: required checks failed or evidence is incomplete.');
 }
+process.exitCode = outcome.exitCode;
