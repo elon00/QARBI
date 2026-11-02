@@ -75,6 +75,9 @@ jobs:
       - name: Verify REA/RSI subprocess deadlines fail closed
         run: node --test test/rsi-bounded-command.test.mjs
 
+      - name: Verify mission subprocess deadlines and failure propagation
+        run: node --test test/mission-bounded-command.test.mjs
+
       - name: Execute bounded REA/RSI runner and verify fail-closed audit evidence
         run: |
           npm run gate:rsi
