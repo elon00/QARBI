@@ -21,7 +21,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { rsiResultDigest } from './rsi-result-integrity.mjs';
 import { runRsiCommand } from './rsi-bounded-command.mjs';
-import { markRsiAuditUnverified } from './rsi-audit-report.mjs';
+import { markRsiAuditUnverified, writeRsiAuditReport } from './rsi-audit-report.mjs';
 import { rsiAuditOutcome } from './rsi-audit-outcome.mjs';
 import { assertCleanVerificationSources } from './git-verification-source-guard.mjs';
 
@@ -236,9 +236,7 @@ const recoveryBaseline = {
 // This is local integrity detection, not external attestation or cryptographic authentication.
 recoveryBaseline.resultDigest = rsiResultDigest(recoveryBaseline);
 
-const artifactDir = path.join(rootDir, 'reality');
-fs.mkdirSync(artifactDir, { recursive: true });
-fs.writeFileSync(path.join(artifactDir, 'RAVEN_REA_RSI_AUDIT.json'), JSON.stringify(recoveryBaseline, null, 2));
+writeRsiAuditReport(rootDir, recoveryBaseline);
 
 console.log(`  ✓ Rollback Baseline preserved in reality/RAVEN_REA_RSI_AUDIT.json`);
 console.log(`  ✓ Execution completed in ${recoveryBaseline.durationMs} ms`);
