@@ -51,3 +51,24 @@ test('non-repository input fails closed', t => {
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   assert.throws(() => assertCleanVerificationSources(root), /BLOCKED/);
 });
+
+test('modified tracked TypeScript build configuration fails closed', t => {
+  const root = fixture();
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(root, 'tsconfig.json'), '{}\n');
+  git(root, 'add', 'tsconfig.json');
+  git(root, '-c', 'user.name=QARBI Test', '-c', 'user.email=test@example.invalid', 'commit', '-qm', 'add config');
+  fs.writeFileSync(path.join(root, 'tsconfig.json'), '{"compilerOptions":{"strict":false}}\n');
+  assert.throws(() => assertCleanVerificationSources(root), /BLOCKED/);
+});
+
+test('ignored executable source cannot bypass verification', t => {
+  const root = fixture();
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(root, '.gitignore'), 'scripts/*.local.mjs\n');
+  git(root, 'add', '.gitignore');
+  git(root, '-c', 'user.name=QARBI Test', '-c', 'user.email=test@example.invalid', 'commit', '-qm', 'add ignore');
+  fs.writeFileSync(path.join(root, 'scripts', 'shadow.local.mjs'), 'export default true;\n');
+  assert.equal(git(root, 'check-ignore', 'scripts/shadow.local.mjs').trim(), 'scripts/shadow.local.mjs');
+  assert.throws(() => assertCleanVerificationSources(root), /BLOCKED/);
+});
