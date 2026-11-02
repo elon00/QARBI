@@ -36,7 +36,7 @@ test('runner startup failure leaves the current report blocked rather than reusi
   const scripts = path.join(root, 'scripts');
   fs.mkdirSync(scripts, { recursive: true });
   for (const name of ['raven-rea-rsi-runner.mjs', 'rsi-audit-report.mjs', 'rsi-result-integrity.mjs',
-    'rsi-audit-outcome.mjs', 'validate-rsi-audit.mjs']) {
+    'rsi-audit-outcome.mjs', 'validate-rsi-audit.mjs', 'rsi-bounded-command.mjs']) {
     fs.copyFileSync(path.join(import.meta.dirname, '..', 'scripts', name), path.join(scripts, name));
   }
   const report = path.join(root, 'reality', 'RAVEN_REA_RSI_AUDIT.json');
