@@ -22,7 +22,7 @@ const rootDir = path.resolve(__dirname, '..');
 
 // Overwrite any previous success before a new invocation can fail or exit early.
 // A fresh successful RPC scan below is the only path to a verified current-run report.
-const currentReportPath = markContractVerificationUnverified(rootDir);
+markContractVerificationUnverified(rootDir);
 
 const rpc = process.env.QUICKNODE_ARBITRUM_SEPOLIA_RPC || 
             process.env.QUICKNODE_RPC_URL || 
