@@ -114,3 +114,32 @@ test('skip-worktree index flag cannot hide modified verification source', t => {
   assert.match(git(root, 'ls-files', '-v', '--', 'scripts/runner.mjs'), /^S /);
   assert.throws(() => assertCleanVerificationSources(root), /BLOCKED/);
 });
+
+test('tracked npm configuration modifications must fail closed', t => {
+  const root = fixture();
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(root, '.npmrc'), 'audit=true\n');
+  git(root, 'add', '.npmrc');
+  git(root, '-c', 'user.name=QARBI Test', '-c', 'user.email=test@example.invalid', 'commit', '-qm', 'track npm config');
+  assert.equal(assertCleanVerificationSources(root), true);
+  fs.writeFileSync(path.join(root, '.npmrc'), 'audit=false\n');
+  assert.throws(() => assertCleanVerificationSources(root), /BLOCKED/);
+});
+
+test('untracked npm configuration must fail closed', t => {
+  const root = fixture();
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(root, '.npmrc'), 'audit=false\n');
+  assert.throws(() => assertCleanVerificationSources(root), /BLOCKED/);
+});
+
+test('ignored npm configuration must fail closed', t => {
+  const root = fixture();
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(root, '.gitignore'), '.npmrc\n');
+  git(root, 'add', '.gitignore');
+  git(root, '-c', 'user.name=QARBI Test', '-c', 'user.email=test@example.invalid', 'commit', '-qm', 'ignore npm config');
+  fs.writeFileSync(path.join(root, '.npmrc'), 'audit=false\n');
+  assert.equal(git(root, 'check-ignore', '.npmrc').trim(), '.npmrc');
+  assert.throws(() => assertCleanVerificationSources(root), /BLOCKED/);
+});
