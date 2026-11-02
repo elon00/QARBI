@@ -13,10 +13,15 @@ import { fileURLToPath } from 'node:url';
 import { ethers } from 'ethers';
 import { validateContractManifest } from './contract-manifest-guard.mjs';
 import { safeRpcLabel, safeRpcFailureMessage } from './rpc-log-safety.mjs';
+import { markContractVerificationUnverified } from './contract-verification-report.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
+
+// Overwrite any previous success before a new invocation can fail or exit early.
+// A fresh successful RPC scan below is the only path to a verified current-run report.
+const currentReportPath = markContractVerificationUnverified(rootDir);
 
 const rpc = process.env.QUICKNODE_ARBITRUM_SEPOLIA_RPC || 
             process.env.QUICKNODE_RPC_URL || 
@@ -115,7 +120,7 @@ try {
 
   const reportsDir = path.join(rootDir, 'reports', 'reality');
   mkdirSync(reportsDir, { recursive: true });
-  writeFileSync(path.join(reportsDir, 'contract-verification.json'), JSON.stringify(verificationArtifact, null, 2));
+  writeFileSync(currentReportPath, JSON.stringify(verificationArtifact, null, 2));
 
   if (allPresent) {
     console.log('🎉 SUCCESS: All 5 QARBI smart contracts have verified live bytecode on Arbitrum Sepolia!');
