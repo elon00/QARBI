@@ -124,8 +124,11 @@ for (const c of contracts) {
   let bytecodeSize = 0;
   if (fs.existsSync(artifactPath)) {
     const artifact = JSON.parse(fs.readFileSync(artifactPath, 'utf8'));
-    const hex = artifact.deployedBytecode || artifact.bytecode || '';
-    bytecodeSize = hex.startsWith('0x') ? (hex.length - 2) / 2 : hex.length / 2;
+    // EIP-170 limits deployed runtime code, never creation bytecode.
+    const hex = artifact.deployedBytecode;
+    if (typeof hex === 'string' && /^0x(?:[0-9a-fA-F]{2})+$/.test(hex)) {
+      bytecodeSize = (hex.length - 2) / 2;
+    }
   }
 
   const contractIssues = [];
