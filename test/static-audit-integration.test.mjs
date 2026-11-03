@@ -10,7 +10,7 @@ const names = ['QARBIToken','AgentRegistry','TaskMarket','ConwayEngine','AgentWa
 const script = fileURLToPath(new URL('../scripts/audit-static-analysis.mjs', import.meta.url));
 const helper = fileURLToPath(new URL('../scripts/static-audit-verdict.mjs', import.meta.url));
 
-function runFixture({ artifacts = true, oversize = false, finding = false } = {}) {
+function runFixture({ artifacts = true, oversize = false, finding = false, creationOnly = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'qarbi-static-audit-'));
   try {
     for (const dir of ['scripts', 'contracts', 'build/contracts']) mkdirSync(join(root, dir), { recursive: true });
@@ -21,7 +21,9 @@ function runFixture({ artifacts = true, oversize = false, finding = false } = {}
       const source = `pragma solidity ^0.8.24; contract ${name} { ${finding && name === names[0] ? 'function bad() public view returns (address) { return tx.origin; }' : ''} }`;
       writeFileSync(join(root, 'contracts', `${name}.sol`), source);
       if (artifacts) writeFileSync(join(root, 'build', 'contracts', `${name}.json`), JSON.stringify({
-        deployedBytecode: name === names[0] && oversize ? `0x${'00'.repeat(24577)}` : '0x6000'
+        ...(creationOnly ? { bytecode: '0x6000' } : {
+          deployedBytecode: name === names[0] && oversize ? `0x${'00'.repeat(24577)}` : '0x6000'
+        })
       }));
     }
     const result = spawnSync(process.execPath, [join(root, 'scripts', 'audit-static-analysis.mjs')], { cwd: root, encoding: 'utf8', timeout: 10000 });
@@ -58,4 +60,10 @@ test('detected source pattern fails even with valid bytecode', () => {
   assert.notEqual(result.status, 0);
   assert.equal(report.status, 'FAIL_STATIC_PATTERNS_DETECTED');
   assert.equal(report.totalVulnerabilitiesFound, 1);
+});
+
+test('creation bytecode alone cannot establish EIP-170 runtime compliance', () => {
+  const { result, report } = runFixture({ creationOnly: true });
+  assert.notEqual(result.status, 0);
+  assert.equal(report.status, 'BLOCKED_BYTECODE_SIZE_UNVERIFIED_OR_EXCEEDED');
 });
