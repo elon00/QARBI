@@ -52,6 +52,8 @@ test('clean fixture only passes limited patterns and does not claim independent 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(report.status, 'PASS_LIMITED_STATIC_PATTERN_CHECKS');
   assert.equal(report.standardCompliance.accessControlEnforced, null);
+  assert.equal(report.results[0].accessControlVerified, null);
+  assert.equal(report.results[0].reentrancyProtected, null);
   assert.match(report.limitations, /independent security audit/);
 });
 
