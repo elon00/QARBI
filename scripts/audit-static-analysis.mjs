@@ -1,31 +1,10 @@
 #!/usr/bin/env node
 /**
- * QARBI Protocol — Static Security Analyzer & AST Vulnerability Scanner
- * 
- * Inspects all 5 Solidity contracts:
- *  - QARBIToken.sol
- *  - AgentRegistry.sol
- *  - TaskMarket.sol
- *  - ConwayEngine.sol
- *  - AgentWallet.sol
- * 
- * Verifies against 16 critical EVM vulnerability patterns:
- *  1. Reentrancy Protection (ReentrancyGuard / Checks-Effects-Interactions)
- *  2. Unchecked External Low-Level Calls
- *  3. tx.origin Authorization Flaws (enforce msg.sender)
- *  4. Block Timestamp Manipulation Dependence
- *  5. Integer Overflow / Underflow (Solidity >= 0.8.0 automatic checks)
- *  6. Floating / Loose Pragmas (enforce fixed ^0.8.20 or 0.8.24)
- *  7. Selfdestruct / Delegatecall injection hazards
- *  8. Uninitialized Storage Pointers
- *  9. Shadowed State Variables
- * 10. Missing Access Control Modifiers on Administrative Functions
- * 11. Escrow Balance Invariant Violations
- * 12. EIP-170 Contract Size Limit Compliance (< 24,576 bytes)
- * 13. Flash Loan / Inflation Attack Vectors
- * 14. Signature Malleability & Replay Vulnerabilities
- * 15. Unprotected Ether Withdrawal / Griefing
- * 16. Killswitch & Emergency Circuit Breaker Access
+ * QARBI limited heuristic static source scan.
+ * Checks six regular-expression patterns across five Solidity source files
+ * and measures compiled deployed runtime bytecode against EIP-170.
+ * This is not an AST analyzer, independent security audit, formal verification,
+ * proof of access control, or on-chain source-to-bytecode equivalence.
  */
 
 import fs from 'node:fs';
@@ -139,7 +118,7 @@ for (const c of contracts) {
     }
   }
 
-  // EIP-170 check (< 24,576 bytes)
+  // EIP-170 runtime code limit is 24,576 bytes inclusive.
   const isEip170Compliant = bytecodeSize > 0 && bytecodeSize <= 24576;
   const reentrancyGuarded = /ReentrancyGuard|nonReentrant/.test(code);
   const ownableSecured = /Ownable|onlyOwner|onlyAdmin/.test(code);
@@ -148,8 +127,10 @@ for (const c of contracts) {
     contract: c,
     bytecodeSizeBytes: bytecodeSize,
     eip170Compliant: isEip170Compliant,
-    reentrancyProtected: reentrancyGuarded || c === 'ConwayEngine.sol',
-    accessControlVerified: ownableSecured,
+    reentrancyProtected: null,
+    reentrancyPatternPresent: reentrancyGuarded,
+    accessControlVerified: null,
+    accessControlPatternPresent: ownableSecured,
     vulnerabilitiesFound: contractIssues.length,
     issues: contractIssues
   });
@@ -163,7 +144,7 @@ const verdict = summarizeStaticAudit(auditResults, contracts.length);
 const auditPassed = verdict.passed;
 
 const report = {
-  analyzer: 'QARBI Automated Static Security Auditor v1.0',
+  analyzer: 'QARBI Limited Static Pattern Scan v1.1',
   evaluatedAt: new Date().toISOString(),
   contractsAudited: contracts.length,
   totalVulnerabilitiesFound: totalIssues,
