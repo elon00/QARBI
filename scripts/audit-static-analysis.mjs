@@ -30,6 +30,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { summarizeStaticAudit } from './static-audit-verdict.mjs';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -136,7 +137,7 @@ for (const c of contracts) {
   }
 
   // EIP-170 check (< 24,576 bytes)
-  const isEip170Compliant = bytecodeSize > 0 && bytecodeSize < 24576;
+  const isEip170Compliant = bytecodeSize > 0 && bytecodeSize <= 24576;
   const reentrancyGuarded = /ReentrancyGuard|nonReentrant/.test(code);
   const ownableSecured = /Ownable|onlyOwner|onlyAdmin/.test(code);
 
@@ -152,26 +153,21 @@ for (const c of contracts) {
 
   const padName = c.padEnd(18, ' ');
   const statusStr = contractIssues.length === 0 ? '🟢 CLEAN (0 Issues)' : `🔴 ${contractIssues.length} ISSUES`;
-  console.log(`  ${padName} | Size: ${String(bytecodeSize).padStart(5, ' ')} B | EIP-170: ✅ | Security: ${statusStr}`);
+  console.log(`  ${padName} | Size: ${String(bytecodeSize).padStart(5, ' ')} B | EIP-170: ${isEip170Compliant ? 'PASS' : 'BLOCKED'} | Patterns: ${statusStr}`);
 }
 
-const auditPassed = totalIssues === 0;
+const verdict = summarizeStaticAudit(auditResults, contracts.length);
+const auditPassed = verdict.passed;
 
 const report = {
   analyzer: 'QARBI Automated Static Security Auditor v1.0',
   evaluatedAt: new Date().toISOString(),
   contractsAudited: contracts.length,
   totalVulnerabilitiesFound: totalIssues,
-  status: auditPassed ? 'PASS_ZERO_CRITICAL_VULNERABILITIES' : 'FAIL_VULNERABILITIES_DETECTED',
+  status: verdict.status,
   results: auditResults,
-  standardCompliance: {
-    eip170SizeLimits: true,
-    reentrancyChecksEffectsInteractions: true,
-    solidityCheckedArithmetic: true,
-    accessControlEnforced: true,
-    zeroTxOriginVulnerabilities: true,
-    zeroSelfdestructHazards: true
-  }
+  standardCompliance: verdict.standardCompliance,
+  limitations: verdict.limitations
 };
 
 const reportsDir = path.join(rootDir, 'reports', 'reality');
@@ -180,9 +176,10 @@ fs.writeFileSync(path.join(reportsDir, 'static-analysis-report.json'), JSON.stri
 
 console.log('\n══════════════════════════════════════════════════════════════════════════');
 console.log(`  CONTRACTS AUDITED          : ${contracts.length} / ${contracts.length}`);
-console.log(`  CRITICAL/HIGH ISSUES FOUND : 0`);
-console.log(`  EIP-170 LIMITS COMPLIANCE  : 5 / 5 CONTRACTS PASS (< 24,576 B)`);
-console.log(`  OVERALL STATIC AUDIT STATUS: 🟢 PASS (ZERO VULNERABILITIES DETECTED)`);
+console.log(`  HEURISTIC PATTERN FINDINGS : ${totalIssues}`);
+console.log(`  EIP-170 LIMITS COMPLIANCE  : ${auditResults.filter(r => r.eip170Compliant).length} / ${contracts.length} contracts (limit <= 24,576 B)`);
+console.log(`  LIMITED STATIC AUDIT STATUS: ${verdict.status}`);
+console.log('  SCOPE: six heuristic patterns and artifact size only; independent audit NOT verified');
 console.log(`  ARTIFACT WRITTEN           : reports/reality/static-analysis-report.json`);
 console.log('══════════════════════════════════════════════════════════════════════════\n');
 
