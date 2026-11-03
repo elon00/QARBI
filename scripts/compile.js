@@ -53,6 +53,7 @@ for (const sourceFile of Object.keys(output.contracts ?? {})) {
   for (const contractName of Object.keys(output.contracts[sourceFile] ?? {})) {
     const contractData = output.contracts[sourceFile][contractName];
     const bytecode = contractData.evm.bytecode.object;
+    const deployedBytecode = contractData.evm.deployedBytecode.object;
     if (!bytecode) continue;
 
     const artifact = {
@@ -60,6 +61,7 @@ for (const sourceFile of Object.keys(output.contracts ?? {})) {
       sourceFile,
       abi: contractData.abi,
       bytecode: `0x${bytecode}`,
+      deployedBytecode: `0x${deployedBytecode}`,
     };
     console.log(`✓ Compiled ${contractName} (${sourceFile}) - Bytecode length: ${bytecode.length / 2} bytes`);
     fs.writeFileSync(path.join(abisDir, `${contractName}.json`), JSON.stringify(artifact.abi, null, 2) + '\n');
