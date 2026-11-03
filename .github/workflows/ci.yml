@@ -89,6 +89,11 @@ jobs:
           node --test test/rsi-duration-consistency.test.mjs
           node scripts/validate-rsi-audit.mjs
 
+      - name: Reject unverified static audit PASS and false compliance claims
+        run: |
+          node --test test/static-audit-verdict.test.mjs
+          node --test test/static-audit-integration.test.mjs
+
       - name: Run truth, environment and build verification
         run: npm test
 
