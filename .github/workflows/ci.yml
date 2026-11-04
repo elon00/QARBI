@@ -97,6 +97,12 @@ jobs:
       - name: Run truth, environment and build verification
         run: npm test
 
+      - name: Verify reproducible Solidity contract artifacts
+        run: |
+          npm run compile:contracts
+          npm run generate:artifacts
+          git diff --exit-code -- src/contracts/contractArtifacts.ts src/contracts/abis
+
       - name: Verify scorecard subprocess deadlines and failure propagation
         run: node --test test/scorecard-bounded-command.test.mjs
 
