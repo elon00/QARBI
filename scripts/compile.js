@@ -22,7 +22,7 @@ const contractFiles = [
 ];
 
 const sources = Object.fromEntries(
-  contractFiles.map((file) => [file, { content: fs.readFileSync(path.join(contractsDir, file), 'utf8') }])
+  contractFiles.map((file) => [file, { content: fs.readFileSync(path.join(contractsDir, file), 'utf8').replace(/\r\n?/g, '\n') }])
 );
 
 const input = {
@@ -63,7 +63,7 @@ for (const sourceFile of Object.keys(output.contracts ?? {})) {
       bytecode: `0x${bytecode}`,
       deployedBytecode: `0x${deployedBytecode}`,
     };
-    console.log(`âœ“ Compiled ${contractName} (${sourceFile}) - Bytecode length: ${bytecode.length / 2} bytes`);
+    console.log(`Ã¢Å“â€œ Compiled ${contractName} (${sourceFile}) - Bytecode length: ${bytecode.length / 2} bytes`);
     fs.writeFileSync(path.join(abisDir, `${contractName}.json`), JSON.stringify(artifact.abi, null, 2) + '\n');
     fs.writeFileSync(path.join(buildDir, `${contractName}.json`), JSON.stringify(artifact, null, 2) + '\n');
   }
