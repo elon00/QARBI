@@ -7,14 +7,22 @@
  * directly for real EVM runtime bytecode at each contract address.
  */
 import 'dotenv/config';
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ethers } from 'ethers';
+import { validateContractManifest } from './contract-manifest-guard.mjs';
+import { getRuntimeCodeAtSnapshot } from './contract-snapshot-code.mjs';
+import { safeRpcLabel, safeRpcFailureMessage } from './rpc-log-safety.mjs';
+import { markContractVerificationUnverified, writeContractVerificationReport } from './contract-verification-report.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
+
+// Overwrite any previous success before a new invocation can fail or exit early.
+// A fresh successful RPC scan below is the only path to a verified current-run report.
+markContractVerificationUnverified(rootDir);
 
 const rpc = process.env.QUICKNODE_ARBITRUM_SEPOLIA_RPC || 
             process.env.QUICKNODE_RPC_URL || 
@@ -38,12 +46,14 @@ if (endpoint.protocol !== 'https:') {
 const manifestPath = path.join(rootDir, 'src', 'contracts', 'deployedAddresses.json');
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
 
-if (manifest.chainId !== 421614 || !manifest.contracts) {
-  console.error('❌ BLOCKED: Invalid manifest or network is not Arbitrum Sepolia (421614)');
+try {
+  validateContractManifest(manifest);
+} catch (error) {
+  console.error('❌ ' + error.message);
   process.exit(2);
 }
 
-const maskedRpc = rpc.replace(/quiknode\.pro\/[a-zA-Z0-9_-]+/, 'quiknode.pro/****');
+const maskedRpc = safeRpcLabel(endpoint);
 console.log('\n╔══════════════════════════════════════════════════════════════════════════╗');
 console.log('║   QARBI PROTOCOL — ARBITRUM SEPOLIA ON-CHAIN BYTECODE VERIFICATION       ║');
 console.log('║   "Code on chain is reality; claims without bytecode are rejected."      ║');
@@ -73,7 +83,7 @@ try {
       throw new Error(`${name}: invalid Ethereum address format (${c.address})`);
     }
     const checksummed = ethers.getAddress(c.address.toLowerCase());
-    const code = await provider.getCode(checksummed);
+    const code = await getRuntimeCodeAtSnapshot(provider, checksummed, blockNumber);
     const codePresent = code !== '0x' && code.length > 2;
     const bytecodeBytes = codePresent ? (code.length - 2) / 2 : 0;
     const keccak = codePresent ? ethers.keccak256(code) : null;
@@ -109,9 +119,7 @@ try {
     limitations: 'Live on-chain bytecode presence confirms deployment. Arbiscan source-code verification and external audits remain independent steps.'
   };
 
-  const reportsDir = path.join(rootDir, 'reports', 'reality');
-  mkdirSync(reportsDir, { recursive: true });
-  writeFileSync(path.join(reportsDir, 'contract-verification.json'), JSON.stringify(verificationArtifact, null, 2));
+  writeContractVerificationReport(rootDir, verificationArtifact);
 
   if (allPresent) {
     console.log('🎉 SUCCESS: All 5 QARBI smart contracts have verified live bytecode on Arbitrum Sepolia!');
@@ -121,7 +129,7 @@ try {
     process.exitCode = 1;
   }
 } catch (e) {
-  console.error('❌ BLOCKED: ' + e.message);
+  console.error('❌ BLOCKED: ' + safeRpcFailureMessage(e));
   process.exitCode = 1;
 } finally {
   provider.destroy();

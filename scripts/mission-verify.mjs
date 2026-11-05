@@ -24,8 +24,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execSync, execFileSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
+import { runRsiCommand as execSync } from './rsi-bounded-command.mjs';
 import { fileURLToPath } from 'node:url';
+import { missionExitCode } from './mission-status.mjs';
+import { writeMissionReport } from './mission-report-writer.mjs';
+import { verifiedRsiStageDetails } from './mission-rsi-stage.mjs';
+import { assertCleanVerificationSources } from './git-verification-source-guard.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,7 +46,7 @@ const stages = [];
 
 function runStage(id, name, fn) {
   const t0 = Date.now();
-  process.stdout.write(`▶ [STAGE ${id}/12] ${name}... `);
+  process.stdout.write(`▶ [STAGE ${id}/14] ${name}... `);
   try {
     const details = fn();
     const duration = Date.now() - t0;
@@ -60,6 +65,7 @@ function runStage(id, name, fn) {
 
 // STAGE 1: Repository Validation
 runStage('01', 'Repository Validation & Git Integrity', () => {
+  assertCleanVerificationSources(rootDir);
   const commit = execSync('git rev-parse HEAD', { cwd: rootDir }).toString().trim();
   const branch = execSync('git rev-parse --abbrev-ref HEAD', { cwd: rootDir }).toString().trim();
   return { commit, branch };
@@ -124,9 +130,14 @@ runStage('09', 'Deployment Truth & Secret-Exposure Safety Guards', () => {
 
 // STAGE 10: Raven RSI + REA Bounded Automation
 runStage('10', 'Raven RSI + REA Bounded Agentic Verification Engine', () => {
-  execSync('npm run gate:rsi', { cwd: rootDir, stdio: 'pipe' });
+  const invocationChallenge = crypto.randomBytes(16).toString('hex');
+  execSync('npm run gate:rsi', {
+    cwd: rootDir, stdio: 'pipe',
+    env: { ...process.env, QARBI_RSI_RUN_CHALLENGE: invocationChallenge }
+  });
   const rsiAudit = JSON.parse(fs.readFileSync(path.join(rootDir, 'reality', 'RAVEN_REA_RSI_AUDIT.json'), 'utf8'));
-  return { rsiScore: (rsiAudit.evaluatedScore * 100).toFixed(1) + '/100' };
+  const expectedCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: rootDir, encoding: 'utf8' }).trim();
+  return verifiedRsiStageDetails(rsiAudit, expectedCommit, invocationChallenge);
 });
 
 // STAGE 11: Production Bundler
@@ -167,8 +178,8 @@ runStage('14', 'Arbitrum Sepolia Live RPC Chain ID Check', () => {
     }).then(async response => {
       if (!response.ok) throw Error('HTTP ' + response.status);
       const payload = await response.json();
-      if (payload.error || payload.result !== '0x66eee') throw Error('Unexpected chain ID or RPC error');
-      process.stdout.write(payload.result);
+      const { assertArbitrumSepoliaChainIdResponse } = await import('./scripts/rpc-chain-id-evidence.mjs');
+      process.stdout.write(assertArbitrumSepoliaChainIdResponse(payload));
     }).catch(error => {
       console.error('RPC verification failed:', error.message);
       process.exitCode = 1;
@@ -229,6 +240,8 @@ const report = {
   stagesResult: {
     total: stages.length,
     passed: passedCount,
+    failed: stages.filter(s => s.status === 'FAILED').length,
+    blocked: stages.filter(s => s.status === 'BLOCKED').length,
     stages
   },
   chapter22Scorecard: {
@@ -244,9 +257,7 @@ const report = {
   }
 };
 
-const reportPath = path.join(rootDir, 'reports', 'reality', 'mission-report.json');
-fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8');
+const reportPath = writeMissionReport(rootDir, report);
 
 console.log('\n══════════════════════════════════════════════════════════════════════════');
 console.log(`  MISSION STAGES PASSED      : ${passedCount} / ${stages.length}`);
@@ -255,3 +266,10 @@ console.log(`  PRODUCTION CERTIFICATION   : 🔴 NOT CERTIFIED (Fail-Closed)`);
 console.log(`  MAINNET DEPLOYMENT STATUS  : 🔒 LOCKED_FAIL_CLOSED`);
 console.log(`  AUDIT REPORT PERSISTED     : reports/reality/mission-report.json`);
 console.log('══════════════════════════════════════════════════════════════════════════\n');
+
+// A written report is not a successful verification when any stage failed or was blocked.
+// Preserve the evidence artifact, then return a nonzero status to CI and callers.
+process.exitCode = missionExitCode(stages);
+if (process.exitCode !== 0) {
+  console.error('MISSION VERIFICATION FAILED OR BLOCKED: see reports/reality/mission-report.json');
+}

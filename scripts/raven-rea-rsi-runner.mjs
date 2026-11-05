@@ -18,12 +18,22 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { rsiResultDigest } from './rsi-result-integrity.mjs';
+import { runRsiCommand } from './rsi-bounded-command.mjs';
+import { markRsiAuditUnverified, writeRsiAuditReport } from './rsi-audit-report.mjs';
+import { rsiAuditOutcome } from './rsi-audit-outcome.mjs';
+import { assertCleanVerificationSources } from './git-verification-source-guard.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
+
+// Invalidate prior evidence before git, inspection or test failures can abort this run.
+markRsiAuditUnverified(rootDir);
+// A commit hash alone does not bind evidence to locally modified verification code.
+// Check source inputs after invalidating any previous success report.
+assertCleanVerificationSources(rootDir);
 
 console.log('\n╔══════════════════════════════════════════════════════════════════════════╗');
 console.log('║   QARBI PROTOCOL — BOUNDED RAVEN RSI + REA AGENTIC VERIFICATION ENGINE   ║');
@@ -39,8 +49,13 @@ const startTime = Date.now();
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('▶ [STEP 1/6] OBSERVE: Capturing System State & Evidence Ingestion...');
 
-const gitCommit = execSync('git rev-parse HEAD', { cwd: rootDir }).toString().trim();
-const gitBranch = execSync('git rev-parse --abbrev-ref HEAD', { cwd: rootDir }).toString().trim();
+const gitCommit = runRsiCommand('git rev-parse HEAD', { cwd: rootDir }).toString().trim();
+const gitBranch = runRsiCommand('git rev-parse --abbrev-ref HEAD', { cwd: rootDir }).toString().trim();
+
+const invocationChallenge = process.env.QARBI_RSI_RUN_CHALLENGE;
+if (invocationChallenge !== undefined && !/^[a-f0-9]{32}$/.test(invocationChallenge)) {
+  throw new Error('BLOCKED: malformed REA/RSI mission invocation challenge');
+}
 
 const evidenceStore = {
   timestamp: new Date().toISOString(),
@@ -50,7 +65,8 @@ const evidenceStore = {
   platform: process.platform,
   rpcConfigured: Boolean(process.env.QUICKNODE_ARBITRUM_SEPOLIA_RPC || process.env.ARBITRUM_SEPOLIA_RPC),
   deployedManifestState: 'UNVERIFIED_TESTNET_RECORD',
-  invariantsAuditTimestamp: Date.now()
+  invariantsAuditTimestamp: Date.now(),
+  ...(invocationChallenge ? { invocationChallenge } : {})
 };
 
 const evidenceHash = crypto.createHash('sha256').update(JSON.stringify(evidenceStore)).digest('hex');
@@ -64,7 +80,7 @@ console.log('\n▶ [STEP 2/6] INSPECT: REA Sandboxed Security & Invariant Inspec
 // Check 1: Truth check enforcement
 let truthCheckPassed = false;
 try {
-  execSync('node scripts/check-truth.mjs', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('node scripts/check-truth.mjs', { cwd: rootDir, stdio: 'pipe' });
   truthCheckPassed = true;
   console.log('  ✓ Deployment truth guard script passed (scope-limited)');
 } catch (err) {
@@ -118,7 +134,7 @@ const validationResults = {};
 
 // 1. TypeScript typecheck
 try {
-  execSync('npm run typecheck', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('npm run typecheck', { cwd: rootDir, stdio: 'pipe' });
   validationResults.typecheck = true;
   console.log('  ✓ [1/6] Typecheck (tsc --noEmit): PASS');
 } catch {
@@ -128,7 +144,7 @@ try {
 
 // 2. Contracts compilation
 try {
-  execSync('npm run compile:contracts', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('npm run compile:contracts', { cwd: rootDir, stdio: 'pipe' });
   validationResults.compileContracts = true;
   console.log('  ✓ [2/6] Compile Contracts (solc 0.8.24 viaIR): PASS');
 } catch {
@@ -138,7 +154,7 @@ try {
 
 // 3. Official NIST vectors
 try {
-  execSync('npm run test:nist', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('npm run test:nist', { cwd: rootDir, stdio: 'pipe' });
   validationResults.nistVectors = true;
   console.log('  ✓ [3/6] NIST FIPS 204/203 & RFC Vectors: PASS');
 } catch {
@@ -148,7 +164,7 @@ try {
 
 // 4. Quantum portfolio & secure channel
 try {
-  execSync('npm run test:quantum', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('npm run test:quantum', { cwd: rootDir, stdio: 'pipe' });
   validationResults.quantumSuite = true;
   console.log('  ✓ [4/6] Quantum SQA/bSB & PQC Channel: PASS');
 } catch {
@@ -158,7 +174,7 @@ try {
 
 // 5. Smart contracts security invariants
 try {
-  execSync('npx tsx test/smart-contracts-security.test.ts', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('npx tsx test/smart-contracts-security.test.ts', { cwd: rootDir, stdio: 'pipe' });
   validationResults.contractSecurity = true;
   console.log('  ✓ [5/6] Smart Contract Invariants (6 Tiers): PASS');
 } catch {
@@ -168,7 +184,7 @@ try {
 
 // 6. Supply-chain dependency audit: fail closed on high/critical advisories
 try {
-  execSync('npm audit --audit-level=high', { cwd: rootDir, stdio: 'pipe' });
+  runRsiCommand('npm audit --audit-level=high', { cwd: rootDir, stdio: 'pipe' });
   validationResults.dependencyAudit = true;
   console.log('  ✓ [6/6] Dependency security audit: PASS');
 } catch {
@@ -202,20 +218,25 @@ console.log('  BOUNDED AUTONOMY: No patch staged. Zero autonomous mainnet deploy
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\n▶ [STEP 6/6] MONITOR & RECOVER: Baseline Snapshot & Audit Trail...');
 
+const outcome = rsiAuditOutcome({ truthCheckPassed, validationResults, candidateAdopted: isAdopted });
+
 const recoveryBaseline = {
   baselineCommit: gitCommit,
+  evidenceStore,
   evidenceHash,
   evaluatedScore: rsiScore,
   validationResults,
   durationMs: Date.now() - startTime,
-  status: 'REVIEW_REQUIRED_NOT_ADOPTED',
+  status: outcome.status,
   candidateAdopted: false,
   truthCheckPassed
 };
 
-const artifactDir = path.join(rootDir, 'reality');
-fs.mkdirSync(artifactDir, { recursive: true });
-fs.writeFileSync(path.join(artifactDir, 'RAVEN_REA_RSI_AUDIT.json'), JSON.stringify(recoveryBaseline, null, 2));
+// Bind reported check outcomes and score to the persisted audit, not only its input evidence.
+// This is local integrity detection, not external attestation or cryptographic authentication.
+recoveryBaseline.resultDigest = rsiResultDigest(recoveryBaseline);
+
+writeRsiAuditReport(rootDir, recoveryBaseline);
 
 console.log(`  ✓ Rollback Baseline preserved in reality/RAVEN_REA_RSI_AUDIT.json`);
 console.log(`  ✓ Execution completed in ${recoveryBaseline.durationMs} ms`);
@@ -224,7 +245,7 @@ console.log('\n═════════════════════�
 console.log('RAVEN RSI + REA EVIDENCE COLLECTION FINISHED — NOT CERTIFIED');
 console.log('══════════════════════════════════════════════════════════════════════════\n');
 
-if (!truthCheckPassed || Object.values(validationResults).some(value => value !== true)) {
-  console.error('REA/RSI verification failed: one or more checks did not pass.');
-  process.exitCode = 1;
+if (outcome.exitCode !== 0) {
+  console.error('REA/RSI verification BLOCKED: required checks failed or evidence is incomplete.');
 }
+process.exitCode = outcome.exitCode;

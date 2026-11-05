@@ -1,35 +1,15 @@
 #!/usr/bin/env node
 /**
- * QARBI Protocol — Static Security Analyzer & AST Vulnerability Scanner
- * 
- * Inspects all 5 Solidity contracts:
- *  - QARBIToken.sol
- *  - AgentRegistry.sol
- *  - TaskMarket.sol
- *  - ConwayEngine.sol
- *  - AgentWallet.sol
- * 
- * Verifies against 16 critical EVM vulnerability patterns:
- *  1. Reentrancy Protection (ReentrancyGuard / Checks-Effects-Interactions)
- *  2. Unchecked External Low-Level Calls
- *  3. tx.origin Authorization Flaws (enforce msg.sender)
- *  4. Block Timestamp Manipulation Dependence
- *  5. Integer Overflow / Underflow (Solidity >= 0.8.0 automatic checks)
- *  6. Floating / Loose Pragmas (enforce fixed ^0.8.20 or 0.8.24)
- *  7. Selfdestruct / Delegatecall injection hazards
- *  8. Uninitialized Storage Pointers
- *  9. Shadowed State Variables
- * 10. Missing Access Control Modifiers on Administrative Functions
- * 11. Escrow Balance Invariant Violations
- * 12. EIP-170 Contract Size Limit Compliance (< 24,576 bytes)
- * 13. Flash Loan / Inflation Attack Vectors
- * 14. Signature Malleability & Replay Vulnerabilities
- * 15. Unprotected Ether Withdrawal / Griefing
- * 16. Killswitch & Emergency Circuit Breaker Access
+ * QARBI limited heuristic static source scan.
+ * Checks six regular-expression patterns across five Solidity source files
+ * and measures compiled deployed runtime bytecode against EIP-170.
+ * This is not an AST analyzer, independent security audit, formal verification,
+ * proof of access control, or on-chain source-to-bytecode equivalence.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { summarizeStaticAudit } from './static-audit-verdict.mjs';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -123,8 +103,11 @@ for (const c of contracts) {
   let bytecodeSize = 0;
   if (fs.existsSync(artifactPath)) {
     const artifact = JSON.parse(fs.readFileSync(artifactPath, 'utf8'));
-    const hex = artifact.deployedBytecode || artifact.bytecode || '';
-    bytecodeSize = hex.startsWith('0x') ? (hex.length - 2) / 2 : hex.length / 2;
+    // EIP-170 limits deployed runtime code, never creation bytecode.
+    const hex = artifact.deployedBytecode;
+    if (typeof hex === 'string' && /^0x(?:[0-9a-fA-F]{2})+$/.test(hex)) {
+      bytecodeSize = (hex.length - 2) / 2;
+    }
   }
 
   const contractIssues = [];
@@ -135,8 +118,8 @@ for (const c of contracts) {
     }
   }
 
-  // EIP-170 check (< 24,576 bytes)
-  const isEip170Compliant = bytecodeSize > 0 && bytecodeSize < 24576;
+  // EIP-170 runtime code limit is 24,576 bytes inclusive.
+  const isEip170Compliant = bytecodeSize > 0 && bytecodeSize <= 24576;
   const reentrancyGuarded = /ReentrancyGuard|nonReentrant/.test(code);
   const ownableSecured = /Ownable|onlyOwner|onlyAdmin/.test(code);
 
@@ -144,34 +127,31 @@ for (const c of contracts) {
     contract: c,
     bytecodeSizeBytes: bytecodeSize,
     eip170Compliant: isEip170Compliant,
-    reentrancyProtected: reentrancyGuarded || c === 'ConwayEngine.sol',
-    accessControlVerified: ownableSecured,
+    reentrancyProtected: null,
+    reentrancyPatternPresent: reentrancyGuarded,
+    accessControlVerified: null,
+    accessControlPatternPresent: ownableSecured,
     vulnerabilitiesFound: contractIssues.length,
     issues: contractIssues
   });
 
   const padName = c.padEnd(18, ' ');
   const statusStr = contractIssues.length === 0 ? '🟢 CLEAN (0 Issues)' : `🔴 ${contractIssues.length} ISSUES`;
-  console.log(`  ${padName} | Size: ${String(bytecodeSize).padStart(5, ' ')} B | EIP-170: ✅ | Security: ${statusStr}`);
+  console.log(`  ${padName} | Size: ${String(bytecodeSize).padStart(5, ' ')} B | EIP-170: ${isEip170Compliant ? 'PASS' : 'BLOCKED'} | Patterns: ${statusStr}`);
 }
 
-const auditPassed = totalIssues === 0;
+const verdict = summarizeStaticAudit(auditResults, contracts.length);
+const auditPassed = verdict.passed;
 
 const report = {
-  analyzer: 'QARBI Automated Static Security Auditor v1.0',
+  analyzer: 'QARBI Limited Static Pattern Scan v1.1',
   evaluatedAt: new Date().toISOString(),
   contractsAudited: contracts.length,
   totalVulnerabilitiesFound: totalIssues,
-  status: auditPassed ? 'PASS_ZERO_CRITICAL_VULNERABILITIES' : 'FAIL_VULNERABILITIES_DETECTED',
+  status: verdict.status,
   results: auditResults,
-  standardCompliance: {
-    eip170SizeLimits: true,
-    reentrancyChecksEffectsInteractions: true,
-    solidityCheckedArithmetic: true,
-    accessControlEnforced: true,
-    zeroTxOriginVulnerabilities: true,
-    zeroSelfdestructHazards: true
-  }
+  standardCompliance: verdict.standardCompliance,
+  limitations: verdict.limitations
 };
 
 const reportsDir = path.join(rootDir, 'reports', 'reality');
@@ -180,9 +160,10 @@ fs.writeFileSync(path.join(reportsDir, 'static-analysis-report.json'), JSON.stri
 
 console.log('\n══════════════════════════════════════════════════════════════════════════');
 console.log(`  CONTRACTS AUDITED          : ${contracts.length} / ${contracts.length}`);
-console.log(`  CRITICAL/HIGH ISSUES FOUND : 0`);
-console.log(`  EIP-170 LIMITS COMPLIANCE  : 5 / 5 CONTRACTS PASS (< 24,576 B)`);
-console.log(`  OVERALL STATIC AUDIT STATUS: 🟢 PASS (ZERO VULNERABILITIES DETECTED)`);
+console.log(`  HEURISTIC PATTERN FINDINGS : ${totalIssues}`);
+console.log(`  EIP-170 LIMITS COMPLIANCE  : ${auditResults.filter(r => r.eip170Compliant).length} / ${contracts.length} contracts (limit <= 24,576 B)`);
+console.log(`  LIMITED STATIC AUDIT STATUS: ${verdict.status}`);
+console.log('  SCOPE: six heuristic patterns and artifact size only; independent audit NOT verified');
 console.log(`  ARTIFACT WRITTEN           : reports/reality/static-analysis-report.json`);
 console.log('══════════════════════════════════════════════════════════════════════════\n');
 

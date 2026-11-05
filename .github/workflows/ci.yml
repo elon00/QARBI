@@ -35,13 +35,76 @@ jobs:
       - name: Audit dependency vulnerabilities (high and critical)
         run: npm audit --audit-level=high
 
-      - name: Run truth, environment and build verification
-        run: npm test
+      - name: Reject uncommitted verification source inputs
+        run: node --test test/git-verification-source-guard.test.mjs
+
+      - name: Verify mission exit-code fail-closed regression cases
+        run: node --test test/mission-status.test.mjs
+
+      - name: Protect mission evidence against symlink and hardlink redirection
+        run: node --test test/mission-report-writer.test.mjs
+
+      - name: Reject incomplete or ambiguous testnet contract manifests
+        run: node --test test/contract-manifest-guard.test.mjs
+
+      - name: Verify RPC logging redacts credential-bearing URL components
+        run: node --test test/rpc-log-safety.test.mjs
+
+      - name: Ensure contract verification reports fail closed on a new invocation
+        run: node --test test/contract-verification-report.test.mjs
+
+      - name: Verify bytecode reads use a pinned snapshot block
+        run: node --test test/contract-snapshot-code.test.mjs
+
+      - name: Reject malformed Arbitrum Sepolia JSON-RPC chain ID evidence
+        run: node --test test/rpc-chain-id-evidence.test.mjs
+
+      - name: Verify RSI result digest integrity
+        run: node --test test/rsi-result-integrity.test.mjs
+
+      - name: Ensure new RSI invocations invalidate stale success reports
+        run: node --test test/rsi-audit-report.test.mjs
+
+      - name: Require failed RSI checks to produce blocked audit status and nonzero exit
+        run: node --test test/rsi-audit-outcome.test.mjs
+
+      - name: Reject fabricated, replayed or stale REA/RSI mission stage evidence
+        run: |
+          node --test test/mission-rsi-stage.test.mjs
+          node --test test/rsi-run-challenge.test.mjs
+
+      # Run the source-integrity-bound RSI audit before npm test/finish regenerates
+      # src/contracts/contractArtifacts.ts in the checkout.
+      - name: Verify REA/RSI subprocess deadlines fail closed
+        run: node --test test/rsi-bounded-command.test.mjs
+
+      - name: Verify mission subprocess deadlines and failure propagation
+        run: node --test test/mission-bounded-command.test.mjs
 
       - name: Execute bounded REA/RSI runner and verify fail-closed audit evidence
         run: |
           npm run gate:rsi
-          node --input-type=module -e "import fs from 'node:fs'; const a = JSON.parse(fs.readFileSync('reality/RAVEN_REA_RSI_AUDIT.json','utf8')); const checks = Object.values(a.validationResults || {}); if (a.candidateAdopted !== false || a.status !== 'REVIEW_REQUIRED_NOT_ADOPTED' || a.truthCheckPassed !== true || checks.length !== 6 || checks.some(v => v !== true)) throw new Error('Bounded REA/RSI evidence failed closed'); console.log('REA/RSI bounded runtime evidence PASS; not external Raven/REA verification or production certification');"
+          node --test test/rsi-audit-evidence.test.mjs
+          node --test test/rsi-audit-freshness.test.mjs
+          node --test test/rsi-duration-consistency.test.mjs
+          node scripts/validate-rsi-audit.mjs
+
+      - name: Reject unverified static audit PASS and false compliance claims
+        run: |
+          node --test test/static-audit-verdict.test.mjs
+          node --test test/static-audit-integration.test.mjs
+
+      - name: Run truth, environment and build verification
+        run: npm test
+
+      - name: Verify reproducible Solidity contract artifacts
+        run: |
+          npm run compile:contracts
+          npm run generate:artifacts
+          git diff --exit-code -- src/contracts/contractArtifacts.ts src/contracts/abis
+
+      - name: Verify scorecard subprocess deadlines and failure propagation
+        run: node --test test/scorecard-bounded-command.test.mjs
 
       - name: Verify conservative scorecard and REA/RSI syntax
         run: |

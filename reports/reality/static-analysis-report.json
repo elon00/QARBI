@@ -3,60 +3,64 @@
   "evaluatedAt": "2026-10-16T14:40:47.443Z",
   "contractsAudited": 5,
   "totalVulnerabilitiesFound": 0,
-  "status": "PASS_ZERO_CRITICAL_VULNERABILITIES",
+  "status": "HISTORICAL_UNVERIFIED_NOT_RELEASE_EVIDENCE",
   "results": [
     {
       "contract": "QARBIToken.sol",
-      "bytecodeSizeBytes": 3531,
-      "eip170Compliant": true,
-      "reentrancyProtected": false,
-      "accessControlVerified": true,
-      "vulnerabilitiesFound": 0,
+      "legacyBytecodeSizeBytesUnverified": 3531,
+      "eip170Compliant": null,
+      "reentrancyProtected": null,
+      "accessControlVerified": null,
+      "heuristicPatternFindings": 0,
       "issues": []
     },
     {
       "contract": "AgentRegistry.sol",
-      "bytecodeSizeBytes": 5577,
-      "eip170Compliant": true,
-      "reentrancyProtected": false,
-      "accessControlVerified": true,
-      "vulnerabilitiesFound": 0,
+      "legacyBytecodeSizeBytesUnverified": 5577,
+      "eip170Compliant": null,
+      "reentrancyProtected": null,
+      "accessControlVerified": null,
+      "heuristicPatternFindings": 0,
       "issues": []
     },
     {
       "contract": "TaskMarket.sol",
-      "bytecodeSizeBytes": 5872,
-      "eip170Compliant": true,
-      "reentrancyProtected": false,
-      "accessControlVerified": true,
-      "vulnerabilitiesFound": 0,
+      "legacyBytecodeSizeBytesUnverified": 5872,
+      "eip170Compliant": null,
+      "reentrancyProtected": null,
+      "accessControlVerified": null,
+      "heuristicPatternFindings": 0,
       "issues": []
     },
     {
       "contract": "ConwayEngine.sol",
-      "bytecodeSizeBytes": 1291,
-      "eip170Compliant": true,
-      "reentrancyProtected": true,
-      "accessControlVerified": false,
-      "vulnerabilitiesFound": 0,
+      "legacyBytecodeSizeBytesUnverified": 1291,
+      "eip170Compliant": null,
+      "reentrancyProtected": null,
+      "accessControlVerified": null,
+      "heuristicPatternFindings": 0,
       "issues": []
     },
     {
       "contract": "AgentWallet.sol",
-      "bytecodeSizeBytes": 2186,
-      "eip170Compliant": true,
-      "reentrancyProtected": false,
-      "accessControlVerified": true,
-      "vulnerabilitiesFound": 0,
+      "legacyBytecodeSizeBytesUnverified": 2186,
+      "eip170Compliant": null,
+      "reentrancyProtected": null,
+      "accessControlVerified": null,
+      "heuristicPatternFindings": 0,
       "issues": []
     }
   ],
   "standardCompliance": {
-    "eip170SizeLimits": true,
-    "reentrancyChecksEffectsInteractions": true,
-    "solidityCheckedArithmetic": true,
-    "accessControlEnforced": true,
-    "zeroTxOriginVulnerabilities": true,
-    "zeroSelfdestructHazards": true
-  }
+    "eip170SizeLimits": null,
+    "reentrancyChecksEffectsInteractions": null,
+    "solidityCheckedArithmetic": null,
+    "accessControlEnforced": null,
+    "zeroTxOriginVulnerabilities": null,
+    "zeroSelfdestructHazards": null
+  },
+  "historicalOnly": true,
+  "historicalStatus": "PASS_ZERO_CRITICAL_VULNERABILITIES",
+  "commitBound": false,
+  "limitations": "Historical 2026-10-16 heuristic output, not current commit evidence. Original artifact used creation-bytecode fallback for EIP-170 and hard-coded unsupported compliance booleans. Re-run compile:contracts and audit:static to produce a fresh limited scan; independent security audit and source-to-runtime-bytecode verification remain absent."
 }

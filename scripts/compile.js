@@ -22,7 +22,7 @@ const contractFiles = [
 ];
 
 const sources = Object.fromEntries(
-  contractFiles.map((file) => [file, { content: fs.readFileSync(path.join(contractsDir, file), 'utf8') }])
+  contractFiles.map((file) => [file, { content: fs.readFileSync(path.join(contractsDir, file), 'utf8').replace(/\r\n?/g, '\n') }])
 );
 
 const input = {
@@ -35,7 +35,7 @@ const input = {
   },
 };
 
-console.log('Compiling Solidity smart contracts with solc 0.8.24 (viaIR: true)...');
+console.log('Compiling Solidity smart contracts with solc ' + solc.version() + ' (viaIR: true)...');
 const output = JSON.parse(solc.compile(JSON.stringify(input)));
 
 let hasErrors = false;
@@ -53,6 +53,7 @@ for (const sourceFile of Object.keys(output.contracts ?? {})) {
   for (const contractName of Object.keys(output.contracts[sourceFile] ?? {})) {
     const contractData = output.contracts[sourceFile][contractName];
     const bytecode = contractData.evm.bytecode.object;
+    const deployedBytecode = contractData.evm.deployedBytecode.object;
     if (!bytecode) continue;
 
     const artifact = {
@@ -60,8 +61,9 @@ for (const sourceFile of Object.keys(output.contracts ?? {})) {
       sourceFile,
       abi: contractData.abi,
       bytecode: `0x${bytecode}`,
+      deployedBytecode: `0x${deployedBytecode}`,
     };
-    console.log(`✓ Compiled ${contractName} (${sourceFile}) - Bytecode length: ${bytecode.length / 2} bytes`);
+    console.log(`Ã¢Å“â€œ Compiled ${contractName} (${sourceFile}) - Bytecode length: ${bytecode.length / 2} bytes`);
     fs.writeFileSync(path.join(abisDir, `${contractName}.json`), JSON.stringify(artifact.abi, null, 2) + '\n');
     fs.writeFileSync(path.join(buildDir, `${contractName}.json`), JSON.stringify(artifact, null, 2) + '\n');
   }
