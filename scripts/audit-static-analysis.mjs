@@ -19,8 +19,8 @@ const contractsDir = path.join(rootDir, 'contracts');
 const buildDir = path.join(rootDir, 'build', 'contracts');
 
 console.log('\n╔══════════════════════════════════════════════════════════════════════════╗');
-console.log('║   QARBI PROTOCOL — AUTOMATED STATIC SECURITY & AST VULNERABILITY AUDIT   ║');
-console.log('║   "Security before claims • Zero-compromise formal vulnerability scan"   ║');
+console.log('║   QARBI PROTOCOL — LIMITED HEURISTIC STATIC SECURITY PATTERN SCAN   ║');
+console.log('║   "Six regex checks • Not AST analysis, formal verification, or an audit"   ║');
 console.log('╚══════════════════════════════════════════════════════════════════════════╝\n');
 
 const contracts = [
