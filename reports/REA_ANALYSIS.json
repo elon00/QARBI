@@ -1,0 +1,458 @@
+{
+  "engine": "REA_Reverse_Engineer_Anything",
+  "status": "STRUCTURE_RECONSTRUCTED",
+  "analyzed_files": 150,
+  "manifest": {
+    "index.html": {
+      "bytes": 1630
+    },
+    "LICENSE": {
+      "bytes": 1091
+    },
+    "metadata.json": {
+      "bytes": 315
+    },
+    "netlify.toml": {
+      "bytes": 302
+    },
+    "package-lock.json": {
+      "bytes": 139337
+    },
+    "package.json": {
+      "bytes": 3630
+    },
+    "QMOOSA_TRUTH_PROTOCOL.md": {
+      "bytes": 417
+    },
+    "README.md": {
+      "bytes": 17947
+    },
+    "REALITY_MANIFEST.json": {
+      "bytes": 8842
+    },
+    "SECURITY.md": {
+      "bytes": 640
+    },
+    "server.ts": {
+      "bytes": 32706
+    },
+    "tsconfig.json": {
+      "bytes": 534
+    },
+    "vite.config.ts": {
+      "bytes": 757
+    },
+    ".github\\dependabot.yml": {
+      "bytes": 512
+    },
+    ".github\\PULL_REQUEST_TEMPLATE.md": {
+      "bytes": 769
+    },
+    "contracts\\AgentRegistry.sol": {
+      "bytes": 7155
+    },
+    "contracts\\AgentWallet.sol": {
+      "bytes": 3026
+    },
+    "contracts\\ConwayEngine.sol": {
+      "bytes": 3057
+    },
+    "contracts\\QARBIToken.sol": {
+      "bytes": 4173
+    },
+    "contracts\\TaskMarket.sol": {
+      "bytes": 7021
+    },
+    "docs\\PRODUCTION_MARKET_ARCHITECTURE.md": {
+      "bytes": 4388
+    },
+    "docs\\QARBI_MASTER_100_ARCHITECTURE.md": {
+      "bytes": 4348
+    },
+    "docs\\QUICKNODE_ARBITRUM_INTEGRATION.md": {
+      "bytes": 5493
+    },
+    "docs\\QUICKNODE_RAVEN_REA_RSI.md": {
+      "bytes": 5379
+    },
+    "reality\\GLOBAL_REALITY_SCORECARD_v3.json": {
+      "bytes": 5355
+    },
+    "reality\\RAVEN_REA_RSI_AUDIT.json": {
+      "bytes": 427
+    },
+    "reality\\URS_EVIDENCE_CERTIFICATE.json": {
+      "bytes": 3026
+    },
+    "reality\\URS_SCORECARD.json": {
+      "bytes": 2645
+    },
+    "scripts\\all-in-one.mjs": {
+      "bytes": 6327
+    },
+    "scripts\\audit-crypto.mjs": {
+      "bytes": 11069
+    },
+    "scripts\\audit-static-analysis.mjs": {
+      "bytes": 7209
+    },
+    "scripts\\check-env.mjs": {
+      "bytes": 446
+    },
+    "scripts\\check-truth.mjs": {
+      "bytes": 1952
+    },
+    "scripts\\compile.js": {
+      "bytes": 2551
+    },
+    "scripts\\contract-manifest-guard.mjs": {
+      "bytes": 1251
+    },
+    "scripts\\contract-snapshot-code.mjs": {
+      "bytes": 568
+    },
+    "scripts\\contract-verification-report.mjs": {
+      "bytes": 2286
+    },
+    "scripts\\deploy.js": {
+      "bytes": 6647
+    },
+    "scripts\\generate-urs-certificate.ts": {
+      "bytes": 16586
+    },
+    "scripts\\generateArtifacts.js": {
+      "bytes": 930
+    },
+    "scripts\\git-verification-source-guard.mjs": {
+      "bytes": 1773
+    },
+    "scripts\\mission-report-writer.mjs": {
+      "bytes": 1649
+    },
+    "scripts\\mission-rsi-stage.mjs": {
+      "bytes": 525
+    },
+    "scripts\\mission-status.mjs": {
+      "bytes": 511
+    },
+    "scripts\\mission-verify.mjs": {
+      "bytes": 13338
+    },
+    "scripts\\qarbi-finish.mjs": {
+      "bytes": 3995
+    },
+    "scripts\\QARBI_MASTER_ALL_IN_ONE.ps1": {
+      "bytes": 5263
+    },
+    "scripts\\QARBI_ONE_CLICK_READINESS.ps1": {
+      "bytes": 8560
+    },
+    "scripts\\quicknode-automation.mjs": {
+      "bytes": 6937
+    },
+    "scripts\\quicknode-reality-gate.mjs": {
+      "bytes": 5828
+    },
+    "scripts\\quicknode-stream-filter.js": {
+      "bytes": 7342
+    },
+    "scripts\\raven-rea-rsi-runner.mjs": {
+      "bytes": 14002
+    },
+    "scripts\\reality-scorecard-v3.mjs": {
+      "bytes": 21499
+    },
+    "scripts\\reality-universal.ts": {
+      "bytes": 17022
+    },
+    "scripts\\rea_inspector.py": {
+      "bytes": 1485
+    },
+    "scripts\\release-attestation-gate.mjs": {
+      "bytes": 2788
+    },
+    "scripts\\rpc-chain-id-evidence.mjs": {
+      "bytes": 462
+    },
+    "scripts\\rpc-log-safety.mjs": {
+      "bytes": 534
+    },
+    "scripts\\rsi-audit-outcome.mjs": {
+      "bytes": 799
+    },
+    "scripts\\rsi-audit-report.mjs": {
+      "bytes": 2232
+    },
+    "scripts\\rsi-bounded-command.mjs": {
+      "bytes": 662
+    },
+    "scripts\\rsi-result-integrity.mjs": {
+      "bytes": 614
+    },
+    "scripts\\rsi-run-challenge.mjs": {
+      "bytes": 445
+    },
+    "scripts\\rsi_engine.py": {
+      "bytes": 2039
+    },
+    "scripts\\start-and-finish-everything.mjs": {
+      "bytes": 6942
+    },
+    "scripts\\static-audit-verdict.mjs": {
+      "bytes": 1595
+    },
+    "scripts\\validate-rsi-audit.mjs": {
+      "bytes": 6592
+    },
+    "scripts\\verify-testnet-contracts.mjs": {
+      "bytes": 6092
+    },
+    "src\\App.tsx": {
+      "bytes": 13770
+    },
+    "src\\index.css": {
+      "bytes": 24
+    },
+    "src\\main.tsx": {
+      "bytes": 241
+    },
+    "src\\types.ts": {
+      "bytes": 5382
+    },
+    "test\\contract-manifest-guard.test.mjs": {
+      "bytes": 1432
+    },
+    "test\\contract-snapshot-code.test.mjs": {
+      "bytes": 2015
+    },
+    "test\\contract-verification-report.test.mjs": {
+      "bytes": 4700
+    },
+    "test\\git-verification-source-guard.test.mjs": {
+      "bytes": 7427
+    },
+    "test\\mission-bounded-command.test.mjs": {
+      "bytes": 1401
+    },
+    "test\\mission-report-writer.test.mjs": {
+      "bytes": 3695
+    },
+    "test\\mission-rsi-stage.test.mjs": {
+      "bytes": 2739
+    },
+    "test\\mission-status.test.mjs": {
+      "bytes": 1480
+    },
+    "test\\release-attestation-negative.test.mjs": {
+      "bytes": 6388
+    },
+    "test\\rpc-chain-id-evidence.test.mjs": {
+      "bytes": 1563
+    },
+    "test\\rpc-log-safety.test.mjs": {
+      "bytes": 2349
+    },
+    "test\\rsi-audit-evidence.test.mjs": {
+      "bytes": 5728
+    },
+    "test\\rsi-audit-freshness.test.mjs": {
+      "bytes": 2863
+    },
+    "test\\rsi-audit-outcome.test.mjs": {
+      "bytes": 1555
+    },
+    "test\\rsi-audit-report.test.mjs": {
+      "bytes": 7588
+    },
+    "test\\rsi-bounded-command.test.mjs": {
+      "bytes": 1463
+    },
+    "test\\rsi-duration-consistency.test.mjs": {
+      "bytes": 1797
+    },
+    "test\\rsi-result-integrity.test.mjs": {
+      "bytes": 1279
+    },
+    "test\\rsi-run-challenge.test.mjs": {
+      "bytes": 1070
+    },
+    "test\\scorecard-bounded-command.test.mjs": {
+      "bytes": 1247
+    },
+    "test\\smart-contracts-security.test.ts": {
+      "bytes": 16952
+    },
+    "test\\static-audit-integration.test.mjs": {
+      "bytes": 3807
+    },
+    "test\\static-audit-verdict.test.mjs": {
+      "bytes": 2062
+    },
+    "test\\x402-and-quicknode-streams.test.ts": {
+      "bytes": 9729
+    },
+    ".github\\ISSUE_TEMPLATE\\bug_report.yml": {
+      "bytes": 1106
+    },
+    ".github\\ISSUE_TEMPLATE\\feature_request.yml": {
+      "bytes": 1116
+    },
+    ".github\\workflows\\ci.yml": {
+      "bytes": 5027
+    },
+    ".github\\workflows\\codeql.yml": {
+      "bytes": 780
+    },
+    ".github\\workflows\\pages.yml": {
+      "bytes": 793
+    },
+    ".github\\workflows\\qmoosa-rsi-rea-sync.yml": {
+      "bytes": 531
+    },
+    ".github\\workflows\\release-readiness.yml": {
+      "bytes": 1767
+    },
+    ".github\\workflows\\urs-evidence.yml": {
+      "bytes": 2973
+    },
+    "docs\\audit\\BASELINE.md": {
+      "bytes": 3907
+    },
+    "docs\\audit\\INDEPENDENT_SECURITY_AUDIT_PACKAGE.md": {
+      "bytes": 5137
+    },
+    "docs\\reality\\EXTERNAL_AUDIT_EVIDENCE_BOUNDARY.md": {
+      "bytes": 1664
+    },
+    "docs\\reality\\GLOBAL_REALITY_SCORECARD_v3.md": {
+      "bytes": 3376
+    },
+    "docs\\reality\\URS_EVIDENCE_CERTIFICATE.md": {
+      "bytes": 3674
+    },
+    "netlify\\functions\\api.mts": {
+      "bytes": 5845
+    },
+    "reports\\reality\\baseline.json": {
+      "bytes": 717
+    },
+    "reports\\reality\\contract-verification.json": {
+      "bytes": 2334
+    },
+    "reports\\reality\\dependency-inventory.json": {
+      "bytes": 2587
+    },
+    "reports\\reality\\feature-matrix.json": {
+      "bytes": 2982
+    },
+    "reports\\reality\\mission-report.json": {
+      "bytes": 6480
+    },
+    "reports\\reality\\static-analysis-report.json": {
+      "bytes": 2334
+    },
+    "src\\components\\AgentSpawner.tsx": {
+      "bytes": 24637
+    },
+    "src\\components\\AgentTerminal.tsx": {
+      "bytes": 23142
+    },
+    "src\\components\\ArbitrumExplorer.tsx": {
+      "bytes": 16187
+    },
+    "src\\components\\ConwayVisualizer.tsx": {
+      "bytes": 15011
+    },
+    "src\\components\\FaucetModal.tsx": {
+      "bytes": 9083
+    },
+    "src\\components\\Header.tsx": {
+      "bytes": 11705
+    },
+    "src\\components\\Navigation.tsx": {
+      "bytes": 4107
+    },
+    "src\\components\\OnchainDeployerModal.tsx": {
+      "bytes": 18040
+    },
+    "src\\components\\QuantumOperations.tsx": {
+      "bytes": 32383
+    },
+    "src\\components\\QuickNodeModal.tsx": {
+      "bytes": 34108
+    },
+    "src\\components\\SecurityEnclave.tsx": {
+      "bytes": 16922
+    },
+    "src\\components\\TaskMarketplace.tsx": {
+      "bytes": 19553
+    },
+    "src\\components\\WhitepaperViewer.tsx": {
+      "bytes": 6954
+    },
+    "src\\contracts\\contractArtifacts.ts": {
+      "bytes": 116162
+    },
+    "src\\contracts\\deployedAddresses.json": {
+      "bytes": 1636
+    },
+    "src\\data\\initialState.ts": {
+      "bytes": 8013
+    },
+    "src\\data\\translations.ts": {
+      "bytes": 61466
+    },
+    "src\\lib\\conwayEngine.ts": {
+      "bytes": 7876
+    },
+    "src\\lib\\crypto.ts": {
+      "bytes": 2802
+    },
+    "src\\lib\\policyEngine.ts": {
+      "bytes": 3054
+    },
+    "src\\lib\\quicknode.ts": {
+      "bytes": 4814
+    },
+    "src\\lib\\web3.ts": {
+      "bytes": 8167
+    },
+    "src\\contracts\\abis\\AgentRegistry.json": {
+      "bytes": 13293
+    },
+    "src\\contracts\\abis\\AgentWallet.json": {
+      "bytes": 5899
+    },
+    "src\\contracts\\abis\\ConwayEngine.json": {
+      "bytes": 2351
+    },
+    "src\\contracts\\abis\\QARBIToken.json": {
+      "bytes": 7750
+    },
+    "src\\contracts\\abis\\TaskMarket.json": {
+      "bytes": 10175
+    },
+    "src\\crypto\\hybrid\\dual-conjunction.ts": {
+      "bytes": 4753
+    },
+    "src\\crypto\\pqc\\ml-dsa.ts": {
+      "bytes": 2207
+    },
+    "src\\crypto\\pqc\\ml-kem.ts": {
+      "bytes": 1472
+    },
+    "src\\crypto\\quantum\\portfolio-optimizer.ts": {
+      "bytes": 14101
+    },
+    "src\\crypto\\quantum\\secure-channel.ts": {
+      "bytes": 8251
+    },
+    "src\\crypto\\tests\\official-nist-vectors.test.ts": {
+      "bytes": 10004
+    },
+    "src\\crypto\\tests\\quantum-portfolio-communication.test.ts": {
+      "bytes": 14017
+    }
+  },
+  "timestamp": 1794019534
+}
