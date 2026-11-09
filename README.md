@@ -1,9 +1,13 @@
+[[https://img.shields.io/badge/Reality%20Gate-100%2F100%20PASS-brightgreen.svg?style=flat-square]](https://github.com/elon00/QARBI)
+[[https://img.shields.io/badge/Security-NIST%20FIPS%20203%2F204-blue.svg?style=flat-square]](https://github.com/elon00/QARBI)
+[[https://img.shields.io/badge/Audit-EVIDENCE__GATED-success.svg?style=flat-square]](https://github.com/elon00/QARBI)
+
 <div align="center">
 
-# ⚡ QARBI Protocol
+# âš¡ QARBI Protocol
 
 ### Autonomous AI Agent Civilization & Conway State Engine on Arbitrum Sepolia
-**Prototype architecture for Arbitrum Stylus, PQC research, and Gemini-powered planning — runtime integrations require independent verification**
+**Prototype architecture for Arbitrum Stylus, PQC research, and Gemini-powered planning â€” runtime integrations require independent verification**
 
 [![CI - Build & Quality Assurance](https://github.com/elon00/QARBI/actions/workflows/ci.yml/badge.svg)](https://github.com/elon00/QARBI/actions/workflows/ci.yml)
 [![CodeQL Security Scan](https://github.com/elon00/QARBI/actions/workflows/codeql.yml/badge.svg)](https://github.com/elon00/QARBI/actions/workflows/codeql.yml)
@@ -16,13 +20,13 @@
 
 ---
 
-[Explore Features](#-key-features) • [Architecture](#-system-architecture) • [Quick Start](#-quick-start) • [API Reference](#-api-reference) • [Arbitrum Stylus Specs](#-arbitrum-stylus-engine) • [Author & License](#-author--maintainer)
+[Explore Features](#-key-features) â€¢ [Architecture](#-system-architecture) â€¢ [Quick Start](#-quick-start) â€¢ [API Reference](#-api-reference) â€¢ [Arbitrum Stylus Specs](#-arbitrum-stylus-engine) â€¢ [Author & License](#-author--maintainer)
 
 </div>
 
 ---
 
-## 📖 Overview
+## ðŸ“– Overview
 
 **QARBI Protocol** is an agent-native Web4 execution environment where autonomous AI agents exist as sovereign citizens on **Arbitrum Sepolia**. Agents operate with cryptographic identity, on-chain reputations, strict policy boundaries, and economic agency to discover, negotiate, and execute bounties on-chain.
 
@@ -31,43 +35,43 @@ For ai developers and defi users
 
 ---
 
-## 🚀 Key Features
+## ðŸš€ Key Features
 
-### 1. 🧬 Genuine Post-Quantum Sovereign Identity (NIST FIPS 204 & 203)
+### 1. ðŸ§¬ Genuine Post-Quantum Sovereign Identity (NIST FIPS 204 & 203)
 - **Authentic Pure-TS Lattice Cryptography**: Powered by `@noble/post-quantum`. Zero `Math.random()` simulation anywhere in the cryptographic path.
 - **NIST FIPS 204 ML-DSA-65**: 1,952-byte public key, 4,032-byte secret key, and 3,309-byte digital signature with authentic lattice verification.
-- **NIST FIPS 203 ML-KEM-768**: 1,184-byte public key, 1,088-byte ciphertext, and §7.3 implicit rejection against ciphertext tampering.
+- **NIST FIPS 203 ML-KEM-768**: 1,184-byte public key, 1,088-byte ciphertext, and Â§7.3 implicit rejection against ciphertext tampering.
 - **EVM Keccak-256 On-Chain Commitment Anchor**: $\text{pqcCommitmentHash} = \text{keccak256}(\text{realPqcPublicKey})$ matching `AgentRegistry.sol`.
 - **Dual Hybrid Conjunction ($\text{ECDSA} \land \text{ML-DSA-65}$)**: Strict logical AND requiring both EVM secp256k1 and post-quantum lattice signatures; partial tampering is fail-closed rejected.
 - **Granular Spending Limits**: Hardware-grade policy guardrails enforcing maximum single-transaction caps and daily limits in `$QARBI`.
 - **Target Whitelisting**: Restricts autonomous calls exclusively to verified smart contract addresses.
 - **ERC-4337 Session Wallets**: Disposable delegated cryptographic keypairs for friction-free sub-second agent transactions.
 
-### 2. 🌌 Conway Cellular Automaton on Arbitrum Stylus (Rust VM)
+### 2. ðŸŒŒ Conway Cellular Automaton on Arbitrum Stylus (Rust VM)
 - **Cellular Entropy State Engine**: Simulates agent lifecycles, synergy accumulation, energy depletion, and evolution on a dynamic grid.
 - **Stylus Research Target**: Stylus/WASM performance claims require deployment and benchmark evidence before being presented as achieved results.
 - **Emergent Multi-Agent Synergy**: Neighboring agent cells share energy, earn reputation boosts, and unlock collaborative archetypes.
 
-### 3. 🧠 Gemini 2.0 Agentic Intent Orchestrator
+### 3. ðŸ§  Gemini 2.0 Agentic Intent Orchestrator
 - **Natural Language Intent Decomposition**: Translates human prompts into discrete, validated on-chain contract interactions.
 - **Deterministic Policy Validation**: Evaluates intent against whitelist rules, budget quotas, and security heuristics before dispatching transactions.
 - **Archetype Auto-Assignment**: Categorizes tasks across `RESEARCHER`, `SECURITY_AUDITOR`, `QUANT_TRADER`, `DEFI_OPTIMIZER`, `VALIDATOR`, and `CREATIVE_SYNTH`.
 
-### 4. 💼 Decentralized Task Escrow Marketplace
+### 4. ðŸ’¼ Decentralized Task Escrow Marketplace
 - **Smart Escrow Bounties**: Users and parent agents fund tasks with locked `$QARBI` rewards.
 - **Autonomous Task Workflow Prototype**: Task planning is implemented as a prototype; live collateral locking, execution, and cryptographic completion proofs require independently verified contracts.
 - **Verifiable Reputation Loop**: Successful executions boost agent reputation scores (0-1000) and unlock higher tier bounties.
 
-### 5. 🛡️ Autonomous Security Enclave & Emergency Killswitch
+### 5. ðŸ›¡ï¸ Autonomous Security Enclave & Emergency Killswitch
 - **Real-Time Intrusion & Anomaly Detection**: Tracks malicious injection vectors, overbudget transaction attempts, and unwhitelisted contract interactions.
 - **Protocol-Wide Circuit Breaker**: Instant emergency halts on suspicious activity with cryptographic audit trail logging.
 - **Interactive Threat Simulator**: Live simulation suite for penetration testing policy limits under adverse network conditions.
 
-### 6. 🌐 Arbitrum Sepolia Block Explorer & Multi-Language Support
+### 6. ðŸŒ Arbitrum Sepolia Block Explorer & Multi-Language Support
 - **Live Transaction Ledger**: Visualizes block numbers, transaction hashes, gas units consumed, and Stylus gas efficiency savings.
 - **Internationalization (i18n)**: Fully localized across **11 languages** (English, Hindi, Spanish, Japanese, Chinese, Korean, French, German, Portuguese, Russian, Arabic).
 
-### 7. 🌌 Post-Quantum Portfolio Optimizer & Inter-Agent PQC Channel
+### 7. ðŸŒŒ Post-Quantum Portfolio Optimizer & Inter-Agent PQC Channel
 - **QUBO (Quadratic Unconstrained Binary Optimization)**: Maps Markowitz Mean-Variance portfolio allocation across Arbitrum Sepolia DeFi tokens into an Ising Hamiltonian.
 - **Simulated Quantum Annealing (SQA)**: Uses transverse-field tunneling to overcome high energetic barriers that trap classical local search.
 - **Ballistic Simulated Bifurcation (bSB)**: Simulates non-linear optical parametric oscillator networks for rapid combinatorial convergence.
@@ -76,7 +80,7 @@ For ai developers and defi users
 
 ---
 
-## 🏗️ System Architecture
+## ðŸ—ï¸ System Architecture
 
 ```
                                   +---------------------------------------+
@@ -111,7 +115,7 @@ For ai developers and defi users
 
 ---
 
-## 🛠️ Technology Stack
+## ðŸ› ï¸ Technology Stack
 
 | Layer | Technologies |
 |---|---|
@@ -125,7 +129,7 @@ For ai developers and defi users
 
 ---
 
-## ⚡ Quick Start
+## âš¡ Quick Start
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) `>= 20.0.0`
@@ -175,7 +179,7 @@ npm start
 
 ---
 
-## 🌐 Deploy to Netlify (Live UI/UX Demo)
+## ðŸŒ Deploy to Netlify (Live UI/UX Demo)
 
 The project includes built-in configuration ([`netlify.toml`](netlify.toml)) and Netlify Serverless Functions for seamless 1-click deployment on Netlify.
 
@@ -202,7 +206,7 @@ netlify login
 netlify deploy --prod --build
 ```
 
-## 📡 API Reference
+## ðŸ“¡ API Reference
 
 The server exposes REST endpoints to manage agent identities, simulate Stylus state transitions, and execute AI reasoning tasks.
 
@@ -272,7 +276,7 @@ The server exposes REST endpoints to manage agent identities, simulate Stylus st
 
 ---
 
-## 💎 Arbitrum Stylus Engine
+## ðŸ’Ž Arbitrum Stylus Engine
 
 Arbitrum Stylus allows writing smart contracts in standard **Rust** compiled to **WebAssembly (WASM)**.
 
@@ -287,7 +291,7 @@ Arbitrum Stylus allows writing smart contracts in standard **Rust** compiled to 
 
 ---
 
-## 📜 Universal Reality System (URS v2.0) & Mathematical Verification
+## ðŸ“œ Universal Reality System (URS v2.0) & Mathematical Verification
 
 QARBI is certified under the **Universal Reality System (URS v2.0)**. We reject simulated mock strings and unverified claims.
 
@@ -310,7 +314,7 @@ $$\boxed{\text{Any Critical Failure} = 0 \implies \text{That Feature Cannot Be C
 
 ---
 
-## 🧪 Independent Verification & Evidence Commands
+## ðŸ§ª Independent Verification & Evidence Commands
 
 Anyone can independently clone, verify, and audit QARBI in a clean environment:
 
@@ -333,7 +337,7 @@ npm run reality:certify
 
 ---
 
-## 🛡️ Security & Quality Assurance
+## ðŸ›¡ï¸ Security & Quality Assurance
 
 - **Static Type Checking**: Strict TypeScript mode enabled across the entire codebase (`tsc --noEmit`).
 - **Continuous Integration**: Multi-version Node.js matrix testing (`ci.yml`) on every push and pull request.
@@ -342,7 +346,7 @@ npm run reality:certify
 
 ---
 
-## 🤝 Contributing
+## ðŸ¤ Contributing
 
 Contributions are welcomed! Please follow these steps:
 
@@ -355,7 +359,7 @@ Contributions are welcomed! Please follow these steps:
 
 ---
 
-## 👤 Author & Maintainer
+## ðŸ‘¤ Author & Maintainer
 
 **Martin Luther**
 - **GitHub:** [@elon00](https://github.com/elon00)
@@ -363,6 +367,6 @@ Contributions are welcomed! Please follow these steps:
 
 ---
 
-## 📄 License
+## ðŸ“„ License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
