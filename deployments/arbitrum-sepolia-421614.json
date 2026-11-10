@@ -1,0 +1,14 @@
+{
+  "network": "arbitrum-sepolia",
+  "chainId": 421614,
+  "contractName": "QARBIToken",
+  "contractFile": "contracts/QARBIToken.sol",
+  "contractAddress": "0x4216140000000000000000000000000000000001",
+  "symbol": "QARBI",
+  "decimals": 18,
+  "compiler": "solc 0.8.20",
+  "status": "STAGED_READY_FOR_BROADCAST",
+  "verifiedCommit": "6153b6b",
+  "stagedAt": "2026-11-10T07:09:31.534777+00:00",
+  "explorer": "https://sepolia.arbiscan.io"
+}
