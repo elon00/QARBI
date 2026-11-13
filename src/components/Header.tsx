@@ -71,6 +71,11 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Network & Live Metrics */}
           <div className="hidden lg:flex items-center space-x-3 text-xs">
+            <div className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 font-semibold shadow-sm shadow-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Creator: <strong className="text-emerald-400 font-bold tracking-wide">Martin</strong></span>
+            </div>
+
             <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
               <span className="font-mono font-medium text-emerald-400">{t?.networkBadge || "Arbitrum Sepolia"}</span>

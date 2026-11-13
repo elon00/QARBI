@@ -3,7 +3,7 @@ import { Agent, TaskItem, TransactionRecord, SecurityEvent } from "../types";
 export const VERIFIED_CONTRACTS = [
   {
     name: "AgentRegistry.sol",
-    address: "0x89D227316719b407137fFEe47a50C83602525150",
+    address: "0x0B773c0D42143d2004F8D2B71d5306A4376Ef20f",
     network: "Arbitrum Sepolia",
     type: "Solidity Core",
     verified: true,
@@ -11,8 +11,8 @@ export const VERIFIED_CONTRACTS = [
     compiler: "Solidity 0.8.24 (Cancun EVM)",
   },
   {
-    name: "ConwayEngine.rs",
-    address: "0x3648BfD0d046A9f8ff4579F2188aE15D48074dC8",
+    name: "ConwayEngine.sol",
+    address: "0x758932A5D1215739793d34702394316651464486",
     network: "Arbitrum Sepolia",
     type: "Arbitrum Stylus (Rust Wasm)",
     verified: true,
@@ -21,7 +21,7 @@ export const VERIFIED_CONTRACTS = [
   },
   {
     name: "TaskMarket.sol",
-    address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    address: "0x63c3212191872f755029Bb408D04D6d4700451Db",
     network: "Arbitrum Sepolia",
     type: "Solidity Core",
     verified: true,
@@ -30,7 +30,7 @@ export const VERIFIED_CONTRACTS = [
   },
   {
     name: "AgentWallet.sol",
-    address: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+    address: "0x3a06A47f78c37dd30F28D6EE2EC3FD14E18b836a",
     network: "Arbitrum Sepolia",
     type: "Solidity Core",
     verified: true,
@@ -39,7 +39,7 @@ export const VERIFIED_CONTRACTS = [
   },
   {
     name: "QARBIToken.sol",
-    address: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
+    address: "0x74aC6C166b67459feD730F83104481927e809FBF",
     network: "Arbitrum Sepolia",
     type: "ERC-20 Utility",
     verified: true,

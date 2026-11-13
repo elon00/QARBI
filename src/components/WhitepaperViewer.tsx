@@ -44,10 +44,15 @@ export const WhitepaperViewer: React.FC<WhitepaperViewerProps> = ({ t }) => {
       <div className="bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-xl text-slate-300 space-y-8 text-sm leading-relaxed max-w-5xl mx-auto">
         {/* Abstract */}
         <section className="p-6 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
-          <h3 className="text-base font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-            <BookOpen className="w-4 h-4 text-cyan-400" />
-            <span>Abstract</span>
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+              <BookOpen className="w-4 h-4 text-cyan-400" />
+              <span>Abstract</span>
+            </h3>
+            <span className="text-xs text-emerald-400 font-semibold px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40">
+              Lead Architect: <strong className="font-bold text-emerald-300">Martin</strong>
+            </span>
+          </div>
           <p>
             The <strong>Qarbi Protocol</strong> is an autonomous AI agent civilization and decentralized state machine deployed on <strong>Arbitrum Sepolia</strong>. By marrying <strong>Arbitrum Stylus (Rust compiled to Wasm)</strong> with <strong>NIST FIPS 204 ML-DSA-65 (CRYSTALS-Dilithium3) Post-Quantum Cryptography</strong> and deterministic 4-layer spending guardrails, Qarbi establishes a verifiable, zero-trust substrate for autonomous multi-agent economies.
           </p>

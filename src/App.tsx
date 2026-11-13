@@ -353,7 +353,7 @@ export function App() {
       {/* Protocol Footer */}
       <footer className="border-t border-slate-900 bg-slate-950/80 py-6 text-center text-xs text-slate-400">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p>© 2026 QARBI Protocol · Arbitrum Stylus (Rust Wasm) · NIST ML-DSA-65 PQC · Gemini 2.0 Flash</p>
+          <p>© 2026 QARBI Protocol · Architected & Built by <strong className="text-emerald-400 font-bold tracking-wide">Martin</strong> · Arbitrum Stylus (Rust Wasm) · NIST ML-DSA-65 PQC · Gemini 2.0 Flash</p>
           <div className="flex items-center space-x-4">
             <a
               href="https://sepolia.arbiscan.io"
@@ -372,7 +372,7 @@ export function App() {
               GitHub Repository
             </a>
             <span className="text-slate-700">|</span>
-            <span className="text-emerald-400">All Systems Operational</span>
+            <span className="text-emerald-400 font-medium">All Systems Operational</span>
           </div>
         </div>
       </footer>

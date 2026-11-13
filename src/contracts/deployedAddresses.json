@@ -1,42 +1,42 @@
 {
   "network": "Arbitrum Sepolia",
   "chainId": 421614,
-  "rpcProvider": "configured externally; credentials intentionally omitted",
+  "rpcUrl": "https://sepolia-rollup.arbitrum.io/rpc",
   "explorerUrl": "https://sepolia.arbiscan.io",
-  "deployer": "0xbbaaD9B836f9bd61cD0d616a016Cc911A2E1f60D",
-  "deployedAt": "2026-10-15T20:23:05.438Z",
+  "deployer": "0xF34331FF53C4BDAA07793570aaad0084E7cE6DFD",
+  "deployedAt": "2026-11-13T08:47:35.917Z",
   "contracts": {
     "QARBIToken": {
-      "address": "0xd74F17527C480BFd0016be31792403ea2F69f842",
+      "address": "0x74aC6C166b67459feD730F83104481927e809FBF",
       "name": "QARBIToken.sol",
       "symbol": "QARBI",
       "decimals": 18,
-      "verified": false,
-      "explorer": "https://sepolia.arbiscan.io/address/0xd74F17527C480BFd0016be31792403ea2F69f842"
+      "verified": true,
+      "explorer": "https://sepolia.arbiscan.io/address/0x74aC6C166b67459feD730F83104481927e809FBF"
     },
     "AgentRegistry": {
-      "address": "0xA4984b0b33e685fc6171EE234c66007cd10c18AC",
+      "address": "0x0B773c0D42143d2004F8D2B71d5306A4376Ef20f",
       "name": "AgentRegistry.sol",
-      "verified": false,
-      "explorer": "https://sepolia.arbiscan.io/address/0xA4984b0b33e685fc6171EE234c66007cd10c18AC"
+      "verified": true,
+      "explorer": "https://sepolia.arbiscan.io/address/0x0B773c0D42143d2004F8D2B71d5306A4376Ef20f"
     },
     "TaskMarket": {
-      "address": "0x59FA58058f72A766da1c706Ec8FcEae743B450DE",
+      "address": "0x63c3212191872f755029Bb408D04D6d4700451Db",
       "name": "TaskMarket.sol",
-      "verified": false,
-      "explorer": "https://sepolia.arbiscan.io/address/0x59FA58058f72A766da1c706Ec8FcEae743B450DE"
+      "verified": true,
+      "explorer": "https://sepolia.arbiscan.io/address/0x63c3212191872f755029Bb408D04D6d4700451Db"
     },
     "ConwayEngine": {
-      "address": "0x7A168D432500F421116A29f337613aeffa33a0bA",
+      "address": "0x758932A5D1215739793d34702394316651464486",
       "name": "ConwayEngine.sol",
-      "verified": false,
-      "explorer": "https://sepolia.arbiscan.io/address/0x7A168D432500F421116A29f337613aeffa33a0bA"
+      "verified": true,
+      "explorer": "https://sepolia.arbiscan.io/address/0x758932A5D1215739793d34702394316651464486"
     },
     "AgentWallet": {
-      "address": "0x37da753Eb54989D13c9eD461597c9a19a588345E",
+      "address": "0x3a06A47f78c37dd30F28D6EE2EC3FD14E18b836a",
       "name": "AgentWallet.sol",
-      "verified": false,
-      "explorer": "https://sepolia.arbiscan.io/address/0x37da753Eb54989D13c9eD461597c9a19a588345E"
+      "verified": true,
+      "explorer": "https://sepolia.arbiscan.io/address/0x3a06A47f78c37dd30F28D6EE2EC3FD14E18b836a"
     }
   }
 }
