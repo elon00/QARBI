@@ -66,8 +66,8 @@
     "@noble/ciphers": "^2.4.0",
     "@noble/hashes": "^1.8.0",
     "@noble/post-quantum": "^0.7.1",
-    "@tailwindcss/vite": "^4.1.14",
-    "@vitejs/plugin-react": "^6.1.2",
+    "@tailwindcss/vite": "^4.3.5",
+    "@vitejs/plugin-react": "^6.3.0",
     "dotenv": "^18.0.7",
     "ethers": "^6.17.0",
     "express": "^5.3.0",
@@ -76,7 +76,7 @@
     "motion": "^14.2.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.0",
-    "vite": "^8.3.5"
+    "vite": "^8.3.8"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
